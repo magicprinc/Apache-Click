@@ -18,6 +18,11 @@
  */
 package org.apache.click.extras.gae;
 
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileItemHeaders;
+import org.apache.commons.fileupload.FileItemHeadersSupport;
+import org.apache.commons.fileupload.ParameterParser;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -25,12 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-
 import java.util.Map;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileItemHeaders;
-import org.apache.commons.fileupload.FileItemHeadersSupport;
-import org.apache.commons.fileupload.ParameterParser;
 
 /**
  * Provides an In-Memory FileItem implementation which represents a file or

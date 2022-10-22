@@ -18,13 +18,14 @@
  */
 package org.apache.click.extras.gae;
 
-import java.io.File;
 import junit.framework.TestCase;
 import org.apache.click.MockContainer;
 import org.apache.click.control.FileField;
 import org.apache.click.control.Form;
 import org.apache.click.extras.pages.MemoryFileItemUploadPage;
 import org.apache.click.servlet.MockRequest;
+
+import java.io.File;
 
 /**
  * Provides tests for the Google App Engine MemoryFileItem.
