@@ -1,0 +1,12 @@
+
+include 'click'
+include 'click-cayenne'
+include 'click-extras'
+include 'click-freemarker'
+include 'click-gae'
+include 'click-hibernate'
+include 'click-mock'
+include 'click-ognl'
+include 'click-velocity'
+include 'examples'
+include 'template'
