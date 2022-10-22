@@ -46,7 +46,7 @@ import javax.servlet.ServletContext;
 public class Slf4jLogService implements LogService {
 
     /** The wrapped JDK logger instance. */
-    protected Logger logger = LoggerFactory.getLogger("Click.not_initialized");
+    protected Logger logger = LoggerFactory.getLogger("Web.Click");
 
     /** The logger category name. The default value is "<tt>Click</tt>". */
     protected String name = "Click";

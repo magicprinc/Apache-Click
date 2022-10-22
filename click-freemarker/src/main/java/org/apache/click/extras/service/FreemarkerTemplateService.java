@@ -18,20 +18,6 @@
  */
 package org.apache.click.extras.service;
 
-import java.io.IOException;
-import java.io.Writer;
-import java.util.Map;
-
-import javax.servlet.ServletContext;
-
-import org.apache.click.Page;
-import org.apache.click.service.ConfigService;
-import org.apache.click.service.LogService;
-import org.apache.click.service.TemplateException;
-import org.apache.click.service.TemplateService;
-import org.apache.click.util.ClickUtils;
-import org.apache.commons.lang.Validate;
-
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
 import freemarker.cache.TemplateLoader;
@@ -41,6 +27,18 @@ import freemarker.template.Configuration;
 import freemarker.template.ObjectWrapper;
 import freemarker.template.Template;
 import freemarker.template.TemplateExceptionHandler;
+import org.apache.click.Page;
+import org.apache.click.service.ConfigService;
+import org.apache.click.service.LogService;
+import org.apache.click.service.TemplateException;
+import org.apache.click.service.TemplateService;
+import org.apache.click.util.ClickUtils;
+import org.apache.commons.lang.Validate;
+
+import javax.servlet.ServletContext;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Map;
 
 /**
  * Provides a <a target="_blank" href="http://www.freemarker.org/">Freemarker</a> TemplateService class.
@@ -161,12 +159,7 @@ public class FreemarkerTemplateService implements TemplateService {
 
         // Attempt to match Freemarker Logger to configured LogService type
         LogService logService = configService.getLogService();
-        if (logService instanceof Log4JLogService) {
-            Logger.selectLoggerLibrary(Logger.LIBRARY_LOG4J);
-
-        } else if (logService instanceof JdkLogService) {
-            Logger.selectLoggerLibrary(Logger.LIBRARY_JAVA);
-        }
+        Logger.selectLoggerLibrary(Logger.LIBRARY_SLF4J);
 
         configuration = new Configuration();
 
