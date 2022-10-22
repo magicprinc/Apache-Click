@@ -18,6 +18,9 @@
  */
 package org.apache.click.extras.control;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.io.Serial;
 import java.text.NumberFormat;
 import java.text.ParseException;
 
@@ -59,7 +62,7 @@ import java.text.ParseException;
  */
 public class DoubleField extends NumberField {
 
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     // ----------------------------------------------------------- Constructors
 
@@ -153,15 +156,9 @@ public class DoubleField extends NumberField {
      *
      * @return the field Double value
      */
-    public Double getDouble() {
+    @Nullable public Double getDouble() {
         Number number = getNumber();
-
-        if (number != null) {
-            return new Double(number.doubleValue());
-
-        } else {
-            return null;
-        }
+        return number != null ? number.doubleValue() : null;
     }
 
     /**
@@ -179,13 +176,9 @@ public class DoubleField extends NumberField {
      *
      * @return the field Float value
      */
-    public Float getFloat() {
-        Double value = getDouble();
-        if (value != null) {
-            return new Float(value.floatValue());
-        } else {
-            return null;
-        }
+    @Nullable public Float getFloat() {
+        Number number = getNumber();
+        return number != null ? number.floatValue() : null;
     }
 
     /**

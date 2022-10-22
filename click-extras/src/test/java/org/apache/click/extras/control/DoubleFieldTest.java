@@ -18,13 +18,14 @@
  */
 package org.apache.click.extras.control;
 
-import java.math.BigDecimal;
-import java.util.Locale;
-
 import junit.framework.TestCase;
+import lombok.Setter;
 import org.apache.click.MockContext;
 import org.apache.click.control.Form;
 import org.apache.click.servlet.MockRequest;
+
+import java.math.BigDecimal;
+import java.util.Locale;
 
 public class DoubleFieldTest extends TestCase {
 
@@ -183,21 +184,18 @@ public class DoubleFieldTest extends TestCase {
         Form form = new Form("form");
 
         DoubleField decimalField = new DoubleField("decimalField");
-        String decimalValue = "0.1";
+        final String decimalValue = "0.1";
         decimalField.setValue(decimalValue);
         form.add(decimalField);
 
         MyObj obj = new MyObj(); 
         form.copyTo(obj);
 
-        assertEquals(decimalValue, obj.decimalField.toString());
+        assertEquals(Double.parseDouble(decimalValue), obj.decimalField.doubleValue(), 0.00000001);
     }
-    
+
+    @Setter
     public static class MyObj {
         public BigDecimal decimalField;
-        
-        public void setDecimalField(BigDecimal value) {
-            this.decimalField = value;
-        }
     }
 }

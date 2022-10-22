@@ -18,37 +18,37 @@
  */
 package org.apache.click.extras.control;
 
+import junit.framework.TestCase;
+import org.apache.click.MockContext;
+import org.apache.click.control.Form;
+import org.apache.click.servlet.MockRequest;
+import org.mvel2.MVEL;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.Map;
 
-import org.apache.click.MockContext;
-
-import junit.framework.TestCase;
-import org.apache.click.control.Form;
-import org.apache.click.servlet.MockRequest;
-
 public class NumberFieldTest extends TestCase{
 
     Locale defaultLocale;
 
     @Override
-    protected void setUp() throws Exception {
+    protected void setUp() {
         defaultLocale = Locale.getDefault();
         Locale.setDefault(Locale.US);
     }
 
     @Override
-    protected void tearDown() throws Exception {
+    protected void tearDown() {
         Locale.setDefault(defaultLocale);
     }
 
     public void testFormat() {
         MockContext.initContext(Locale.US);
         
-        Number decNum = new Float(2.56f);
+        Number decNum = 2.56f;
         
         NumberField engF = new NumberField("en");
 
@@ -64,7 +64,7 @@ public class NumberFieldTest extends TestCase{
         
         engF.setValue("12.456,5656");
         assertEquals("12.456,5656", engF.getValue());
-        assertEquals(new Double(12.456), engF.getNumber());
+        assertEquals(12.456, engF.getNumber());
         
         engF.setNumber(decNum);
         assertEquals("2.56", engF.getValue());
@@ -75,7 +75,7 @@ public class NumberFieldTest extends TestCase{
         assertEquals(engF.getNumber(), engF.getValueObject());
         
         engF.setPattern("0");
-        engF.setNumber(new Float(123.6f));
+        engF.setNumber(123.6f);
         assertEquals("124", engF.getValue());
         assertEquals(124, engF.getNumber().intValue());
         
@@ -84,7 +84,7 @@ public class NumberFieldTest extends TestCase{
         assertEquals(123.6f, engF.getNumber().floatValue(),0);
         
         engF.setPattern("0.00");
-        engF.setNumber(new Float(123.6f));
+        engF.setNumber(123.6f);
         assertEquals("123.60", engF.getValue());
         assertEquals(123.6f, engF.getNumber().floatValue(),0);
         
@@ -213,16 +213,22 @@ public class NumberFieldTest extends TestCase{
         NumberField bigIntegerField = new NumberField("bigIntegerField");
 
         // Specify a very large value
-        String bigValue = "999999999999999999";
+        final String bigValue = "999999999999999999";
         bigDecimalField.setValue(bigValue);
+        assertEquals(bigValue, bigDecimalField.getValue());
+        assertEquals(bigValue, bigDecimalField.getNumber().toString());
+        assertEquals(bigValue, bigDecimalField.getValueObject().toString());
+
         form.add(bigDecimalField);
         bigIntegerField.setValue(bigValue);
+        assertEquals(bigValue, bigIntegerField.getValue());
         form.add(bigIntegerField);
 
         MyObj obj = new MyObj();
         form.copyTo(obj);
 
-        assertEquals(bigValue, obj.bigDecimalField.toString());
+        assertEquals(obj.bigDecimalField.getClass()+"="+obj.bigDecimalField.longValue(),
+          bigValue, obj.bigDecimalField.toString());
         assertEquals(bigValue, obj.bigIntegerField.toString());
     }
 
@@ -238,35 +244,69 @@ public class NumberFieldTest extends TestCase{
         NumberField bigIntegerField = new NumberField("bigIntegerField");
 
         // Specify a very large value
-        String bigValue = "999999999999999999";
+        final String bigValue = "999999999999999999";
         bigDecimalField.setValue(bigValue);
         form.add(bigDecimalField);
+        assertEquals(bigDecimalField.getValueObject().getClass()+" = "+bigDecimalField.getValueObject(),
+          bigValue, bigDecimalField.getValueObject().toString());
+
         bigIntegerField.setValue(bigValue);
         form.add(bigIntegerField);
 
         MyObj obj = new MyObj();
         form.copyTo(obj);
 
-        assertEquals(bigValue, obj.bigDecimalField.toString());
         assertEquals(bigValue, obj.bigIntegerField.toString());
+        assertEquals(bigValue, obj.bigDecimalField.toString());
     }
 
-    /**
-     * POJO for testing of copying values between Fields and domain objects.
-     */
+
+    // https://github.com/mvel/mvel
+    public void testMvelPure () {
+        final String bigValue = "999999999999999999";
+        MyObj obj = new MyObj();
+
+        final String expr = "obj.bigDecimalField = bigValue; obj.bigIntegerField = bigValue";
+        MVEL.eval(expr, Map.of("obj", obj, "bigValue", bigValue));
+
+        assertEquals(bigValue, obj.bigIntegerField.toString());
+        assertEquals(bigValue, obj.bigDecimalField.toString());
+
+        obj.bigDecimalField = new BigDecimal(Long.valueOf(bigValue));
+        assertEquals(bigValue, obj.bigDecimalField.toString());
+
+        MVEL.eval(expr, Map.of("obj", obj, "bigValue", Long.valueOf(bigValue)));
+
+        assertEquals(bigValue, obj.bigIntegerField.toString());
+        assertEquals(bigValue, obj.bigDecimalField.toString());
+    }
+
+
+    // https://github.com/mvel/mvel/issues/313
+    public void testBugReport () {
+        final String bigValue = "999999999999999999";
+        MyObj obj = new MyObj();
+        final String expr = "obj.bigDecimalField = bigValue";
+
+        MVEL.eval(expr, Map.of("obj", obj, "bigValue", bigValue));
+        assertEquals(bigValue, obj.bigDecimalField.toString());// OK
+
+        assertEquals(bigValue, new BigDecimal(Long.valueOf(bigValue).toString()).toString());
+
+        MVEL.eval(expr, Map.of("obj", obj, "bigValue", Long.valueOf(bigValue)));
+        assertEquals(bigValue, obj.bigDecimalField.toString());// Failure
+        // Expected :999999999999999999
+        // Actual   :1000000000000000000
+    }
+
+    /** POJO for testing of copying values between Fields and domain objects */
     public static class MyObj {
+      BigDecimal bigDecimalField;
+      BigInteger bigIntegerField;
 
-        public BigDecimal bigDecimalField;
+      public void setBigDecimalField (BigDecimal v) { bigDecimalField = v;}
 
-        public BigInteger bigIntegerField;
-
-        public void setBigDecimalField(BigDecimal value) {
-            this.bigDecimalField = value;
-        }
-
-        public void setBigIntegerField(BigInteger value) {
-            this.bigIntegerField = value;
-        }
+      public void setBigIntegerField (BigInteger v) { bigIntegerField = v;}
     }
 
 }
