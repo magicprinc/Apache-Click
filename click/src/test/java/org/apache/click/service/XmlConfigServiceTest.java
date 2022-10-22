@@ -18,6 +18,22 @@
  */
 package org.apache.click.service;
 
+import junit.framework.TestCase;
+import org.apache.click.Context;
+import org.apache.click.MockContainer;
+import org.apache.click.Page;
+import org.apache.click.PageInterceptor;
+import org.apache.click.control.AbstractControl;
+import org.apache.click.pages.BinaryPage;
+import org.apache.click.pages.JspPage;
+import org.apache.click.pages.ListenerPage;
+import org.apache.click.service.ConfigService.AutoBinding;
+import org.apache.click.util.ClickUtils;
+import org.apache.click.util.ErrorPage;
+import org.apache.click.util.Format;
+import org.apache.click.util.MessagesMap;
+
+import javax.servlet.ServletContext;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -28,25 +44,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
-import javax.servlet.ServletContext;
-import javax.servlet.UnavailableException;
-
-import junit.framework.TestCase;
-import org.apache.click.Context;
-import org.apache.click.MockContainer;
-import org.apache.click.Page;
-import org.apache.click.PageInterceptor;
-
-import org.apache.click.control.AbstractControl;
-import org.apache.click.pages.BinaryPage;
-import org.apache.click.pages.JspPage;
-import org.apache.click.pages.ListenerPage;
-import org.apache.click.service.ConfigService.AutoBinding;
-import org.apache.click.util.ClickUtils;
-import org.apache.click.util.ErrorPage;
-import org.apache.click.util.Format;
-import org.apache.click.util.MessagesMap;
 
 /**
  * Tests for the XmlConfigService class.
@@ -506,7 +503,7 @@ public class XmlConfigServiceTest extends TestCase {
 
         ConfigService config = ClickUtils.getConfigService(container.getServletContext());
 
-        assertTrue(config.getLogService() instanceof ConsoleLogService);
+        assertTrue(config.getLogService() instanceof Slf4jLogService);
 
         container.stop();
         deleteDir(tmpdir);
@@ -539,7 +536,8 @@ public class XmlConfigServiceTest extends TestCase {
         PrintStream pstr = makeXmlStream(tmpdir, "WEB-INF/click.xml");
         pstr.println("<click-app>");
         pstr.println(" <pages/>");
-        pstr.println(" <template-service classname='org.apache.click.service.VelocityTemplateService'/>");
+        //pstr.println(" <template-service classname='org.apache.click.service.VelocityTemplateService'/>");
+        pstr.println(" <template-service classname='org.apache.click.service.MVELTemplateService'/>");
         pstr.println("</click-app>");
         pstr.close();
 
@@ -548,7 +546,7 @@ public class XmlConfigServiceTest extends TestCase {
 
         ConfigService config = ClickUtils.getConfigService(container.getServletContext());
 
-        assertTrue(config.getTemplateService() instanceof VelocityTemplateService);
+        assertTrue(config.getTemplateService() instanceof MVELTemplateService);
 
         container.stop();
         deleteDir(tmpdir);

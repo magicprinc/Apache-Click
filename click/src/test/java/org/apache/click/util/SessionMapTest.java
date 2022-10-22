@@ -18,16 +18,13 @@
  */
 package org.apache.click.util;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.servlet.http.HttpSession;
-
-import junit.framework.Assert;
 import junit.framework.TestCase;
-
 import org.apache.click.MockContainer;
 import org.apache.click.pages.SessionMapPage;
+
+import javax.servlet.http.HttpSession;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Tests for SessionMap.
@@ -39,20 +36,20 @@ public class SessionMapTest extends TestCase  {
     public void testNoSession() {
         SessionMap sm = new SessionMap(null);
        
-        Assert.assertEquals(0, sm.size());
-        Assert.assertEquals(0, sm.keySet().size());
-        Assert.assertEquals(0, sm.entrySet().size());
-        Assert.assertEquals(0, sm.values().size());
+        assertEquals(0, sm.size());
+        assertEquals(0, sm.keySet().size());
+        assertEquals(0, sm.entrySet().size());
+        assertEquals(0, sm.values().size());
         
-        Assert.assertNull(sm.get("attrib1"));
-        Assert.assertNull(sm.get(null));
-        Assert.assertTrue(sm.isEmpty());
+        assertNull(sm.get("attrib1"));
+        assertNull(sm.get(null));
+        assertTrue(sm.isEmpty());
         
-        Assert.assertFalse(sm.containsKey("attrib1"));
-        Assert.assertFalse(sm.containsKey(null));
+        assertFalse(sm.containsKey("attrib1"));
+        assertFalse(sm.containsKey(null));
         
-        Assert.assertNull(sm.put("attrib1", "value1"));
-        Assert.assertNull(sm.remove("attrib1"));
+        assertNull(sm.put("attrib1", "value1"));
+        assertNull(sm.remove("attrib1"));
     }
     
     /**
@@ -64,30 +61,30 @@ public class SessionMapTest extends TestCase  {
         HttpSession session = container.getRequest().getSession();
         SessionMap sm = new SessionMap(session);
        
-        Assert.assertEquals(0, sm.size());
-        Assert.assertEquals(0, sm.keySet().size());
-        Assert.assertEquals(0, sm.entrySet().size());
-        Assert.assertEquals(0, sm.values().size());
+        assertEquals(0, sm.size());
+        assertEquals(0, sm.keySet().size());
+        assertEquals(0, sm.entrySet().size());
+        assertEquals(0, sm.values().size());
         
-        Assert.assertNull(sm.get("attrib1"));
-        Assert.assertNull(sm.get(null));
-        Assert.assertTrue(sm.isEmpty());
+        assertNull(sm.get("attrib1"));
+        assertNull(sm.get(null));
+        assertTrue(sm.isEmpty());
         
         session.setAttribute("attrib1", "value1");
         
-        Assert.assertEquals("value1", sm.get("attrib1"));
+        assertEquals("value1", sm.get("attrib1"));
         
-        Assert.assertEquals(1, sm.size());
-        Assert.assertEquals(1, sm.keySet().size());
-        Assert.assertTrue(sm.keySet().contains("attrib1"));
+        assertEquals(1, sm.size());
+        assertEquals(1, sm.keySet().size());
+        assertTrue(sm.keySet().contains("attrib1"));
         
-        Assert.assertEquals(1, sm.entrySet().size());
+        assertEquals(1, sm.entrySet().size());
         Map.Entry<String, Object> entry = sm.entrySet().iterator().next();
-        Assert.assertEquals("attrib1", entry.getKey());
-        Assert.assertEquals("value1", entry.getValue());
+        assertEquals("attrib1", entry.getKey());
+        assertEquals("value1", entry.getValue());
 
-        Assert.assertEquals(1, sm.values().size());
-        Assert.assertTrue(sm.values().contains("value1"));
+        assertEquals(1, sm.values().size());
+        assertTrue(sm.values().contains("value1"));
 
         container.stop();
     }
@@ -101,33 +98,33 @@ public class SessionMapTest extends TestCase  {
         HttpSession session = container.getRequest().getSession();
         SessionMap sm = new SessionMap(session);
        
-        Assert.assertEquals(0, sm.size());
+        assertEquals(0, sm.size());
         
         sm.put("attrib1", "value1");
         
-        Assert.assertEquals("value1", session.getAttribute("attrib1"));
+        assertEquals("value1", session.getAttribute("attrib1"));
         
         sm.put("attrib1", "value2");
 
-        Assert.assertEquals("value2", session.getAttribute("attrib1"));
+        assertEquals("value2", session.getAttribute("attrib1"));
 
-        Assert.assertEquals("value2", sm.remove("attrib1"));
+        assertEquals("value2", sm.remove("attrib1"));
         
-        Assert.assertEquals(0, sm.size());
+        assertEquals(0, sm.size());
         
         sm.putAll(null);
 
-        Assert.assertEquals(0, sm.size());
+        assertEquals(0, sm.size());
 
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("attrib2", "value2");
         
         sm.putAll(map);
-        Assert.assertEquals(1, sm.size());
+        assertEquals(1, sm.size());
 
         sm.clear();
         
-        Assert.assertEquals(0, sm.size());
+        assertEquals(0, sm.size());
         
         container.stop();
     }
@@ -145,7 +142,7 @@ public class SessionMapTest extends TestCase  {
         container.getRequest().setMethod("GET");
 
         container.testPage(SessionMapPage.class);
-        Assert.assertTrue(container.getHtml().contains("attrib1=value1"));
+        assertTrue(container.getHtml(), container.getHtml().contains("attrib1=value1"));
         
         container.stop();
     }

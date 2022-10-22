@@ -18,6 +18,7 @@
  */
 package org.apache.click.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.click.Control;
 import org.apache.click.Page;
 import org.apache.click.PageInterceptor;
@@ -67,6 +68,7 @@ import java.util.TreeMap;
  * However you can instruct Click to use a different service implementation.
  * Please see {@link ConfigService} for more details.
  */
+@Slf4j
 public class XmlConfigService implements ConfigService, EntityResolver {
 
     /** The name of the Click logger: &nbsp; "<tt>org.apache.click</tt>". */
@@ -1545,7 +1547,7 @@ public class XmlConfigService implements ConfigService, EntityResolver {
         fileUploadService.onInit(servletContext);
     }
 
-    private void loadLogService(Element rootElm) throws Exception {
+    private void loadLogService (Element rootElm) throws Exception {
         Element logServiceElm = ClickUtils.getChild(rootElm, "log-service");
 
         if (logServiceElm != null) {
@@ -1554,17 +1556,16 @@ public class XmlConfigService implements ConfigService, EntityResolver {
             String classname = logServiceElm.getAttribute("classname");
 
             if (StringUtils.isNotBlank(classname)) {
-                logServiceClass = ClickUtils.classForName(classname);
+                //logServiceClass = ClickUtils.classForName(classname);
+                log.warn("loadLogService: ignore found logServiceClass: {}", classname);
             }
 
-            logService = logServiceClass.newInstance();
+            //logService = logServiceClass.newInstance();
 
-            Map<String, String> propertyMap = loadPropertyMap(logServiceElm);
-
-            for (String name : propertyMap.keySet()) {
-                String value = propertyMap.get(name).toString();
-
-                getPropertyService().setValue(logService, name, value);
+            Map<String,String> propertyMap = loadPropertyMap(logServiceElm);
+            for (var kv : propertyMap.entrySet()) {
+                 log.warn("loadLogService: ignore found logService settings: {} = {}", kv.getKey(), kv.getValue());
+                //getPropertyService().setValue(logService, kv.getKey(), kv.getValue());
             }
         } else {
             logService = new Slf4jLogService();

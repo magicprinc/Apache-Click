@@ -46,7 +46,7 @@ import javax.servlet.ServletContext;
 public class Slf4jLogService implements LogService {
 
     /** The wrapped JDK logger instance. */
-    protected Logger logger;
+    protected Logger logger = LoggerFactory.getLogger("Click.not_initialized");
 
     /** The logger category name. The default value is "<tt>Click</tt>". */
     protected String name = "Click";
@@ -57,8 +57,20 @@ public class Slf4jLogService implements LogService {
      * @param servletContext the application servlet context
      * @throws Exception if an error occurs initializing the LogService
      */
-    public void onInit(ServletContext servletContext) throws Exception {
-        logger = LoggerFactory.getLogger(getName()+"@"+servletContext.getServletContextName());
+    public void onInit (ServletContext servletContext) throws Exception {
+        String loggerName = getName();
+        if (servletContext != null) {
+            String ctxName = servletContext.getServletContextName();
+            if (ctxName != null && ctxName.trim().length()>0) {
+                loggerName = loggerName+"@"+ctxName;
+            } else {
+               String path = servletContext.getContextPath();
+               if (path != null && path.trim().length()>0) {
+                   loggerName = loggerName+"@"+path;
+               }
+            }
+        }
+        logger = LoggerFactory.getLogger(loggerName);
     }
 
     /**

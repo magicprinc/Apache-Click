@@ -18,19 +18,17 @@
  */
 package org.apache.click;
 
-import org.apache.click.servlet.MockServletConfig;
-import org.apache.click.servlet.MockResponse;
-import org.apache.click.servlet.MockRequest;
-import java.util.Locale;
-import javax.servlet.ServletConfig;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.apache.click.service.ConfigService;
-import org.apache.click.service.ConsoleLogService;
+import org.apache.click.servlet.MockRequest;
+import org.apache.click.servlet.MockResponse;
+import org.apache.click.servlet.MockServletConfig;
 import org.apache.click.servlet.MockServletContext;
 import org.apache.click.servlet.MockSession;
-import org.apache.click.util.ClickUtils;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Locale;
 
 /**
  * Provides a mock {@link org.apache.click.Context} object for unit testing.
@@ -302,10 +300,6 @@ public class MockContext extends Context {
             ControlRegistry.pushThreadLocalRegistry(controlRegistry);
             Context.pushThreadLocalContext(mockContext);
 
-            if (ClickUtils.getLogService() instanceof ConsoleLogService) {
-                ConsoleLogService logService = (ConsoleLogService) ClickUtils.getLogService();
-                logService.setLevel(ConsoleLogService.TRACE_LEVEL);
-            }
             return (MockContext) Context.getThreadLocalContext();
         } catch (Exception e) {
             throw new MockContainer.CleanRuntimeException(e);

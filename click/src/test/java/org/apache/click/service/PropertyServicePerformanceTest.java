@@ -1,14 +1,13 @@
 package org.apache.click.service;
 
+import junit.framework.TestCase;
+import org.apache.click.util.ChildObject;
+import org.apache.click.util.ParentObject;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
-
-import junit.framework.TestCase;
-
-import org.apache.click.util.ChildObject;
-import org.apache.click.util.ParentObject;
 
 public class PropertyServicePerformanceTest extends TestCase {
 	
@@ -30,7 +29,7 @@ public class PropertyServicePerformanceTest extends TestCase {
 		readDuration.set(0);
 		writeDuration.set(0);
 		
-		PropertyService ps = new OGNLPropertyService();
+		PropertyService ps = new MVELPropertyService();// OGNLPropertyService
 
 		for (int i = 0; i < 50; i++) {
 			Thread testThread = new Thread(new TestRunner(ps, i == 49));

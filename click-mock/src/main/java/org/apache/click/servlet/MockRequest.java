@@ -18,6 +18,17 @@
  */
 package org.apache.click.servlet;
 
+import org.apache.click.util.ClickUtils;
+import org.apache.commons.fileupload.FileUploadBase;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletInputStream;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -39,18 +50,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
 import java.util.Random;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import org.apache.click.util.ClickUtils;
-import org.apache.commons.fileupload.FileUploadBase;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 
 /**
  * Mock implementation of {@link javax.servlet.http.HttpServletRequest}.
@@ -1492,5 +1492,6 @@ public class MockRequest implements HttpServletRequest {
             this.file = file;
         }
     }
+
 
 }
