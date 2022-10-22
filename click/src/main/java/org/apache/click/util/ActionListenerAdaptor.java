@@ -18,20 +18,22 @@
  */
 package org.apache.click.util;
 
-import java.io.Serializable;
-
+import lombok.NonNull;
 import org.apache.click.ActionListener;
 import org.apache.click.Control;
+
+import java.io.Serial;
+import java.io.Serializable;
 
 /**
  * Provides an ActionListener adaptor instance.
  *
- * @deprecated ActionListener only has a single method to implement, there is
+ * [was deprecated] ActionListener only has a single method to implement, there is
  * no need for an adaptor
  */
 public class ActionListenerAdaptor implements ActionListener, Serializable {
 
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     /** The target listener object. */
     protected final Object listener;
@@ -46,7 +48,7 @@ public class ActionListenerAdaptor implements ActionListener, Serializable {
      * @param target the listener object
      * @param method the target listener method name
      */
-    public ActionListenerAdaptor(Object target, String method) {
+    public ActionListenerAdaptor (@NonNull Object target, @NonNull String method) {
         this.listener = target;
         this.method = method;
     }

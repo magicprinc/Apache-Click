@@ -56,16 +56,16 @@ import java.io.Serializable;
  * }
  * </pre>
  */
+@FunctionalInterface
 public interface ActionListener extends Serializable {
 
     /**
-     * Return true if the control and page processing should continue, or false
-     * otherwise.
+     * Return true if the control and page processing should continue,
+     * or false otherwise.
      *
      * @param source the source of the action event
-     * @return true if control and page processing should continue or false
-     * otherwise.
+     * @return true if control and page processing should continue or false otherwise.
      */
-    public boolean onAction(Control source);
+    boolean onAction (Control source);
 
 }
