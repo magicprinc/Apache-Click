@@ -18,6 +18,22 @@
  */
 package org.apache.click.service;
 
+import org.apache.click.Control;
+import org.apache.click.Page;
+import org.apache.click.PageInterceptor;
+import org.apache.click.util.Bindable;
+import org.apache.click.util.ClickUtils;
+import org.apache.click.util.Format;
+import org.apache.click.util.HtmlStringBuffer;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+import javax.servlet.ServletContext;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -36,23 +52,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
-
-import javax.servlet.ServletContext;
-
-import org.apache.click.Control;
-import org.apache.click.Page;
-import org.apache.click.PageInterceptor;
-import org.apache.click.util.Bindable;
-import org.apache.click.util.ClickUtils;
-import org.apache.click.util.Format;
-import org.apache.click.util.HtmlStringBuffer;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  * Provides a Click XML configuration service class.
@@ -222,7 +221,7 @@ public class XmlConfigService implements ConfigService, EntityResolver {
         onGoogleAppEngine = servletContext.getServerInfo().startsWith(GOOGLE_APP_ENGINE);
 
         // Set default logService early to log errors when services fail.
-        logService = new ConsoleLogService();
+        logService = new Slf4jLogService();
         messagesMapService = new DefaultMessagesMapService();
 
         InputStream inputStream = ClickUtils.getClickConfig(servletContext);
@@ -360,7 +359,7 @@ public class XmlConfigService implements ConfigService, EntityResolver {
      */
     public PropertyService getPropertyService() {
         // TODO
-        return new OGNLPropertyService();
+        return new MVELPropertyService();
     }
 
     /**
@@ -1460,25 +1459,6 @@ public class XmlConfigService implements ConfigService, EntityResolver {
                 + "' - defaulted to '" + MODE_VALUES[DEBUG] + "'");
             mode = DEBUG;
         }
-
-        // Set log levels
-        if (logService instanceof ConsoleLogService) {
-            int logLevel = ConsoleLogService.INFO_LEVEL;
-
-            if (mode == PRODUCTION) {
-                logLevel = ConsoleLogService.WARN_LEVEL;
-
-            } else if (mode == DEVELOPMENT) {
-
-            } else if (mode == DEBUG) {
-                logLevel = ConsoleLogService.DEBUG_LEVEL;
-
-            } else if (mode == TRACE) {
-                logLevel = ConsoleLogService.TRACE_LEVEL;
-            }
-
-            ((ConsoleLogService) logService).setLevel(logLevel);
-        }
     }
 
     private void loadDefaultPages() throws ClassNotFoundException {
@@ -1569,7 +1549,7 @@ public class XmlConfigService implements ConfigService, EntityResolver {
         Element logServiceElm = ClickUtils.getChild(rootElm, "log-service");
 
         if (logServiceElm != null) {
-            Class logServiceClass = ConsoleLogService.class;
+            Class<? extends LogService> logServiceClass = Slf4jLogService.class;
 
             String classname = logServiceElm.getAttribute("classname");
 
@@ -1577,7 +1557,7 @@ public class XmlConfigService implements ConfigService, EntityResolver {
                 logServiceClass = ClickUtils.classForName(classname);
             }
 
-            logService = (LogService) logServiceClass.newInstance();
+            logService = logServiceClass.newInstance();
 
             Map<String, String> propertyMap = loadPropertyMap(logServiceElm);
 
@@ -1587,7 +1567,7 @@ public class XmlConfigService implements ConfigService, EntityResolver {
                 getPropertyService().setValue(logService, name, value);
             }
         } else {
-            logService = new ConsoleLogService();
+            logService = new Slf4jLogService();
         }
 
         logService.onInit(getServletContext());
@@ -1693,7 +1673,7 @@ public class XmlConfigService implements ConfigService, EntityResolver {
         Element propertyServiceElm = ClickUtils.getChild(rootElm, "property-service");
 
         if (propertyServiceElm != null) {
-            Class propertyServiceClass = OGNLPropertyService.class;
+            Class<? extends PropertyService> propertyServiceClass = MVELPropertyService.class;
 
             String classname = propertyServiceElm.getAttribute("classname");
 
@@ -1701,10 +1681,10 @@ public class XmlConfigService implements ConfigService, EntityResolver {
                 propertyServiceClass = ClickUtils.classForName(classname);
             }
 
-            propertyService = (PropertyService) propertyServiceClass.newInstance();
+            propertyService = propertyServiceClass.newInstance();
 
         } else {
-            propertyService = new OGNLPropertyService();
+            propertyService = new MVELPropertyService();
         }
 
         if (getLogService().isDebugEnabled()) {
@@ -1720,7 +1700,7 @@ public class XmlConfigService implements ConfigService, EntityResolver {
         Element templateServiceElm = ClickUtils.getChild(rootElm, "template-service");
 
         if (templateServiceElm != null) {
-            Class templateServiceClass = VelocityTemplateService.class;
+            Class<? extends TemplateService> templateServiceClass = MVELTemplateService.class;
 
             String classname = templateServiceElm.getAttribute("classname");
 
@@ -1728,7 +1708,7 @@ public class XmlConfigService implements ConfigService, EntityResolver {
                 templateServiceClass = ClickUtils.classForName(classname);
             }
 
-            templateService = (TemplateService) templateServiceClass.newInstance();
+            templateService = templateServiceClass.newInstance();
 
             Map<String, String> propertyMap = loadPropertyMap(templateServiceElm);
 
@@ -1739,7 +1719,7 @@ public class XmlConfigService implements ConfigService, EntityResolver {
             }
 
         } else {
-            templateService = new VelocityTemplateService();
+            templateService = new MVELTemplateService();
         }
 
         if (getLogService().isDebugEnabled()) {
@@ -1752,7 +1732,7 @@ public class XmlConfigService implements ConfigService, EntityResolver {
     }
 
     private static Map<String, String> loadPropertyMap(Element parentElm) {
-        Map<String, String> propertyMap = new HashMap<String, String>();
+        Map<String, String> propertyMap = new HashMap<>();
 
         for (Element property : ClickUtils.getChildren(parentElm, "property")) {
             String name = property.getAttribute("name");
@@ -1845,9 +1825,9 @@ public class XmlConfigService implements ConfigService, EntityResolver {
     }
 
     private Class<? extends Page> getExcludesPageClass(String path) {
-        for (int i = 0; i < excludesList.size(); i++) {
-            XmlConfigService.ExcludesElm override =
-                (XmlConfigService.ExcludesElm) excludesList.get(i);
+        for (Object o : excludesList) {
+            ExcludesElm override =
+              (ExcludesElm) o;
 
             if (override.isMatch(path)) {
                 return override.getPageClass();
@@ -1912,18 +1892,18 @@ public class XmlConfigService implements ConfigService, EntityResolver {
      * @param pageClass the page class
      * @return the map of bindable fields
      */
-    private static Map getAnnotatedBindableFields(Class pageClass) {
+    private static Map getAnnotatedBindableFields(Class<? extends Page> pageClass) {
 
-        List<Class> pageClassList = new ArrayList<Class>();
+        List<Class<? extends Page>> pageClassList = new ArrayList<>();
         pageClassList.add(pageClass);
 
-        Class parentClass = pageClass.getSuperclass();
+        Class<?> parentClass = pageClass.getSuperclass();
         while (parentClass != null) {
             // Include parent classes up to but excluding Page.class
             if (parentClass.isAssignableFrom(Page.class)) {
                 break;
             }
-            pageClassList.add(parentClass);
+            pageClassList.add(ClickUtils.castUnsafe(parentClass));
             parentClass = parentClass.getSuperclass();
         }
 
@@ -1932,9 +1912,9 @@ public class XmlConfigService implements ConfigService, EntityResolver {
         // page classes fields to override parent class fields
         Collections.reverse(pageClassList);
 
-        Map<String, Field> fieldMap = new TreeMap<String, Field>();
+        Map<String, Field> fieldMap = new TreeMap<>();
 
-        for (Class aPageClass : pageClassList) {
+        for (Class<? extends Page> aPageClass : pageClassList) {
 
             for (Field field : aPageClass.getDeclaredFields()) {
 
@@ -1962,7 +1942,7 @@ public class XmlConfigService implements ConfigService, EntityResolver {
      */
     public static class ExcludePage extends Page {
 
-        static final Map HEADERS = new HashMap();
+        static final Map<String,String> HEADERS = new HashMap<>();
 
         static {
             HEADERS.put("Cache-Control", "max-age=3600, public");
@@ -2019,8 +1999,8 @@ public class XmlConfigService implements ConfigService, EntityResolver {
                 throw new RuntimeException(msg);
             }
 
-            Class tmpPageClass = null;
-            String classnameFound = null;
+            Class tmpPageClass;
+            String classnameFound;
 
             try {
                 // First, lookup classname as provided
@@ -2065,7 +2045,7 @@ public class XmlConfigService implements ConfigService, EntityResolver {
 
             fieldArray = XmlConfigService.getBindablePageFields(pageClass, autobinding);
 
-            fields = new HashMap<String, Field>();
+            fields = new HashMap<>();
             for (Field field : fieldArray) {
                 fields.put(field.getName(), field);
             }
@@ -2082,7 +2062,7 @@ public class XmlConfigService implements ConfigService, EntityResolver {
 
             fieldArray = getBindablePageFields(pageClass, mode);
 
-            fields = new HashMap<String, Field>();
+            fields = new HashMap<>();
             for (Field field : fieldArray) {
                 fields.put(field.getName(), field);
             }
@@ -2121,8 +2101,8 @@ public class XmlConfigService implements ConfigService, EntityResolver {
 
     static class ExcludesElm {
 
-        final Set<String> pathSet = new HashSet<String>();
-        final Set<String> fileSet = new HashSet<String>();
+        final Set<String> pathSet = new HashSet<>();
+        final Set<String> fileSet = new HashSet<>();
 
         public ExcludesElm(Element element) throws ClassNotFoundException {
 
@@ -2208,8 +2188,8 @@ public class XmlConfigService implements ConfigService, EntityResolver {
 
                     for (Property property : properties) {
                         propertyService.setValue(listener,
-                                                 property.getName(),
-                                                 property.getValue());
+                                                 property.name(),
+                                                 property.value());
                     }
 
                 } catch (Exception e) {
@@ -2228,22 +2208,6 @@ public class XmlConfigService implements ConfigService, EntityResolver {
         }
     }
 
-    static class Property {
-        final String name;
-        final String value;
-
-        Property(String name, String value) {
-            this.name = name;
-            this.value = value;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getValue() {
-            return value;
-        }
-    }
+    record Property(String name, String value) {}
 
 }

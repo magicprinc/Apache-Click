@@ -16,14 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.click.extras.service;
+package org.apache.click.service;
 
 
-import javax.servlet.ServletContext;
-
-import org.apache.click.service.LogService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.servlet.ServletContext;
 
 /**
  * Provides a
@@ -59,14 +58,19 @@ public class Slf4jLogService implements LogService {
      * @throws Exception if an error occurs initializing the LogService
      */
     public void onInit(ServletContext servletContext) throws Exception {
-        logger = LoggerFactory.getLogger(getName());
+        logger = LoggerFactory.getLogger(getName()+"@"+servletContext.getServletContextName());
     }
 
     /**
      * @see LogService#onDestroy()
      */
-    public void onDestroy() {
+    public void onDestroy() {}
+
+
+    @Override public Logger log () {
+        return logger;
     }
+
 
     /**
      * @see LogService#debug(Object)
@@ -208,6 +212,5 @@ public class Slf4jLogService implements LogService {
     public void setName(String name) {
         this.name = name;
     }
-
 
 }

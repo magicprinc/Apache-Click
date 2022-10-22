@@ -18,6 +18,37 @@
  */
 package org.apache.click.util;
 
+import org.apache.click.ActionResult;
+import org.apache.click.Context;
+import org.apache.click.Control;
+import org.apache.click.Page;
+import org.apache.click.Stateful;
+import org.apache.click.control.AbstractControl;
+import org.apache.click.control.AbstractLink;
+import org.apache.click.control.ActionLink;
+import org.apache.click.control.Container;
+import org.apache.click.control.Field;
+import org.apache.click.control.Form;
+import org.apache.click.service.ConfigService;
+import org.apache.click.service.LogService;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.ClassUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.EntityResolver;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
@@ -49,39 +80,6 @@ import java.util.ResourceBundle;
 import java.util.TreeMap;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.apache.click.Context;
-import org.apache.click.Control;
-import org.apache.click.Page;
-import org.apache.click.ActionResult;
-import org.apache.click.Stateful;
-import org.apache.click.control.AbstractControl;
-import org.apache.click.control.AbstractLink;
-import org.apache.click.control.ActionLink;
-import org.apache.click.control.Container;
-import org.apache.click.control.Field;
-import org.apache.click.control.Form;
-import org.apache.click.service.ConfigService;
-import org.apache.click.service.LogService;
-
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.ClassUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.EntityResolver;
 
 /**
  * Provides miscellaneous Form, String and Stream utility methods.
@@ -3378,5 +3376,10 @@ public class ClickUtils {
                 targetMethod.setAccessible(false);
             }
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T castUnsafe (Object x) {
+        return (T) x;
     }
 }

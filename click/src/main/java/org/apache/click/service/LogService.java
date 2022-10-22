@@ -18,13 +18,15 @@
  */
 package org.apache.click.service;
 
+import org.slf4j.Logger;
+
 import javax.servlet.ServletContext;
 
 /**
  * Provides a logging service for the Click runtime.
  *
  * <h3>Configuration</h3>
- * The default {@link LogService} implementation is {@link ConsoleLogService}.
+ * The default {@link LogService} implementation is {@link Slf4jLogService}.
  * <p/>
  * You can instruct Click to use a different implementation by adding
  * the following element to your <tt>click.xml</tt> configuration file.
@@ -70,6 +72,9 @@ public interface LogService {
      * Destroy the LogService.
      */
     public void onDestroy();
+
+
+    Logger log ();
 
     /**
      * Log the given message at [debug] logging level.
