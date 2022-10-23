@@ -18,6 +18,14 @@
  */
 package org.apache.click.servlet;
 
+import org.apache.click.util.ClickUtils;
+import org.apache.click.util.HtmlStringBuffer;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.Servlet;
+import javax.servlet.ServletContext;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -32,15 +40,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import javax.servlet.RequestDispatcher;
-import javax.servlet.Servlet;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import org.apache.click.util.ClickUtils;
-import org.apache.click.util.HtmlStringBuffer;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
 
 /**
  * Mock implementation of {@link javax.servlet.ServletContext}.
@@ -72,13 +71,13 @@ public class MockServletContext implements ServletContext {
     // -------------------------------------------------------- Private variables
 
     /** Map of attributes. */
-    private final Map<String, Object> attributes = new HashMap<String, Object>();
+    private final Map<String, Object> attributes = new HashMap<>();
 
     /** Map of initialization parameters. */
-    private final Map<String, String> initParameters = new HashMap<String, String>();
+    private final Map<String, String> initParameters = new HashMap<>();
 
     /** Map of mime types. */
-    private final Map<String, String> mimeTypes = new HashMap<String, String>();
+    private final Map<String, String> mimeTypes = new HashMap<>();
 
     /** The context temporary path. */
     private String tempPath;
@@ -610,14 +609,14 @@ public class MockServletContext implements ServletContext {
                 + " does not start with a \"/\" character");
         }
         if (webappRoot == null) {
-            return new HashSet<String>();
+            return new HashSet<>();
         }
 
         name = name.substring(1);
         if (name.endsWith("/")) {
             name = name.substring(0, name.length() - 1);
         }
-        String[] elements = null;
+        String[] elements;
         if (name.trim().length() == 0) {
             elements = new String[0];
         } else {
@@ -626,13 +625,13 @@ public class MockServletContext implements ServletContext {
 
         //Find the most specific matching path
         File current = webappRoot;
-        for (int i = 0; i < elements.length; i++) {
+        for (String element : elements) {
             File[] files = current.listFiles();
             boolean match = false;
-            for (int f = 0; f < files.length; f++) {
-                if (files[f].getName().equals(elements[i])
-                    && files[f].isDirectory()) {
-                    current = files[f];
+            for (File file : files) {
+                if (file.getName().equals(element)
+                  && file.isDirectory()) {
+                    current = file;
                     match = true;
                     break;
                 }
@@ -644,11 +643,11 @@ public class MockServletContext implements ServletContext {
 
         //List of resources in the matching path
         File[] files = current.listFiles();
-        Set<String> result = new HashSet<String>();
+        Set<String> result = new HashSet<>();
         int stripLength = webappRoot.getPath().length();
-        for (int f = 0; f < files.length; f++) {
-            String s = files[f].getPath().substring(stripLength).replace('\\', '/');
-            if (files[f].isDirectory()) {
+        for (File file : files) {
+            String s = file.getPath().substring(stripLength).replace('\\', '/');
+            if (file.isDirectory()) {
                 s = s + "/";
             }
             result.add(s);
@@ -672,9 +671,8 @@ public class MockServletContext implements ServletContext {
      *
      * @return null
      *
-     * @throws ServletException Not used
      */
-    public Servlet getServlet(String name) throws ServletException {
+    public Servlet getServlet(String name) {
         return null;
     }
 
@@ -787,7 +785,7 @@ public class MockServletContext implements ServletContext {
                 buffer.append("    This can occur (especially on a Windows OS) when some of the files in the ");
                 buffer.append("directory are locked by another process. ");
                 buffer.append("You can delete this directory manually.");
-                System.err.println(buffer.toString());
+                System.err.println(buffer);
                 System.err.println("=======================================================================\n");
                 if (shutdownException != null) {
                     shutdownException.printStackTrace(System.err);
@@ -808,14 +806,10 @@ public class MockServletContext implements ServletContext {
         if (directory == null) {
             return;
         }
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-
-            @Override
-            public void run() {
-                //delete the temporary directory and all subdirectories
-                deleteDirectory(directory);
-            }
-        });
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            //delete the temporary directory and all subdirectories
+            deleteDirectory(directory);
+        }));
     }
 
     /**

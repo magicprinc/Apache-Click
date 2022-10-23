@@ -18,6 +18,7 @@
  */
 package org.apache.click;
 
+import lombok.NonNull;
 import org.apache.click.service.ConfigService;
 import org.apache.click.servlet.MockRequest;
 import org.apache.click.servlet.MockResponse;
@@ -195,14 +196,10 @@ public class MockContext extends Context {
      * @param servletPath the requests servletPath
      * @return new Context instance
      */
-    public static MockContext initContext(Locale locale, String servletPath) {
-        if (locale == null) {
-            throw new IllegalArgumentException("Locale cannot be null");
-        }
+    public static MockContext initContext (@NonNull Locale locale, String servletPath) {
         MockServletContext servletContext = new MockServletContext();
         String servletName = "click-servlet";
-        MockServletConfig servletConfig = new MockServletConfig(servletName,
-            servletContext);
+        MockServletConfig servletConfig = new MockServletConfig(servletName, servletContext);
 
         ClickServlet servlet = new ClickServlet();
 
@@ -245,32 +242,17 @@ public class MockContext extends Context {
      * @param controlRegistry the control registry
      * @return new Context instance
      */
-    public static MockContext initContext(MockServletConfig servletConfig,
-        MockRequest request, MockResponse response, ClickServlet clickServlet,
-        ActionEventDispatcher actionEventDispatcher, ControlRegistry controlRegistry) {
-
-        try {
-            //Sanity checks
-            if (servletConfig == null) {
-                throw new IllegalArgumentException("ServletConfig cannot be null");
-            }
+    public static MockContext initContext(@NonNull MockServletConfig servletConfig,
+        @NonNull MockRequest request, @NonNull MockResponse response, @NonNull ClickServlet clickServlet,
+        ActionEventDispatcher actionEventDispatcher, ControlRegistry controlRegistry)
+    {
+        try {// Sanity checks
             if (servletConfig.getServletContext() == null) {
                 throw new IllegalArgumentException("ServletConfig.getServletContext() cannot return null");
             }
-            if (request == null) {
-                throw new IllegalArgumentException("Request cannot be null");
-            }
-            if (response == null) {
-                throw new IllegalArgumentException("Response cannot be null");
-            }
-            if (clickServlet == null) {
-                throw new IllegalArgumentException("ClickServlet cannot be null");
-            }
-
             boolean isPost = request.getMethod().equalsIgnoreCase("POST");
 
-            MockServletContext servletContext =
-                (MockServletContext) servletConfig.getServletContext();
+            MockServletContext servletContext = (MockServletContext) servletConfig.getServletContext();
 
             servletContext.setAttribute(ClickServlet.MOCK_MODE_ENABLED, Boolean.TRUE);
             request.setAttribute(ClickServlet.MOCK_MODE_ENABLED, Boolean.TRUE);
@@ -294,7 +276,7 @@ public class MockContext extends Context {
             }
 
             // Remove lingering ThreadLocal variables of the Mock stack
-        mockContext.cleanup();
+            mockContext.cleanup();
 
             ActionEventDispatcher.pushThreadLocalDispatcher(actionEventDispatcher);
             ControlRegistry.pushThreadLocalRegistry(controlRegistry);
