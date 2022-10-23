@@ -18,21 +18,21 @@
  */
 package org.apache.click.service;
 
+import lombok.NonNull;
+import org.apache.click.Page;
+
+import javax.servlet.ServletContext;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
-
-import javax.servlet.ServletContext;
-
-import org.apache.click.Page;
 
 /**
  * Provides a templating service interface.
  *
  * <h3>Configuration</h3>
- * The default TemplateService is {@link VelocityTemplateService}.
+ * The default TemplateService is × VelocityTemplateService→ {@link MVELTemplateService}.
  * <p/>
- * However you can instruct Click to use a different implementation by adding
+ * However, you can instruct Click to use a different implementation by adding
  * the following element to your <tt>click.xml</tt> configuration file.
  *
  * <pre class="codeConfig">
@@ -44,12 +44,14 @@ import org.apache.click.Page;
  *     &lt;<span class="red">template-service</span> classname="<span class="blue">org.apache.click.extras.service.FreemarkerTemplateService</span>"&gt;
  *
  * &lt;/click-app&gt; </pre>
+ *
+ * see VelocityTemplateService
+ * see FreemarkerTemplateService
+ * @see MVELTemplateService
  */
 public interface TemplateService {
-
     /**
-     * Initialize the TemplateService with the given application configuration
-     * service instance.
+     * Initialize the TemplateService with the given application configuration service instance.
      * <p/>
      * This method is invoked after the TemplateService has been constructed.
      * <p/>
@@ -59,12 +61,10 @@ public interface TemplateService {
      * @param servletContext the application servlet context
      * @throws Exception if an error occurs initializing the Template Service
      */
-    public void onInit(ServletContext servletContext) throws Exception;
+    void onInit (@NonNull ServletContext servletContext) throws Exception;
 
-    /**
-     * Destroy the TemplateService.
-     */
-    public void onDestroy();
+    /** Destroy the TemplateService. */
+    void onDestroy();
 
     /**
      * Render the given page to the writer.
@@ -75,8 +75,7 @@ public interface TemplateService {
      * @throws IOException if an IO error occurs
      * @throws TemplateException if template error occurs
      */
-    public void renderTemplate(Page page, Map<String, ?> model, Writer writer)
-        throws IOException, TemplateException;
+    void renderTemplate (Page page, Map<String, ?> model, Writer writer) throws IOException, TemplateException;
 
     /**
      * Render the given template and model to the writer.
@@ -87,7 +86,5 @@ public interface TemplateService {
      * @throws IOException if an IO error occurs
      * @throws TemplateException if template error occurs
      */
-    public void renderTemplate(String templatePath, Map<String, ?> model, Writer writer)
-        throws IOException, TemplateException;
-
+    void renderTemplate (String templatePath, Map<String, ?> model, Writer writer) throws IOException, TemplateException;
 }
