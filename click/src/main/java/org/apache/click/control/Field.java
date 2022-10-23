@@ -22,11 +22,12 @@ import org.apache.click.Context;
 import org.apache.click.Control;
 import org.apache.click.Page;
 import org.apache.click.Stateful;
-import org.apache.commons.lang.StringUtils;
-
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.ContainerUtils;
 import org.apache.click.util.HtmlStringBuffer;
+import org.apache.commons.lang.StringUtils;
+
+import java.io.Serial;
 
 /**
  * Provides an abstract form Field control. Field controls are contained by
@@ -184,7 +185,7 @@ public abstract class Field extends AbstractControl implements Stateful {
 
     // Constants --------------------------------------------------------------
 
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     // Instance Variables -----------------------------------------------------
 
@@ -327,15 +328,13 @@ public abstract class Field extends AbstractControl implements Stateful {
         // Check parents for instances of either FieldSet or Form
         while (control.getParent() != null && !(control.getParent() instanceof Page)) {
             control = (Control) control.getParent();
-            if (control instanceof FieldSet) {
-                FieldSet fieldSet = (FieldSet) control;
+            if (control instanceof FieldSet fieldSet) {
                 if (fieldSet.isDisabled()) {
                     return true;
                 } else {
                     return disabled;
                 }
-            } else if (control instanceof Form) {
-                Form localForm = (Form) control;
+            } else if (control instanceof Form localForm) {
                 if (localForm.isDisabled()) {
                     return true;
                 } else {
@@ -486,10 +485,10 @@ public abstract class Field extends AbstractControl implements Stateful {
             help = getMessage(getName() + ".help");
 
             if (help != null) {
-                if (help.indexOf("$context") != -1) {
+                if (help.contains("$context")) {
                     help = StringUtils.replace(help, "$context", getContext().getRequest().getContextPath());
 
-                } else if (help.indexOf("${context}") != -1) {
+                } else if (help.contains("${context}")) {
                     help = StringUtils.replace(help, "${context}", getContext().getRequest().getContextPath());
                 }
             }
@@ -761,15 +760,13 @@ public abstract class Field extends AbstractControl implements Stateful {
         // Check parents for instances of either FieldSet or Form
         while (control.getParent() != null && !(control.getParent() instanceof Page)) {
             control = (Control) control.getParent();
-            if (control instanceof FieldSet) {
-                FieldSet fieldSet = (FieldSet) control;
+            if (control instanceof FieldSet fieldSet) {
                 if (fieldSet.isReadonly()) {
                     return true;
                 } else {
                     return readonly;
                 }
-            } else if (control instanceof Form) {
-                Form localForm = (Form) control;
+            } else if (control instanceof Form localForm) {
                 if (localForm.isReadonly()) {
                     return true;
                 } else {
