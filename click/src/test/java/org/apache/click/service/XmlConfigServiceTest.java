@@ -19,6 +19,8 @@
 package org.apache.click.service;
 
 import junit.framework.TestCase;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.click.Context;
 import org.apache.click.MockContainer;
 import org.apache.click.Page;
@@ -35,15 +37,19 @@ import org.apache.click.util.MessagesMap;
 
 import javax.servlet.ServletContext;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.PrintStream;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import static org.apache.click.util.ClickTestUtils.deleteDir;
+import static org.apache.click.util.ClickTestUtils.makeFile;
+import static org.apache.click.util.ClickTestUtils.makeTmpDir;
+import static org.apache.click.util.ClickTestUtils.makeXmlStream;
 
 /**
  * Tests for the XmlConfigService class.
@@ -67,11 +73,11 @@ public class XmlConfigServiceTest extends TestCase {
         assertEquals(Page.class, config.getNotFoundPageClass());
         assertEquals("development", config.getApplicationMode());
         assertEquals("UTF-8", config.getCharset());
-        assertEquals(false, config.isProductionMode());
-        assertEquals(false, config.isProfileMode());
+        assertFalse(config.isProductionMode());
+        assertFalse(config.isProfileMode());
         assertEquals(Format.class, config.createFormat().getClass());
         assertEquals(AutoBinding.DEFAULT, config.getAutoBindingMode());
-        assertEquals(null, config.getLocale());
+        assertNull(config.getLocale());
         assertEquals(Collections.EMPTY_LIST, config.getPageClassList());
         // Check deployed resource
         assertTrue(new File(tmpdir, "click/control.css").exists());
@@ -147,8 +153,8 @@ public class XmlConfigServiceTest extends TestCase {
         container.start();
         ConfigService config = ClickUtils.getConfigService(container.getServletContext());
 
-        assertEquals(true, config.isProductionMode());
-        assertEquals(false, config.isProfileMode());
+        assertTrue(config.isProductionMode());
+        assertFalse(config.isProfileMode());
 
         container.stop();
 
@@ -169,8 +175,8 @@ public class XmlConfigServiceTest extends TestCase {
         container.start();
         ConfigService config = ClickUtils.getConfigService(container.getServletContext());
 
-        assertEquals(false, config.isProductionMode());
-        assertEquals(true, config.isProfileMode());
+        assertFalse(config.isProductionMode());
+        assertTrue(config.isProfileMode());
 
         container.stop();
 
@@ -191,8 +197,8 @@ public class XmlConfigServiceTest extends TestCase {
         container.start();
         ConfigService config = ClickUtils.getConfigService(container.getServletContext());
 
-        assertEquals(false, config.isProductionMode());
-        assertEquals(false, config.isProfileMode());
+        assertFalse(config.isProductionMode());
+        assertFalse(config.isProfileMode());
 
         container.stop();
 
@@ -222,7 +228,7 @@ public class XmlConfigServiceTest extends TestCase {
         assertNull(config.getPageClass("/UnknownPage.htm"));
         assertNull(config.getPageHeaders("/UnknownPage.htm"));
 
-        ArrayList<Class<? extends Page>> list = new ArrayList<Class<? extends Page>>();
+        ArrayList<Class<? extends Page>> list = new ArrayList<>();
         list.add(org.apache.click.pages.BinaryPage.class);
         assertEquals(list, config.getPageClassList());
 
@@ -630,7 +636,7 @@ public class XmlConfigServiceTest extends TestCase {
     }
 
     static public class MyControl extends AbstractControl {
-        private static final long serialVersionUID = 1L;
+        @Serial private static final long serialVersionUID = 1L;
 
         @Override
         public void onDeploy(ServletContext servletContext) {
@@ -669,17 +675,16 @@ public class XmlConfigServiceTest extends TestCase {
 
 
     static public class MyPageInterceptor implements PageInterceptor {
+        @Getter @Setter
         public String type;
 
         public boolean postCreate(Page page) {
             return false;
         }
 
-        public void postDestroy(Page page) {
-        }
+        public void postDestroy(Page page) {}
 
-        public boolean preCreate(Class<? extends Page> pageClass,
-                Context context) {
+        public boolean preCreate(Class<? extends Page> pageClass, Context context) {
             return false;
         }
 
@@ -687,44 +692,9 @@ public class XmlConfigServiceTest extends TestCase {
             return false;
         }
 
-        public void setType(String type) {
-            this.type = type;
-        }
-
         @Override
         public String toString() {
             return type;
         }
-    }
-
-
-    private File makeTmpDir() throws IOException {
-        File tmpdir = File.createTempFile("click", "");
-        tmpdir.delete();
-        tmpdir.mkdir();
-        return tmpdir;
-    }
-
-    private PrintStream makeXmlStream(File dir, String filename) throws FileNotFoundException {
-        File file = makeFile(dir, filename);
-        PrintStream pstr = new PrintStream(file);
-        pstr.println("<?xml version='1.0' encoding=\"UTF-8\" standalone=\"yes\"?>");
-        return pstr;
-    }
-
-    private File makeFile(File dir, String filename) {
-        File file = new File(dir, filename);
-        file.getParentFile().mkdirs();
-        return file;
-    }
-
-    private void deleteDir(File tmpdir) throws IOException {
-        for (File f : tmpdir.listFiles()) {
-            if (f.isDirectory()) {
-                deleteDir(f);
-            }
-            f.delete();
-        }
-        tmpdir.delete();
     }
 }
