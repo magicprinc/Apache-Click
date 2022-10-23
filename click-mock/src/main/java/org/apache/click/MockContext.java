@@ -27,6 +27,7 @@ import org.apache.click.servlet.MockServletContext;
 import org.apache.click.servlet.MockSession;
 
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Locale;
@@ -378,4 +379,13 @@ public class MockContext extends Context {
         ControlRegistry.getRegistryStack().clear();
         ActionEventDispatcher.getDispatcherStack().clear();
     }
+
+    /**
+     @see ServletContext
+     @see MockServletContext
+     */
+    public MockServletContext getServletContext() {
+        return (MockServletContext) context;
+    }
+
 }
