@@ -1,0 +1,118 @@
+<div>
+$link
+</div>
+
+
+<div id="resultHolder">
+$!form
+</div>
+
+
+This example demonstrates how a form can be loaded through Ajax and how the
+Form and Field HEAD elements can be added to the page and any scripts evaluated.
+<p/>
+Notice especially that the DateField popup calendar works properly after the
+Form has been loaded. This is achieved through the following <tt>click-jquery-utils.js</tt>
+functions:
+
+<pre class="prettyprint">
+      // Extract the elements (time) from the server response
+      var elements=Click.jq.extractElements(data);
+
+      // Add any head elements to the page HEAD section
+      Click.jq.addHeadElements(elements);
+
+      // Eval scripts after Form has been added
+      Click.jq.evalScripts(elements);</pre>
+
+
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#linkId').click(function(e) {
+            var link = this;
+            e.preventDefault();
+
+            var formHolder = $('#resultHolder');
+            formHolder.slideUp(function(){
+            makeAjaxRequest(link, e);
+          });
+        })
+        $('#form_send').live('click', function(e) {
+            var source = this;
+            e.preventDefault();
+
+            var formHolder = $('#resultHolder');
+            formHolder.slideUp(function(){
+            var form=document.getElementById('form');
+            postForm(form, source, e);
+          });
+        })
+    });
+
+function makeAjaxRequest(source, e) {
+Click.jq.debug =1;
+// Get the link URL
+var url = Click.jq.getUrl(source);
+
+// Get the link data (ID, event)
+var data = Click.jq.getData({source: source, event: e, extraData: 'jan=2'});
+
+    $.ajax({
+        url: url,
+  data: data,
+  dataType: 'html',
+  success: function(data) {
+
+      // Extract the elements (form) from the server response
+      var elements=Click.jq.extractElements(data);
+
+      // Add any head elements to the page HEAD section
+      Click.jq.addHeadElements(elements);
+
+      $('#resultHolder').html(elements.form).slideDown();
+      // Eval scripts after Form has been added
+      Click.jq.evalScripts(elements);
+  },
+  error: function (xhr, textStatus, errorThrown) {
+      // Handle any error that occurred
+      Click.jq.handleError(xhr, textStatus, errorThrown);
+  }
+});
+}
+
+function postForm(form, source, e) {
+Click.jq.debug =1;
+// Get the link URL
+var url = Click.jq.getUrl(form);
+
+// Get the link data (ID, event)
+var data = Click.jq.getFormData({form: form, source: source, event: e});
+
+    $.ajax({
+        url: url,
+  data: data,
+  type: 'POST',
+  dataType: 'html',
+  success: function(data) {
+      if(data==''){
+        return;
+      }
+
+      // Extract the elements (form) from the server response
+      var elements=Click.jq.extractElements(data);
+
+      // Add any head elements to the page HEAD section
+      Click.jq.addHeadElements(elements);
+
+      $('#resultHolder').html(elements.form).slideDown();
+      // Eval scripts after Form has been added
+      Click.jq.evalScripts(elements);
+  },
+  error: function (xhr, textStatus, errorThrown) {
+      // Handle any error that occurred
+      Click.jq.handleError(xhr, textStatus, errorThrown);
+  }
+});
+}
+</script>

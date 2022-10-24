@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Click JQuery Example - $title</title>
+        <link rel="stylesheet" type="text/css" href="$context/assets/style.css" title="Style"/>
+        <link rel="stylesheet" type="text/css" href="${context}/assets/css/syntax-highlighter.css"/>
+        <script type="text/javascript" src="${context}/assets/js/syntax-highlighter.js"></script>
+        $headElements
+        $jsElements
+    </head>
+
+    <body>
+
+        <div id="header">
+            <span id="title">Click jQuery Example :: $title</span>
+            <span id="link">
+                <a target="_blank" href="http://code.google.com/p/click-jquery/">Click-jQuery</a>
+            </span>
+        </div>
+
+        #if ($rootMenu)
+        $rootMenu
+        #end
+
+        <div id="container">
+            #parse($path)
+        </div>
+
+        <!-- Activate source code highlighting. -->
+        <script type="text/javascript">prettyPrint();</script>
+    </body>
+</html>

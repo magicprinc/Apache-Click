@@ -1,0 +1,74 @@
+<div>
+$link
+</div>
+
+<!-- div where the time will be added to -->
+<div id="resultHolder">
+</div>
+
+<p/>
+
+This example demonstrates the basic Ajax functions provided by the <tt>click-jquery-utils.js</tt>
+script.
+<p/>
+The following functions are used in this demo:
+<pre class="prettyprint">
+// Get the link URL
+var url = Click.jq.getUrl(link);
+
+// Get the link data (ID, event)
+var data = Click.jq.getData({source: link, event: e});
+
+// Extract the elements (time) from the server response
+var elements=Click.jq.extractElements(data);
+
+// Add any head elements to the page HEAD section
+Click.jq.addHeadElements(elements);
+
+// Add the returned 'time' to the result div
+$('#resultHolder').html(elements.time);
+
+// Evaluate any scripts returned from the server
+Click.jq.evalScripts(elements);
+
+// Handle any error that occurred
+Click.jq.handleError(xhr, textStatus, errorThrown);</pre>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#linkId').click(function(e) {
+            e.preventDefault();
+
+            var link = this;
+            // Get the link URL
+            var url = Click.jq.getUrl(link);
+
+            // Get the link data (ID, event)
+            var data = Click.jq.getData({source: link, event: e});
+
+            $.ajax({
+                url: url,
+                data: data,
+                dataType: 'html',
+                success: function(data) {
+
+                    // Extract the elements (time) from the server response
+                    var elements=Click.jq.extractElements(data);
+
+                    // Add any head elements to the page HEAD section
+                    Click.jq.addHeadElements(elements);
+
+                    // Add the returned 'time' to the result div
+                    $('#resultHolder').html(elements.time);
+
+                    // Evaluate any scripts returned from the server
+                    Click.jq.evalScripts(elements);
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    // Handle any error that occurred
+                    Click.jq.handleError(xhr, textStatus, errorThrown);
+                }
+            });
+        })
+    });
+</script>

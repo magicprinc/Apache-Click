@@ -1,0 +1,51 @@
+<html lang="fr-CA">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Flot Examples</title>
+<script src="../jquery.js" type="text/javascript"></script>
+<script src="../jquery.flot.js" type="text/javascript"></script>
+  </head>
+
+  <body>
+    <h1>Apache click charts enhanced, demo app</h1>
+
+<div id="placeHolder" style="height:350px; width:380px;"></div>
+
+<hr>
+<div id="placeHolder2" style="height:350px; width:380px;"></div>
+
+
+    <p>Simple example. </p>
+
+
+<script id="lineChart_js_setup" language="javascript" type="text/javascript">
+lineChart_js_setup = function() {var series = [];
+series.push({
+	 color: 'rgb(255,0,0)',	 label: 'Série 1',	 data: [[1.0,2.0] , [3.0,5.0] , [5.0,10.0] , [6.0,1.0]]}
+);
+series.push({
+	 label: 'Deuxième série',	 data: [[0.0,0.0] , [1.0,3.0] , [2.0,-1.0] , [3.0,1.0]]}
+);
+
+$.plot($('#placeHolder'), series);
+
+};
+
+var series2 = [];series2.push({
+	 color: 'rgb(255,0,0)',	 label: 'Série 1',	 data: [[1.0,2.0] , [3.0,5.0] , [5.0,10.0] , [6.0,1.0]]}
+);series2.push({
+	 label: 'Deuxième série',	 data: [[0.0,0.0] , [1.0,3.0] , [2.0,-1.0] , [3.0,1.0]]}
+);var options = { series: { bars: { show: true } } };
+
+$.plot($('#placeHolder2'), series2, options);
+
+lineChart_js_setup(); 
+
+
+
+</script>
+
+
+
+  </body>
+</html>

@@ -1,0 +1,39 @@
+<html>
+<head>
+<title>Click Quick Start - $title</title>
+<link rel="stylesheet" type="text/css" href="$context/assets/style.css" title="Style"/>
+$imports
+</head>
+
+<body>
+
+  <div id="header">
+  	<span id="title">jquery-example :: $title</span>
+  </div>
+
+#if ($rootMenu)
+  $rootMenu
+#end
+
+  <div id="container">
+
+<h3 class="title">$title</h3>
+
+#if ($errorReport)
+ The application encountered an unexpected error.
+ <p/>
+ To return to the application click <a href="$context">here</a>.
+ <p/>
+
+ #if ($mode != "production")
+   To view the error details click <a href="#" onclick="displayError();">here</a>.
+   <p/>
+   $errorReport
+   <p/>
+ #end
+#end
+
+  </div>
+
+</body>
+</html>

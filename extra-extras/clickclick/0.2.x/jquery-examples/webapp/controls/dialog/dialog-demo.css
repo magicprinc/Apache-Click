@@ -1,0 +1,27 @@
+/* complex style */
+table.complex th {
+    background-color: orange;
+    color: #fff;
+}
+table.complex th:hover {
+    cursor: pointer;
+    background-color: #FF9000;
+}
+table.complex tr.even {
+    background-color: #ddd;
+}
+table.complex tr.odd {
+    background-color: #E6F7D4;
+}
+table.complex, table.complex td, table.complex th {
+	border: 1px solid #999;
+	border-collapse: collapse;
+}
+table.complex th {
+	padding: 2px 4px 2px 4px;
+	text-align: left;
+}
+table.complex td {
+	padding: 2px 4px 2px 4px;
+	text-align: left;
+}

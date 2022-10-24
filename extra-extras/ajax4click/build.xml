@@ -1,0 +1,410 @@
+<project name="ajax4click" default="help" basedir=".">
+
+    <!-- Project Properties -->
+    <property file="./build.properties"/>
+    <xmlproperty file="./javascript-syntax-highlighter.xml"/>
+    <property name="jar.click" value="click-${click.version}.jar"/>
+    <property name="jar.click-extras" value="click-extras-${click.version}.jar"/>
+    <property name="jar.click-mock" value="click-mock-${click.version}.jar"/>
+    <property name="jar.servlet" value="servlet-api-${servlet-api.version}.jar"/>
+    <property name="jar.junit" value="junit-${junit.version}.jar"/>
+    <property name="jar.click-extras" value="click-extras-${click.version}.jar"/>
+    <property name="jar.lang" value="commons-lang-${commons-lang.version}.jar"/>
+    <property name="jar.click-calendar" value="click-calendar-${click-calendar.version}.jar"/>
+    <property name="jar.junit" value="junit-${junit.version}.jar"/>
+    <property name="javac.source" value="1.5"/>
+    <property name="repository" value="http://repo1.maven.org"/>
+    <property name="maven-bundle" value="../maven-upload"/>
+
+    <!-- Macro Definitions -->        
+    <macrodef name="downloadMacro">
+        <attribute name="name"/>  
+        <attribute name="path"/>
+        <attribute name="ignoreFail" default="false"/>
+        <sequential>
+            <get src="${repository}/maven2/@{path}/@{name}"
+                 dest="lib/@{name}"
+                 verbose="true"
+                 usetimestamp="true"
+                 ignoreerrors="@{ignoreFail}" />
+        </sequential>
+    </macrodef>
+
+    <macrodef name="buildJarMacro">
+        <attribute name="name"/>
+        <attribute name="cp"/>
+        <sequential>
+            <!--<property name="dir.source" value="@{name}/src"/>-->
+            <!--<property name="dir.classes" value="@{name}/classes"/>-->
+            <delete dir="@{name}/classes" quiet="false"/>
+            <mkdir dir="@{name}/classes"/>
+            <copy todir="@{name}/classes">
+                <fileset dir="@{name}/src">
+                    <exclude name="**/package.html"/>
+                </fileset>
+            </copy>
+            <!-- No Dependencies -->
+            <javac srcdir="@{name}/src"
+                   destdir="@{name}/classes"
+                   debug="true"
+                   encoding="ISO-8859-1"
+                   source="${javac.source}">
+                <classpath refid="@{cp}"/>
+            </javac>
+            <!-- With Dependencies -->
+            <jar destfile="dist/@{name}-${version}.jar">
+                <manifest>
+                    <attribute name="${project.name}-Version" value="${version}"/>
+                    <attribute name="Package" value="${project.package}"/>
+                    <attribute name="Built-By" value="${user.name}"/>
+                </manifest>
+                <fileset dir="@{name}/classes"/>
+            </jar>
+        </sequential>
+    </macrodef>
+    
+    <macrodef name="buildWarMacro">
+        <attribute name="name"/>
+        <attribute name="cp"/>
+        <sequential>
+            <property name="dir.webapp" value="@{name}/webapp"/>
+            <delete dir="@{name}/webapp/WEB-INF/classes" quiet="false"/>
+            <mkdir dir="@{name}/webapp/WEB-INF/classes"/>
+            <copy todir="@{name}/webapp/WEB-INF/classes">
+                <fileset dir="@{name}/src">
+                    <exclude name="**/package.html"/>
+                </fileset>
+            </copy>
+            <delete dir="@{name}/webapp/WEB-INF/lib"/>
+            <mkdir dir="@{name}/webapp/WEB-INF/lib"/>
+            <copy todir="@{name}/webapp/WEB-INF/lib">
+                <fileset dir="lib">
+                    <exclude name="junit*"/>
+                    <exclude name="servlet*"/>
+                </fileset>
+                <fileset dir="dist">
+                    <include name="${project.name}-*.jar"/>
+                </fileset>
+            </copy>
+            <javac srcdir="@{name}/src"
+                   destdir="@{name}/webapp/WEB-INF/classes"
+                   debug="true"
+                   encoding="ISO-8859-1"
+                   source="1.5">
+                <classpath refid="@{cp}"/>
+            </javac>
+            <delete quiet="true" failonerror="false">
+                <fileset dir="@{name}/webapp/javadoc" includes="**/*"/>
+            </delete>
+            <javadoc sourcepath="@{name}/src"
+                     destdir="@{name}/webapp/javadoc"
+                     author="true"
+                     version="true"
+                     verbose="false"
+                     windowtitle="${project.name} Examples"
+                     doctitle="${project.name} Example API">
+                <classpath refid="classpath"/>
+                <classpath refid="@{cp}"/>
+                <packageset dir="@{name}/src"/>
+                <link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
+                <link href="http://click.apache.org/docs/click-api/"/>
+                <link href="http://static.springframework.org/spring/docs/1.2.x/api/"/>
+            </javadoc>
+            <copy file="documentation/javadoc-stylesheet.css"
+                  overwrite="true"
+                  tofile="@{name}/webapp/javadoc/stylesheet.css"/>
+            <mkdir dir="dist"/>
+            <war destfile="dist/@{name}.war"
+                 webxml="@{name}/webapp/WEB-INF/web.xml">
+                <manifest>
+                    <attribute name="Built-By" value="${user.name}"/>
+                </manifest>
+                <fileset dir="@{name}/webapp">
+                    <exclude name="**/web.xml"/>
+                </fileset>
+            </war>            
+        </sequential>
+    </macrodef>
+
+    <macrodef name="buildBundleMacro">
+        <attribute name="name"/>
+        <sequential>
+            <mkdir dir="${maven-bundle}/@{name}"/>
+            <copy file="@{name}.pom" tofile="${maven-bundle}/@{name}/pom.xml"/>
+            <replace file="${maven-bundle}/@{name}/pom.xml"
+                     token="VERSION"
+                     value="${version}"/>
+
+            <copy file="dist/@{name}-${version}.jar" todir="${maven-bundle}/@{name}/"/>
+        </sequential>
+    </macrodef>
+
+    <path id="classpath">
+        <pathelement location="ajax4click/classes"/>
+        <pathelement location="lib/${jar.click}"/>
+        <pathelement location="lib/${jar.click-extras}"/>
+        <pathelement location="lib/${jar.click-mock}"/>
+        <pathelement location="lib/${jar.click-calendar}"/>
+        <pathelement location="lib/${jar.lang}"/>
+        <pathelement location="lib/${jar.log4j}"/>
+        <pathelement location="lib/${jar.servlet}"/>
+    </path>
+
+    <path id="classpath.test">
+        <pathelement location="lib/${jar.junit}"/>
+    </path>
+
+    <path id="core.classpath">
+        <!--<pathelement id="classpath"/>-->
+        <pathelement location="ajax4click/classes"/>
+        <pathelement location="lib/${jar.click}"/>
+        <pathelement location="lib/${jar.click-extras}"/>
+        <pathelement location="lib/${jar.click-mock}"/>
+        <pathelement location="lib/${jar.click-calendar}"/>
+        <pathelement location="lib/${jar.lang}"/>
+        <pathelement location="lib/${jar.log4j}"/>
+        <pathelement location="lib/${jar.servlet}"/>
+    </path>
+    
+    <!-- Target Definitions -->
+    <target name="clean">
+        <delete dir="dist" quiet="false"/>
+        <mkdir dir="dist"/>
+    </target>
+
+    <target name="get-deps" description="download JAR dependencies">
+        <delete dir="lib"/>
+        <mkdir dir="lib"/>
+        <downloadMacro name="${jar.click}" path="org/apache/click/click/${click.version}" ignorefail="true"/>
+        <downloadMacro name="${jar.click-extras}" path="org/apache/click/click-extras/${click.version}" ignorefail="true"/>
+        <downloadMacro name="${jar.click-mock}" path="org/apache/click/click-mock/${click.version}" ignorefail="true"/>
+        <downloadMacro name="${jar.lang}" path="commons-lang/commons-lang/${commons-lang.version}"/>
+        <downloadMacro name="${jar.junit}" path="junit/junit/${junit.version}"/>
+        <downloadMacro name="${jar.servlet}" path="javax/servlet/servlet-api/${servlet-api.version}"/>
+        <downloadMacro name="${jar.click-calendar}" path="net/sf/click/click-calendar/${click-calendar.version}"/>
+        
+        <!-- Check if downloading Click JARs was possible. Otherwise require manual build&download -->
+        <available file="lib/${jar.click}" property="isClickJarAvail"/>
+        <available file="lib/${jar.click-extras}" property="isClickExtrasJarAvail"/>
+        <available file="lib/${jar.click-mock}" property="isClickMockJarAvail"/>
+        <condition property="failed">
+            <or>
+                <isfalse value="${isClickJarAvail}"/>
+                <isfalse value="${isClickExtrasJarAvail}"/>
+                <isfalse value="${isClickMockJarAvail}"/>
+            </or>
+        </condition>
+        <fail if="failed">
+            Click JARs can't be downloaded automatically. This is probably due to the fact that ${project.name} depends on an unreleased Click version, so you need to build the Click JARs yourself and copy them to this 'lib' directory. See http://click.apache.org/docs/developer-guide/building.html for more details on how to build the Click JARs.
+        </fail>
+    </target>
+
+    <target name="get-deps-proxy" description="download JAR dependencies">
+       <setproxy proxyhost="${proxy.host}" proxyport="${proxy.port}"/>
+       <antcall target="get-deps"/>
+    </target>
+
+<target name="test">
+        <copy todir="ajax4click/classes">
+            <fileset dir="ajax4click/src">
+                <exclude name="**/package.html"/>
+            </fileset>
+        </copy>
+        <copy todir="ajax4click/classes">
+            <fileset dir="ajax4click/test">
+                <exclude name="**/package.html"/>
+            </fileset>
+        </copy>
+        <javac srcdir="ajax4click/src;ajax4click/test"
+             destdir="ajax4click/classes"
+             debug="true"
+             encoding="ISO-8859-1"
+             source="${javac.source}">
+            <classpath refid="classpath"/>
+            <classpath refid="classpath.test"/>
+        </javac>
+        <delete>
+            <fileset dir="ajax4click/test" includes="TEST-*.txt"/>
+        </delete>
+        <junit haltonfailure="yes" showoutput="true" >
+            <classpath refid="classpath"/>
+            <classpath refid="classpath.test"/>
+            <formatter type="plain"/>
+            <batchtest fork="yes" todir="ajax4click/test">
+                <fileset dir="ajax4click/test">
+                    <include name="**/*Test.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+        <delete>
+            <fileset dir="ajax4click/test" includes="TEST-*.txt"/>
+        </delete>
+    </target>
+
+    <target name="build-distribution"
+           depends="clean, build, build-examples, javadoc"
+           description="build distribution ZIP file">
+      <!-- create distribution zip file -->
+        <delete dir="ajax4click-${version}" quiet="false"/>
+        <mkdir dir="ajax4click-${version}"/>
+        <copy todir="ajax4click-${version}">
+            <fileset dir="." casesensitive="yes">
+                <exclude name=".**"/>
+                <exclude name=".**/**"/>
+                <exclude name="ajax4click-${version}"/>
+                <exclude name="TODO.txt"/>
+                <exclude name="dist/*-src.zip"/>
+                <exclude name="lib/**"/>
+                <exclude name="documentation/*.html"/>
+                <exclude name="documentation/*.css"/>
+                <exclude name="documentation/images/**"/>
+                <exclude name="**/classes/**"/>
+                <exclude name="**/WEB-INF/lib/**"/>
+                <exclude name="examples/webapp/javadoc/**"/>
+            </fileset>
+        </copy>
+        <delete file="../ajax4click-${version}.zip"/>
+        <zip basedir="."
+           destfile="../../ajax4click-${version}.zip"
+           includes="ajax4click-${version}/**"/>
+         <delete dir="ajax4click-${version}" quiet="false"/>
+    </target>
+
+    <target name="build" depends="clean" description="build ajax4click JAR file">
+        <mkdir dir="dist"/>
+        <available file="lib/${jar.click}" property="isClickJarAvail"/>
+        <available file="lib/${jar.click-extras}" property="isClickExtrasJarAvail"/>
+        <available file="lib/${jar.click-mock}" property="isClickMockJarAvail"/>
+        <fail message="Download *all* required JAR dependencies first with 'get-deps' (or build them manually and copy them to this 'lib' directory!)">
+            <condition>
+                <or>
+                    <isfalse value="${isClickJarAvail}"/>
+                    <isfalse value="${isClickExtrasJarAvail}"/>
+                    <isfalse value="${isClickMockJarAvail}"/>
+                </or>
+            </condition>
+        </fail>
+        <!-- build core -->
+        <delete file="dist/${project.name}-core-${version}.jar" quiet="false"/>
+        <buildJarMacro name="${project.name}" cp="core.classpath"/>
+    </target>
+
+    <target name="build-examples" depends="build" description="build ${project.name} examples">
+        <!-- build examples-->
+        <delete file="dist/examples.war"/>
+        <buildWarMacro name="${project.name}-examples" cp="core.classpath"/>
+    </target>
+
+    <target name="build-maven-bundles"
+           depends="build"
+           description="build Maven repository upload bundles">
+      <!-- Start with a clean directory -->
+        <delete dir="${maven-bundle}" quiet="false"/>
+        <mkdir dir="${maven-bundle}"/>
+        <buildBundleMacro name="ajax4click"/>
+    </target>
+
+    <target name="javadoc" description="create Javadoc HTML files">
+
+        <!-- Javadoc for Core -->
+        <delete quiet="false" failonerror="false">
+             <fileset dir="documentation/api" includes="**/*"/>
+        </delete>
+        <javadocMacro src="ajax4click/src"
+                    destdir="documentation/api"
+                    windowtitle="${project.name} Core Extensions API"
+                    doctitle="${project.name} Core API"
+                    classpath="classpath"
+                    overview="documentation/overview.html"/>    
+        <copy file="documentation/javadoc-stylesheet.css"
+            overwrite="true"
+            tofile="documentation/api/stylesheet.css"/>
+
+        <delete quiet="false" failonerror="false">
+             <fileset dir="../site/javadoc" includes="**/*"/>
+        </delete>
+
+        <copy todir="../site/javadoc" overwrite="true">
+            <fileset dir="documentation"/>
+        </copy>
+
+    </target>
+
+    <target name="build-all" depends="clean, build, build-examples, javadoc"
+            description="build all JARs and examples"/>
+
+    <target name="build-sources"
+            description="build source ZIP files for use with IDEs">
+        <!-- zip the core -->
+        <zip destfile="dist/${project.name}-${version}-src.zip">
+            <fileset dir="core/src">
+                <exclude name="**/package.html"/>
+                <exclude name="META-INF"/>
+            </fileset>
+        </zip>
+    </target>
+    <target name="help" description="display the Help message">
+      <echo>${project.name} ${version} extensions
+===================================
+
+Main targets:
+
+    build-distribution    build distribution ZIP file
+    build-all             build all JARs and examples
+    build                 build ${project.name} JAR file
+    build-examples        build ${project.name} examples
+    build-sources         build source ZIP files for use with IDEs
+    get-deps              download JAR dependencies
+    get-deps-proxy        download JAR dependencies via proxy
+    help                  display the Help message
+    javadoc               create Javadoc HTML files
+
+Environment:
+
+    java.home = ${java.home}
+    ant.home  = ${ant.home}
+
+Please ensure you have configured build.properties</echo>
+   </target>     
+
+    <macrodef name="javadocMacro">
+        <attribute name="src"/>
+        <attribute name="destdir"/>
+        <attribute name="windowtitle"/>
+        <attribute name="doctitle"/>
+        <attribute name="classpath"/>
+        <attribute name="overview"/>
+        <sequential>
+            <javadoc sourcepath="@{src}"
+                     destdir="@{destdir}"
+                     author="true"
+                     version="true"
+                     verbose="false"
+                     windowtitle="@{windowtitle}"
+                     packagenames="${project.package}.*"
+                     overview="@{overview}"
+                     doctitle="@{doctitle}">
+                <classpath refid="@{classpath}"/>
+                <link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
+                <link href="http://java.sun.com/j2ee/1.4/docs/api/"/>
+                <link href="http://click.apache.org/docs/click-api/"/>
+                <link href="http://click.apache.org/docs/extras-api/"/>
+                <bottom>${root.properties.highlighter}</bottom>
+            </javadoc>
+
+            <!-- Add IE Mark of the Web to each javadoc page -->
+            <replace dir="@{destdir}" value="&lt;!-- saved from url=(0014)about:internet --&gt;">
+                <include name="**/*.html"/>
+                <replacetoken>&lt;!--NewPage--&gt;</replacetoken>
+            </replace>
+            <!--
+            IE throws exception when trying to access parent frame and Mark of the Web is active.
+            Disable setting of window title, which needs to access the parent frame.
+            -->
+            <replace dir="@{destdir}" value="">
+                <include name="**/*.html"/>
+                <replacetoken>onload="windowTitle();"</replacetoken>
+            </replace>
+        </sequential>
+    </macrodef>
+</project>

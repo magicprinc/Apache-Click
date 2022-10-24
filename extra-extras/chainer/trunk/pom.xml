@@ -1,0 +1,52 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+    http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <!--
+  TODO:
+
+  * Correctly generate array parameters, e.g. LinkDecorator
+  * Detect illegal names, e.g. setDouble -> double in DoubleField
+  * Generate abstract class if target class is abstract
+  * Not sure why Form is not imported in FormTable
+
+  -->
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.googlecode</groupId>
+  <artifactId>chainer</artifactId>
+  <name>chainer</name>
+  <version>1.2-SNAPSHOT</version>
+  <packaging>jar</packaging>
+  <description>
+    Simple command-line tool that generates a subclass with method-chaining property setters.
+  </description>
+
+  <build>
+    <plugins>
+      <plugin>  
+        <artifactId>maven-compiler-plugin</artifactId>  
+        <configuration>  
+          <source>1.5</source>  
+          <target>1.5</target>  
+        </configuration>  
+      </plugin> 
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>com.googlecode.chainer.Main</mainClass>
+            </manifest>
+            <manifestEntries>
+              <url>http://code.google.com/p/chainer</url>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

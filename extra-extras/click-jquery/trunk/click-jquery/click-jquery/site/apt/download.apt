@@ -1,0 +1,43 @@
+            ------
+            Download
+            ------
+            Click Community
+            ------
+            2010-06-21
+
+Download
+
+ You can get JAR file from the following URL:
+
+   * {{http://code.google.com/p/click-jquery/downloads/list}}
+
+   []
+
+ Click-jQuery requires the latest Click from trunk. You can find how to get and build it here:
+
+   * {{http://click.apache.org/docs/developer-guide/developer-guide.html}}
+
+   []
+
+* {Using Click-jQuery with Maven}
+
+ If you are using Maven, you can get Click-jQuery from one of the public Maven repositories.
+ You can add the following fragment into your pom.xml.
+
+----
+<repositories>
+  <repository>
+    <id>net.sf</id>
+    <name>Maven2 Repository</name>
+  </repository>
+</repositories>
+
+<dependencies>
+  <dependency>
+    <groupId>net.sf.click</groupId>
+    <artifactId>click-jquery</artifactId>
+    <version>0.0.1</version>
+  </dependency>
+</dependencies>
+----
+

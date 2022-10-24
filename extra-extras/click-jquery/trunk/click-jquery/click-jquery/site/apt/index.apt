@@ -1,0 +1,27 @@
+            ------
+            Welcome to Click-jQuery
+            ------
+            Click Community
+            ------
+            2010-06-21
+
+Welcome
+
+%{toc|section=1|fromDepth=1|toDepth=3}
+
+* {What's Click-jQuery?}
+
+ Click-jQuery is a set of Click components (Controls) that use jQuery as an underlying Javascript library.
+ JQuery support centers around the jQuery Taconite plugin. Taconite is a plugin that allows you to make multiple
+ DOM updates with a single Ajax request. 
+
+   []
+
+* {How to use Click-jQuery?}
+
+ You just need to include Click-jQuery JAR file into your classpath and use it's Controls like any other Click Controls.
+ For a examples on how to use the various Click-jQuery provided controls, please see the very detailed usage examples from
+ {{http://click-jquery.googlecode.com/svn/trunk/click-jquery/click-jquery-examples/}}
+
+
+   []

@@ -1,0 +1,21 @@
+            ------
+            TODO
+            ------
+            Click Community
+            ------
+            2010-06-21
+
+TODO
+
+
+   * remove non-relevant components and examples and code
+
+   * Javadoc
+
+   * cleanup the code so that  the checkstyles can pass
+
+   * publish the first release, announce it on the Click lists, Click Blog, DZone, etc.
+
+   * push the release to a public maven Repo.
+
+   []

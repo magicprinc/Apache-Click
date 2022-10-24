@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<click-app> 
+
+  <pages package="net.sf.click.jquery.examples.page"/>
+
+  <mode value="trace"/>
+
+</click-app>
+
+

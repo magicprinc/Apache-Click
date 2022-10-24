@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
+    <application>click-charts-enhanced</application>
+    <version>2</version>
+    
+        <static-files> 
+        <exclude path="**.htm" /> 
+        <exclude path="**.css" /> 
+        <exclude path="**.js" /> 
+        <exclude path="**.gif" /> 
+        <exclude path="**.png" /> 
+    </static-files> 
+ 
+</appengine-web-app>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Tomcat specific application context information
+-->
+<Context antiJARLocking="true" path="/jquery-examples" reloadable="true">
+  <!--
+   User logins are authenticated/authorized using $TOMCAT/conf/tomcat-users.xml
+   -->
+  <ResourceLink global="UserDatabase" name="users" type="org.apache.catalina.UserDatabase"/>
+</Context>

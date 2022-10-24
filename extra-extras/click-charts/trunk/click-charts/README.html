@@ -1,0 +1,117 @@
+<html>
+    <head>
+        <title>Click Charts Project</title>
+    </head>
+    <body>
+        <h1 id='click_charts_project'>Click Charts Project</h1>
+
+        <p>Click Charts is a port of the Chart controls found in pre Apache Click releases.
+        The Chart controls had to be removed because LGPL libraries cannot be
+        bundled with Apache Software Foundation distribution.</p>
+
+        <p><b>Please note</b> Click versions 1.5.x and below shipped with the Chart
+        controls so there is no need to use this library is pre Apache releases.
+
+        <p>Only consider this library when using an <tt>Apache Click</tt> release.
+
+        </p>
+
+        <h2 id='project_structure'>Project structure</h2>
+
+        <p>The project consists of the Charts library and an example webapplication.</p>
+
+        <p>Following modules are available:</p>
+
+        <ul>
+            <li><code>[charts]</code> - the charts library</li>
+
+            <li><code>[chart-examples]</code> - example usage for the charts module</li>
+        </ul>
+
+        <p>Other directories:</p>
+
+        <ul>
+            <li><code>[dist]</code> - build distribution directory</li>
+
+            <li><code>[documentation]</code> - all documentation (javadocs too)</li>
+
+            <li><code>[lib]</code> - libraries downloaded automatically with get-deps task.</li>
+        </ul>
+
+        <h2 id='dependencies'>Runtime Dependencies</h2>
+
+        <p>Click Charts has the following runtime dependencies</p>
+
+        <ul>
+            <li>click-2.2.0.jar or greater</li>
+
+            <li>click-extras-2.2.0.jar or greater</li>
+        </ul>
+
+        <h2 id='dependencies'>Compile time Dependencies</h2>
+
+        <p>When compiling the project, the following JARs need to be present in the
+        <code>[lib]</code> directory: (see Step 1. in the <em>Building</em> section
+        below on how to automatically download the libraries)</p>
+
+        <ul>
+            <li>click-2.2.0.jar or greater</li>
+
+            <li>click-extras-2.2.0.jar or greater</li>
+
+            <li>servlet-api-2.3.jar</li>
+        </ul>
+
+        <h2 id='building'>Building</h2>
+
+        <p>To build Click Charts, execute the following steps:</p>
+
+        <ol>
+            <li>
+                <p>get all dependencies
+                (and download manually those jars not found in Maven repo), by running:</p>
+
+                <blockquote>
+                    <p>ant get-deps</p>
+                </blockquote>
+
+                If you are behind a firewall set your proxy configuration in
+                <tt>build.properties</tt> and instead run:
+
+                 <blockquote>
+                    <p>ant get-deps-proxy</p>
+                </blockquote>
+
+            </li>
+
+            <li>
+                <p>build all modules, controls sets, examples, by running:</p>
+
+                <blockquote>
+                    <p>ant build-all</p>
+                </blockquote>
+            </li>
+
+            <li>
+                <p>(optional) build source packages</p>
+
+                <blockquote>
+                    <p>ant build-sources</p>
+                </blockquote>
+            </li>
+
+            <li>
+                <p>(optional) build the entire distribution</p>
+
+                <blockquote>
+                    <p>ant build-distribution</p>
+                </blockquote>
+            </li>
+        </ol>
+
+        <h2 id='building'>Feedback</h2>
+        For questions and suggestions, please use Apache Click official
+        <a href="http://click.apache.org/docs/click-online.html#mailing-lists">mailing lists</a>.
+
+    </body>
+</html>

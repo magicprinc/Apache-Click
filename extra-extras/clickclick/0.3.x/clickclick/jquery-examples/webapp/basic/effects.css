@@ -1,0 +1,38 @@
+h3{
+    margin-top: 2em;
+    margin-bottom: 3px;
+}
+
+#demo1-box {
+    width:300px;
+    display: none;
+    padding:5px;
+    border:2px solid #FFF;
+    border-top: 2px solid #DDD;
+    background-color: #DDD;
+}
+#demo1-but{
+    display:block;
+    color: #FFF;
+    text-decoration:none;
+    width:300px;
+    padding:5px;
+    border:2px solid #CCC;
+    background-color: #555;
+}
+
+#demo2-box{
+    width: 100px;
+    color: white;
+    border: 2px solid #CCC;
+    background-color: #555;
+    padding: 5px;
+}
+
+#demo3-box{
+    height: 100px;
+    width: 100px;
+    display: block;
+    position: relative;
+    background: #555;
+}

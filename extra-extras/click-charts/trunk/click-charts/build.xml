@@ -1,0 +1,339 @@
+
+<project name="click-charts" default="help" basedir=".">
+
+    <!-- Project Properties -->
+    <property file="./build.properties"/>
+    <xmlproperty file="./javascript-syntax-highlighter.xml"/>
+    <property name="jar.click" value="click-${click.version}.jar"/>
+    <property name="jar.click-extras" value="click-extras-${click.version}.jar"/>
+    <property name="jar.servlet" value="servlet-api-${servlet.api.version}.jar"/>
+    <property name="javac.source" value="1.5"/>
+    <property name="repository" value="http://repo1.maven.org"/>
+    <property name="maven-bundle" value="../maven-upload"/>
+
+    <!-- Macro Definitions -->        
+    <macrodef name="downloadMacro">
+        <attribute name="name"/>
+        <attribute name="path"/>
+        <sequential>
+            <get src="${repository}/maven2/@{path}/@{name}"
+                 dest="lib/@{name}"
+                 verbose="true"
+                 usetimestamp="true"/>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="digestMacro">
+        <attribute name="file"/>
+        <sequential>
+            <!--
+            Calculating checksum currently not very useful
+            -->
+            <!--
+            <checksum file="@{file}" forceOverwrite="true" />
+            <checksum file="@{file}" forceOverwrite="true" algorithm="SHA1" />
+            -->
+        </sequential>
+    </macrodef>
+
+    <macrodef name="buildBundleMacro">
+        <attribute name="name"/>
+        <sequential>
+            <mkdir dir="${maven-bundle}/@{name}"/>
+            <copy file="@{name}.pom" tofile="${maven-bundle}/@{name}/pom.xml"/>
+            <replace file="${maven-bundle}/@{name}/pom.xml"
+                     token="VERSION"
+                     value="${version}"/>
+
+            <copy file="dist/@{name}-${version}.jar" todir="${maven-bundle}/@{name}/"/>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="buildJarMacro">
+        <attribute name="name"/>
+        <attribute name="cp"/>
+        <sequential>
+            <delete dir="@{name}/classes" quiet="false"/>
+            <mkdir dir="@{name}/classes"/>
+            <copy todir="@{name}/classes">
+                <fileset dir="@{name}/src">
+                    <exclude name="**/package.html"/>
+                </fileset>
+            </copy>
+            <!-- No Dependencies -->
+            <javac srcdir="@{name}/src"
+                   destdir="@{name}/classes"
+                   debug="true"
+                   encoding="ISO-8859-1"
+                   source="${javac.source}">
+                <classpath refid="@{cp}"/>
+            </javac>
+            <!-- With Dependencies -->
+            <jar destfile="dist/click-@{name}-${version}.jar">
+                <manifest>
+                    <attribute name="ClickCharts-Version" value="${version}"/>
+                    <attribute name="Package" value="net.sf.click"/>
+                    <attribute name="Built-By" value="${user.name}"/>
+                </manifest>
+                <fileset dir="@{name}/classes"/>
+            </jar>
+            <digestMacro file="dist/click-@{name}-${version}.jar"/>
+        </sequential>
+    </macrodef>
+    
+    <macrodef name="buildWarMacro">
+        <attribute name="name"/>
+        <attribute name="cp"/>
+        <sequential>
+            <property name="dir.webapp" value="@{name}-examples/webapp"/>
+            <delete dir="@{name}-examples/webapp/WEB-INF/classes" quiet="false"/>
+            <mkdir dir="@{name}-examples/webapp/WEB-INF/classes"/>
+            <copy todir="@{name}-examples/webapp/WEB-INF/classes">
+                <fileset dir="@{name}-examples/src">
+                    <exclude name="**/package.html"/>
+                </fileset>
+            </copy>
+            <delete dir="@{name}-examples/webapp/WEB-INF/lib"/>
+            <mkdir dir="@{name}-examples/webapp/WEB-INF/lib"/>
+            <copy todir="@{name}-examples/webapp/WEB-INF/lib">
+                <fileset dir="lib">
+                    <exclude name="junit*"/>
+                    <exclude name="servlet*"/>
+                    <exclude name="click-mock*"/>
+                </fileset>
+                <fileset dir="dist">
+                    <include name="click-charts*.jar"/>
+                    <include name="click-@{name}*.jar"/>
+                </fileset>
+            </copy>
+            <javac srcdir="@{name}-examples/src"
+                   destdir="@{name}-examples/webapp/WEB-INF/classes"
+                   debug="true"
+                   encoding="ISO-8859-1"
+                   source="${javac.source}">
+                <classpath refid="@{cp}"/>
+            </javac>
+            <delete quiet="true" failonerror="false">
+                <fileset dir="@{name}-examples/webapp/javadoc" includes="**/*"/>
+            </delete>
+            <javadoc sourcepath="@{name}-examples/src"
+                     destdir="@{name}-examples/webapp/javadoc"
+                     author="true"
+                     version="true"
+                     verbose="false"
+                     windowtitle="Click Examples"
+                     doctitle="Click Example API">
+                <classpath refid="classpath"/>
+                <packageset dir="@{name}-examples/src"/>
+                <link href="http://java.sun.com/j2se/1.4.2/docs/api/"/>
+                <link href="http://click.apache.org/docs/click-api/"/>
+            </javadoc>
+            <copy file="documentation/javadoc-stylesheet.css"
+                  overwrite="true"
+                  tofile="@{name}-examples/webapp/javadoc/stylesheet.css"/>
+            <mkdir dir="dist"/>
+            <war destfile="dist/@{name}-examples.war"
+                 webxml="@{name}-examples/webapp/WEB-INF/web.xml">
+                <manifest>
+                    <attribute name="Built-By" value="${user.name}"/>
+                </manifest>
+                <fileset dir="@{name}-examples/webapp">
+                    <exclude name="**/web.xml"/>
+                </fileset>
+            </war>
+        </sequential>
+    </macrodef>
+
+    <path id="classpath">
+        <pathelement location="charts/classes"/>
+        <pathelement location="lib/${jar.click}"/>
+        <pathelement location="lib/${jar.click-extras}"/>
+        <pathelement location="lib/${jar.click-mock}"/>
+        <pathelement location="lib/${jar.lang}"/>
+        <pathelement location="lib/${jar.servlet}"/>
+    </path>
+
+    <!-- Target Definitions -->
+    <target name="build" description="build Click Charts JAR file">
+        <mkdir dir="dist"/>
+        <available file="lib/${jar.click}" property="isJarAvail"/>
+        <fail message="Download JAR dependencies first with 'get-deps'">
+            <condition>
+                <or>
+                    <isfalse value="${isJarAvail}"/>
+                </or>
+            </condition>
+        </fail>
+        <!-- build charts -->
+        <delete file="dist/click-charts-${version}.jar" quiet="false"/>
+        <buildJarMacro name="charts" cp="classpath"/>
+    </target>
+
+    <target name="build-distribution"
+           depends="clean, build, build-examples, javadoc"
+           description="build distribution ZIP file">
+      <!-- create distribution zip file -->
+        <delete dir="click-charts-${version}" quiet="false"/>
+        <mkdir dir="click-charts-${version}"/>
+        <copy todir="click-charts-${version}">
+            <fileset dir="." casesensitive="yes">
+                <exclude name=".**"/>
+                <exclude name=".**/**"/>
+                <exclude name="click-charts-${version}"/>
+                <exclude name="TODO.txt"/>
+                <exclude name="bin/**"/>
+                <exclude name="design/**"/>
+                <exclude name="dist/*-src.zip"/>
+                <exclude name="lib/**"/>
+                <exclude name="documentation/*.html"/>
+                <exclude name="documentation/*.css"/>
+                <exclude name="documentation/images/**"/>
+                <exclude name="**/Thumbs.db"/>
+                <exclude name="**/classes/**"/>
+                <exclude name="**/WEB-INF/lib/**"/>
+                <exclude name="examples/webapp/javadoc/**"/>
+            </fileset>
+        </copy>
+        <delete file="../click-charts-${version}.zip"/>
+        <zip basedir="."
+           destfile="../click-charts-${version}.zip"
+           includes="click-charts-${version}/**"/>
+        <delete dir="click-charts-${version}" quiet="false"/>
+    </target>
+
+    <target name="build-examples" depends="build" description="build Click Charts examples">
+       <!-- build charts examples-->
+        <delete file="dist/chart-examples.war"/>
+        <buildWarMacro name="chart" cp="classpath"/>
+    </target>
+
+    <target name="build-maven-bundles"
+           depends="build"
+           description="build Maven repository upload bundles">
+      <!-- Start with a clean directory -->
+        <delete dir="${maven-bundle}" quiet="false"/>
+        <mkdir dir="${maven-bundle}"/>
+        <buildBundleMacro name="click-charts"/>
+    </target>
+
+    <target name="clean">
+        <delete dir="dist" quiet="false"/>
+        <mkdir dir="dist"/>
+    </target>
+
+    <target name="get-deps" description="download JAR dependencies">
+        <mkdir dir="lib"/>
+        <downloadMacro name="${jar.click}" path="org/apache/click/click/${click.version}"/>
+        <downloadMacro name="${jar.click-extras}" path="org/apache/click/click-extras/${click.version}"/>
+        <downloadMacro name="${jar.servlet}" path="javax/servlet/servlet-api/${servlet.api.version}"/>
+    </target>
+
+    <target name="get-deps-proxy" description="download JAR dependencies">
+        <setproxy proxyhost="${proxy.host}" proxyport="${proxy.port}"/>
+        <antcall target="get-deps"/>
+    </target>
+
+    <target name="javadoc" description="create Javadoc HTML files">
+
+        <!-- Javadoc for Charts -->
+        <delete quiet="false" failonerror="false">
+            <fileset dir="documentation/charts-api" includes="**/*"/>
+        </delete>
+        <javadocMacro src="charts/src"
+                    destdir="documentation/charts-api"
+                    windowtitle="Click Charts API"
+                    doctitle="Click Charts API"
+                    classpath="classpath"
+      	            overview="documentation/overview.html"/>
+        <copy file="documentation/javadoc-stylesheet.css"
+      	    overwrite="true"
+      	    tofile="documentation/charts-api/stylesheet.css"/>
+        <copy file="documentation/images/line-chart.png"
+             todir="documentation/charts-api/net/sf/click/extras/graph"/>
+        <copy file="documentation/images/bar-chart.png"
+             todir="documentation/charts-api/net/sf/click/extras/graph"/>
+        <copy file="documentation/images/pie-chart.png"
+             todir="documentation/charts-api/net/sf/click/extras/graph"/>
+
+    </target>
+
+    <target name="build-all" depends="clean, build, build-examples, javadoc"
+            description="build all JARs and examples"/>
+
+    <target name="build-sources"
+            description="build source ZIP files for use with IDEs">
+        <!-- zip the charts -->
+        <zip destfile="dist/click-charts-${version}-src.zip">
+            <fileset dir="charts/src">
+                <exclude name="**/package.html"/>
+                <exclude name="META-INF"/>
+            </fileset>
+        </zip>
+    </target>
+    <target name="help" description="display the Help message">
+        <echo>Click Charts ${version}
+===================================
+
+Main targets:
+
+	build-distribution    build distribution ZIP file
+	build-all             build all JARs and examples
+	build                 build Click Charts JAR file
+	build-examples        build Click Charts examples
+  build-maven-bundles   build Maven repository upload bundles
+	build-sources         build source ZIP files for use with IDEs
+	get-deps              download JAR dependencies
+	get-deps-proxy        download JAR dependencies via proxy
+	help                  display the Help message
+	javadoc               create Javadoc HTML files
+
+Environment:
+
+	java.home = ${java.home}
+	ant.home  = ${ant.home}
+
+Please ensure you have configured build.properties
+        </echo>
+    </target>
+
+    <macrodef name="javadocMacro">
+        <attribute name="src"/>
+        <attribute name="destdir"/>
+        <attribute name="windowtitle"/>
+        <attribute name="doctitle"/>
+        <attribute name="classpath"/>
+        <attribute name="overview"/>
+        <sequential>
+            <javadoc sourcepath="@{src}"
+                     destdir="@{destdir}"
+                     author="true"
+                     version="true"
+                     verbose="false"
+                     windowtitle="@{windowtitle}"
+                     packagenames="net.*"
+                     overview="@{overview}"
+                     doctitle="@{doctitle}">
+                <classpath refid="@{classpath}"/>
+                <link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
+                <link href="http://java.sun.com/j2ee/sdk_1.3/techdocs/api/"/>
+                <link href="http://click.apache.org/docs/click-api/"/>
+                <link href="http://click.apache.org/docs/extras-api/"/>
+                <bottom>${root.properties.highlighter}</bottom>
+            </javadoc>
+
+            <!-- Add IE Mark of the Web to each javadoc page -->
+            <replace dir="@{destdir}" value="&lt;!-- saved from url=(0014)about:internet --&gt;">
+                <include name="**/*.html"/>
+                <replacetoken>&lt;!--NewPage--&gt;</replacetoken>
+            </replace>
+            <!--
+            IE throws exception when trying to access parent frame and Mark of the Web is active.
+            Disable setting of window title, which needs to access the parent frame.
+            -->
+            <replace dir="@{destdir}" value="">
+                <include name="**/*.html"/>
+                <replacetoken>onload="windowTitle();"</replacetoken>
+            </replace>
+        </sequential>
+    </macrodef>
+</project>

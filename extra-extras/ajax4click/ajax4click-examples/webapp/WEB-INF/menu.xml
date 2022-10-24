@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<menu>
+
+	<menu label=" Home" path="home.htm" imageSrc="/assets/home.png"/>
+
+  	<menu label="Ajax">
+  		<menu label="Basic Ajax" path="basic/basic-ajax.htm"/>
+      <menu label="Basic Ajax With Effects" path="basic/basic-ajax-with-effects.htm"/>
+      <menu label="AjaxForm" path="basic/load-form-dynamically.htm"/>
+      <menu label="Multi Result Demo" path="basic/multi-result-demo.htm"/>
+  	</menu>
+
+</menu>

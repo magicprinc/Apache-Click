@@ -1,0 +1,45 @@
+This example demonstrates how to validate a Form using the jQuery Validator plugin:
+<a href="http://docs.jquery.com/Plugins/Validation">http://docs.jquery.com/Plugins/Validation</a>.
+
+<style type="text/css">
+#errors label.jq-error {
+  text-decoration: underline;
+  cursor: pointer;
+}
+#errors ul {
+    padding: 0;
+    margin: 0;
+    margin-left: 6px;
+    margin-bottom: 1em;
+}
+#errors li {
+    list-style-type: none;
+    background: url($context/assets/images/exclamation.png) no-repeat 0 50%;
+    padding-left: 12px;
+    margin-bottom: 5px;
+}
+a.jq-error {
+	color: red;
+}
+label.jq-error {
+	color: red;
+  padding-left: 10px;
+}
+input.error {
+    border: 1px dotted red;
+}
+
+</style>
+
+<p/>
+
+<div id="errors">
+    <ul>
+    </ul>
+</div>
+
+<p/>
+
+$form
+
+$msgHolder

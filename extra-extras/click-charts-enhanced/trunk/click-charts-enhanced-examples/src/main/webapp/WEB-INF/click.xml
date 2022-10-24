@@ -1,0 +1,7 @@
+<click-app charset="UTF-8">
+
+  <!-- Specify the Java package where Page classes can be found -->
+  <pages package="net.sf.click.chart.test"/>
+  <mode value="debug" />  
+  
+</click-app>

@@ -1,0 +1,90 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <title>jQuery Taconite Plugin</title>
+        
+        ${cssImports}
+        ${jsImports}
+        <!--<script type="text/javascript" src="/jquery-examples/clickclick/jquery/jquery.click.js"></script>-->
+        <link id="two" rel="stylesheet" type="text/css" href="/jquery-examples/clickclick/jquery/taconite/dummy2.css"/>
+        <script type="text/javascript">
+            // enable debug logging in Taconite Plugin
+            jQuery.taconite.debug = true;
+            Click.debug = true;
+
+            jQuery(document).ready(function() {
+                jQuery('#wireMe').click(function() {
+                    //jQuery('head').append('<style type="text/css" rel="stylesheet" >#main {background:brown}</style>');
+                    //jQuery('head').append('<link rel="stylesheet" type="text/css" href="/jquery-examples/clickclick/jquery/taconite/dummy.css"/>');
+                });
+                jQuery('#loadEvents').click(function() {
+                    Click.loadEventsDone = true;
+                    // Send empty function to addLoadEvents to trigger the stack
+                    addLoadEvent(function(){});
+                });
+            });
+
+            jQuery(document).ready(function() {
+                jQuery('#headers').click(function() {
+                    //Click.addHeader('<html-imports><![CDATA[<link id="one" rel="stylesheet" type="text/css" href="/jquery-examples/clickclick/jquery/taconite/dummy.css"/>\n<link id="three" rel="stylesheet" type="text/css" href="/jquery-examples/clickclick/jquery/taconite/dummy3.css"/>]]></html-imports>');
+                    
+                    //Click.addHeader('<link id="one" rel="stylesheet" type="text/css" href="/jquery-examples/clickclick/jquery/taconite/dummy.css"/>');
+                    //Click.addHeader('<style id="style1" type="text/css" rel="stylesheet" >\n#main {background:brown}\n</style>');
+                    //Click.addHeader('<script id="script1" type="text/javascript">jQuery("#wireMe").click(function() {alert("script import works!")})<\/script>');
+                    jQuery().addHeader('<script type="text/javascript">/*<![CDATA[*/ alert("I don\'t \\" have id and will always run")/*]]>*/<\/script>');
+                    jQuery().addHeader('<script id="poksi" type="text/javascript">/*<![CDATA[*/ alert("I have id and will run only once")/*]]>*/<\/script>');
+                    jQuery().addHeader('<script type="text/javascript" src="dummy.js"><\/script>');
+                    jQuery().addHeader('<style id="style1" type="text/css" rel="stylesheet" >\n#main {background:brown}\n</style>');
+                    jQuery().addHeader('<link rel="stylesheet" type="text/css" href="/jquery-examples/clickclick/jquery/taconite/dummy.css"/>');
+                    //Click.addHeader2('<script id="pok" type="text/javascript">alert("I have an id and will only run once")<\/script>');
+                    //jQuery('head')[0].appendChild(jQuery('<script id="pok" type="text/javascript">alert("I have an id and will only run once")<\/script>')[0]);
+                    //Click.addHeader('<script type="text/javascript" src="dummy.js"><\/script>');
+
+                    //jQuery('head').append('<script id="script1" type="text/javascript">jQuery("#wireMe").click(function() {alert("script import works!")})<\/script>');
+                    //jQuery('head').append('<script src="dummy.js" type="text/javascript"><\/script>');
+                    //addJavascript("scrip2", "dummy.js");
+                    //addJavascript("scrip3", null, "alert('hello');");
+                    //jQuery('head').append('<link rel="stylesheet" type="text/css" href="/jquery-examples/clickclick/jquery/taconite/dummy.css"/>');
+                    //jQuery('head').append('<style id="myid1" rel="stylesheet" type="text/css">#main {background:brown;}</style>');
+                });
+            });
+
+        </script>
+        
+        
+    </head>
+    
+    <body>
+        
+        $form
+        
+        $link
+        
+        <div id="main" style="padding:10px; border:1px solid #ccc"> 
+            This is the <span style="color:#800">structure example</span> div.
+        </div>
+        
+        <div id="mydiv" style="background-color: #ffa; padding:10px; border:1px solid #ccc"> 
+            This is the <span style="color:#800">structure example</span> div.
+        </div>
+        
+        <div id="colorMe" style="padding:10px; border:1px solid #ccc"> 
+            This div will be colored from external <b>style</b> that is imported through Ajax
+        </div>
+        
+        <div class="colorMe" style="padding:10px; border:1px solid #ccc"> 
+            This div will be colored from external <b>link</b> that is imported through Ajax
+        </div>
+        
+        <div id="date" style="padding:10px; border:1px solid #ccc"> 
+            This div will have a date field added
+        </div>
+        
+        <input type="button" id="wireMe" value="Wired!"/>
+        
+        <input type="button" id="loadEvents" value="Run load events!"/>
+        
+        <input type="button" id="headers" value="Add head scritps and links!"/>
+    </body>
+    
+</html>

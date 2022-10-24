@@ -1,0 +1,13 @@
+#if ($source)
+<pre style="font-size:9pt;" class="prettyprint">
+$source
+</pre>
+#elseif ($templateSource)
+<pre style="font-size:9pt;">
+$templateSource
+</pre>
+#elseif ($error)
+ <font color="red">$error</font>
+#else 
+ <font color="read">Source not found</font>
+#end

@@ -1,0 +1,19 @@
+#summary Setup instructions for Maven users.
+
+== Setup ==
+
+The Click Charts Maven bundle is available from the Maven 2 repository http://repo1.maven.org/maven2/net/sf/click/click-charts.
+
+To include Click Charts in your project add the following dependency in your pom.xml:
+
+{{{
+<dependency>
+    <groupId>net.sf.click</groupId>
+    <artifactId>click-charts</artifactId>
+    <version>X.X</version>
+    <scope>compile</scope>
+</dependency>
+}}}
+
+Specify the Click Charts version in the version tag e.g:
+{{{<version>1.0</version>}}}

@@ -1,0 +1,82 @@
+<!doctype html>
+
+<html>
+<head><meta content='application/xhtml+xml;charset=utf-8' http-equiv='Content-type' />
+    <title>Ajax4Click Project</title></head>
+<body>
+<h1 id='clickclick_project'>Ajax4Click Project</h1>
+
+<p>The aim of this project is to provide Ajax utilities for Apache Click.</p>
+
+<h2 id='project_structure'>Project structure</h2>
+
+<p>The following modules are available:</p>
+
+<ul>
+<li><code>[ajax4click]</code> - common Ajax utilities and controls</li>
+
+<li><code>[ajax4click-examples]</code> - Ajax examples</li>
+</ul>
+
+<p>Other directories:</p>
+
+<ul>
+<li><code>[dist]</code> - build distribution directory</li>
+
+<li><code>[documentation]</code> - all documentation (javadocs too)</li>
+
+<li><code>[lib]</code> - libraries downloaded automatically with get-deps task.</li>
+</ul>
+
+<h2 id='dependencies'>Dependencies</h2>
+
+<p>The following JARs need to be present in the <code>[lib]</code> directory:</p>
+
+<ul>
+<li>click-core-2.3.0.jar</li>
+
+<li>click-extras-2.3.0.jar</li>
+
+<li>ajax4click-0.1.jar</li>
+
+<li>servlet-api-2.3.jar</li>
+
+</ul>
+
+<h2 id='building'>Building</h2>
+
+<p>To build Ajax4Click, execute the following steps:</p>
+
+<ol>
+<li>
+<p>get all dependencies (and download manually to the /lib directory those jars not found in Maven repo), by running:</p>
+
+<blockquote>
+<p>ant get-deps</p>
+</blockquote>
+
+<p>build the project by running:</p>
+
+<blockquote>
+<p>ant build-all</p>
+</blockquote>
+</li>
+
+<li>
+<p>(optional) build source packages</p>
+
+<blockquote>
+<p>ant build-sources</p>
+</blockquote>
+</li>
+
+<li>
+<p>(optional) build the entire distribution</p>
+
+<blockquote>
+<p>ant build-dist</p>
+</blockquote>
+</li>
+</ol>
+
+</body></html>

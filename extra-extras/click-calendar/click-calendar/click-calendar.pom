@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.
+-->
+<project>
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>net.sf.click</groupId>
+  <artifactId>click-calendar</artifactId>
+  <packaging>jar</packaging>
+  <version>VERSION</version>
+
+  <name>Click Calendar</name>
+
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <organization>
+    <name>Apache Click</name>
+    <url>http://click.apache.org/</url>
+  </organization>
+
+  <scm>
+    <connection>http://svn.codespot.com/a/apache-extras.org/click-calendar/trunk/</connection>
+    <developerConnection>scm:svn:http://svn.codespot.com/a/apache-extras.org/click-calendar/trunk/</developerConnection>
+    <url>http://code.google.com/a/apache-extras.org/p/click-calendar/source/browse/</url>
+  </scm>
+
+  <inceptionYear>2008</inceptionYear>
+  <url>http://code.google.com/a/apache-extras.org/p/click-calendar/</url>
+  <description>Click Calendar provides a popup DHTML calendar component for Apache Click.</description>
+
+  <issueManagement>
+    <system>jira</system>
+    <url>https://issues.apache.org/click/</url>
+  </issueManagement>
+
+  <mailingLists>
+    <mailingList>
+      <name>User List</name>
+      <subscribe>user-subscribe@click.apache.org</subscribe>
+      <unsubscribe>user-unsubscribe@click.apache.org</unsubscribe>
+      <post>user@click.apache.org</post>
+      <archive>http://mail-archives.apache.org/mod_mbox/click-user/</archive>
+    </mailingList>
+    <mailingList>
+      <name>Development List</name>
+      <subscribe>dev-subscribe@click.apache.org</subscribe>
+      <unsubscribe>dev-unsubscribe@click.apache.org</unsubscribe>
+      <post>dev@click.apache.org</post>
+      <archive>http://mail-archives.apache.org/mod_mbox/click-dev/</archive>
+    </mailingList>
+  </mailingLists>
+
+  <distributionManagement>
+    <repository>
+
+      <!-- <id> must match the <id> specified in ~/.m2/settings.xml -->
+      <id>sf.repo</id>
+      <name>SourceForge Repository</name>
+      <url>sftp://web.sourceforge.net/home/groups/c/cl/click/htdocs/maven2</url>
+    </repository>
+
+    <snapshotRepository>
+
+      <!-- <id> must match the <id> specified in ~/.m2/settings.xml -->
+      <id>sf.repo</id>
+      <name>SourceForge Snapshot Repository</name>
+      <url>sftp://web.sourceforge.net/home/groups/c/cl/click/htdocs/snapshots</url>
+      <uniqueVersion>false</uniqueVersion>
+    </snapshotRepository>
+  </distributionManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.click</groupId>
+      <artifactId>click</artifactId>
+      <version>2.3.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.click</groupId>
+      <artifactId>click-extras</artifactId>
+      <version>2.3.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>2.3</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+
+</project>

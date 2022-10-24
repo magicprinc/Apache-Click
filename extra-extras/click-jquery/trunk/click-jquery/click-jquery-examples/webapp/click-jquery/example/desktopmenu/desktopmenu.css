@@ -1,0 +1,179 @@
+/*
+ * #root-menu-div is created by menu plugin
+ */
+
+#root-menu-div, ul.desktopmenu {
+    font: 11px arial, helvetica, lucida-sans, sans-serif;
+    z-index: 99999;
+}
+
+ul.desktopmenu li {
+    display:none;
+    margin: 0px;
+}
+
+#root-menu-div ul {
+	background-color: #d0d0d0;
+  border-top: 1px solid #909090;
+  border-left: 1px solid #f0f0f0;
+  border-bottom: 1px solid #909090;
+  border-right: 1px solid #909090;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+#root-menu-div li{
+	white-space:nowrap;
+	margin: 0px;
+}
+
+#root-menu-div img.link , ul.desktopmenu img.link {
+    vertical-align: middle;
+}
+
+#root-menu-div .menu-item a, #root-menu-div .menu-item a:visited {
+    font-weight: normal;
+    color: #000;
+    text-decoration: none;
+    padding: 3px 6px 1px 6px;
+    display: block;
+}
+
+#root-menu-div ul.menu-ul {
+	padding: 4px;
+}
+
+#root-menu-div .menu-item {
+	padding: 1px 1px 1px 0px;
+    display: block;
+    border: 1px solid #d0d0d0;
+    vertical-align: middle;
+    width: 160px;
+}
+
+#root-menu-div .active .menu-item {
+    vertical-align: middle;
+    text-decoration: none;
+    background: #E0ECEF;
+    color: #000;
+    border: 1px solid #3699dd;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+}
+
+#root-menu-div li.menu-separator div.menu-item{
+  background-color: #D0D0D0;
+  border: none;
+	border-bottom: 2px groove #CCC;
+	font-size: 0; /* for ie */
+	height: 0;
+	line-height: 0; /* for ie */
+	margin-bottom: 3px;
+}
+
+html>body div.outerbox{
+	padding: 0 5px 5px 0;
+}
+html>body div.outerbox div.shadowbox1{
+	position: absolute;
+	right: 0;
+	bottom: 5px;
+	width: 5px;
+	height: 100%;
+	background: url(shadow.png) no-repeat right top;
+}
+html>body div.outerbox div.shadowbox2{
+	position: absolute;
+	bottom: 0;
+	right: 5px;
+	height: 5px;
+	width: 100%;
+	background: url(shadow.png) left bottom;
+}
+html>body div.outerbox div.shadowbox3{
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	height: 5px;
+	width: 5px;
+	background: url(shadow.png) no-repeat right bottom;
+}
+html>body .innerbox{
+	margin: 0;
+	display: inherit;
+}
+
+/*
+ * desktopmenu identifies the menu markup
+ */
+
+ul.desktopmenu .topitem a {
+    color: #000;
+}
+
+ul.desktopmenu .topitem a, ul.desktopmenu .topitem a:visited {
+    font-weight: normal;
+    padding: 6px 12px;
+    display: block;
+    text-decoration: none;
+    vertical-align: middle;
+    outline: none;
+}
+
+ul.desktopmenu .topitem {
+    font-weight: normal;
+    float: left;
+    display: block;
+    margin-top: 1px;
+    margin-left: 0px;
+}
+
+ul.desktopmenu {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+ul.desktopmenu li{
+	white-space:nowrap;
+}
+
+div.menu-item {
+    position:relative;
+}
+
+img.menu-item-arrow{
+	position: absolute;
+	right: 14px;
+	top: 7px;
+}
+
+ul.desktopmenu {
+    background: #d0d0d0 url(menu-background.png) repeat-x 0px 0px;
+    /*border-top: 1px solid #a0a0a0;*/
+    border-bottom: 1px solid #808080;
+    border-right: none;
+    border-left: none;
+    height: 26px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+ul.desktopmenu li.activetarget a {
+	color: white;
+}
+
+ul.desktopmenu li.topitem a:hover {
+	color: white;
+}
+
+ul.desktopmenu li.activetarget {
+    background: url(menu-background-hover.png) repeat-x;
+    -moz-border-radius: 4px 4px 0px 0px;
+    -webkit-border-top-left-radius: 4px;
+    -webkit-border-top-right-radius: 4px;
+    border-radius: 4px 4px 0px 0px;
+}

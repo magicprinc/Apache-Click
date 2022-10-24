@@ -1,0 +1,27 @@
+${cssImports}
+${jsImports}
+
+$dateWrapper
+
+$link
+
+
+<script type="text/javascript">
+            // Check if jQuery is defined before using it
+            if (typeof jQuery != 'undefined') {
+                // If jQuery is defined dynamically load blockUI
+                jQuery.getScript( '${context}/clickclick/jquery/blockui/jquery.blockUI.js', function() {
+                    // Setup blockUI to popup before all ajax calls
+                    jQuery().ajaxStart(jQuery.blockUI).ajaxStop(jQuery.unblockUI);
+                });
+
+                if (typeof jQuery.taconite != 'undefined') {
+                    // Setup debug if taconite library is included
+                    jQuery.taconite.debug = true;
+                }
+                if (typeof Click != 'undefined') {
+                    // Setup debug if Click library is included
+                    Click.debug = true;
+                }
+            }
+        </script>

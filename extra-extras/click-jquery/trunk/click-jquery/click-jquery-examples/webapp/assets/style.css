@@ -1,0 +1,167 @@
+body {
+	font-family: Arial;
+	font-size: 10pt;
+	margin: 0;
+	padding: 0;
+}
+
+input, label, td {
+	font-size: 10pt;
+}
+
+#header {
+	background: #FDE3B5 url(images/banner.png) top left no-repeat;
+	border-bottom: 1px solid #707070;
+	height: 50px;
+	position: relative;
+	width: 100%;
+}
+
+#title {
+	color: white; 
+	font-size: 20pt;
+	font-weight: bolder;
+	position: absolute;
+	left: 15px;
+	top: 10px;
+}
+
+#link, #link a {
+	position: absolute;
+	right: 5px;
+	bottom: 3px;
+  white-space: nowrap;
+  color: #222;
+}
+
+#container { 
+	padding-top: 1.5em;
+	padding-left: 1.5em;
+	z-index: 0;
+}
+
+h3.title {
+	margin-top: 0em;
+	margin-bottom: 1em;
+}
+
+.info {
+	color: navy;
+	font-style: italic;
+}
+
+a:visited {
+	color: blue;
+}
+
+.infoMsg {
+    border: 1px solid #a7bcd6;
+    background-color: #ffffc0;
+    margin: 0.5em;
+    padding: 0.5em;
+}
+
+/*
+ * Table styles
+ */
+table.complex td, table.complex th, table.isi td, table.isi th, table.its td, table.its th, table.mars td, table.mars th, table.nocol td, table.nocol th, table.simple td, table.simple th, table.simple input, table.simple select, table.report td, table.report th {
+	font-size: 9pt;
+}
+
+/* Table Gray Style */
+table.gray{
+    font-family: Georgia, serif;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: normal;
+    letter-spacing: -1px;
+    line-height: 1.2em;
+    border-collapse:collapse;
+    text-align:left;
+}
+.gray thead th, .gray tfoot td{
+    padding:10px 10px;
+    color:#fff;
+    font-size: 18px;
+    background-color:#222;
+    font-weight:normal;
+    border-right:1px dotted #666;
+    border-top:3px solid #666;
+    -moz-box-shadow:0px -1px 4px #000;
+    -webkit-box-shadow:0px -1px 4px #000;
+    box-shadow:0px -1px 4px #000;
+    text-shadow:1px 1px 1px #000;
+}
+.gray tfoot th{
+    padding:10px;
+    font-size:18px;
+    text-transform:uppercase;
+    color:#888;
+}
+.gray tfoot td{
+    font-size:36px;
+    color:#EF870E;
+    border-top:none;
+    border-bottom:3px solid #666;
+    -moz-box-shadow:0px 1px 4px #000;
+    -webkit-box-shadow:0px 1px 4px #000;
+    box-shadow:0px 1px 4px #000;
+}
+.gray thead th:empty{
+    background:transparent;
+    -moz-box-shadow:none;
+    -webkit-box-shadow:none;
+    box-shadow:none;
+}
+.gray thead :nth-last-child(1){
+    border-right:none;
+}
+/*.gray thead :first-child,*/
+.gray tbody :nth-last-child(1){
+    border:none;
+}
+.gray tbody th{
+    text-align:right;
+    padding:10px;
+    color:#333;
+    text-shadow:1px 1px 1px #ccc;
+    background-color:#f9f9f9;
+}
+.gray tbody td{
+    padding:10px;
+    background-color:#f0f0f0;
+    border-right:1px dotted #999;
+    text-shadow:-1px 1px 1px #fff;
+    text-transform:uppercase;
+    color:#333;
+}
+
+
+/*
+table.gray {
+	table-layout: fixed;
+  background: #DDD;
+}
+
+table.gray tr  {
+	height: 25px;
+}
+
+table.gray td, table.gray th {
+	font-size: 10px;
+	border-bottom: 1px solid #ABABAB;
+  border-right: 1px solid #ABABAB;
+  width: 150px;
+}
+
+table.gray th  {
+	padding: 2px;
+	text-align: left;
+}
+
+table.gray td {
+	padding: 2px;
+	text-align: left;
+  background: #EEE;
+}
+*/

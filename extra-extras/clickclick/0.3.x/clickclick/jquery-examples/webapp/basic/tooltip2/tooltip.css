@@ -1,0 +1,35 @@
+/* simple css-based tooltip */
+div.tooltip {
+    background-color:#000;
+    outline:1px solid #669;
+    border:2px solid #fff;
+    padding:10px 15px;
+    width:200px;
+    display:none;
+    color:#fff;
+    text-align:left;
+    font-size:12px;
+
+    /* outline radius for mozilla/firefox only */
+    outline-radius:4px;
+    -moz-outline-radius:4px;
+    -webkit-outline-radius:4px;
+}
+
+#form li {
+    padding-bottom: 12px;
+}
+
+#form ul {
+    margin: 0;
+    padding: 1em 0 0 1em;
+    list-style: none;
+}
+#form label {
+    float: left;
+    width: 80px;
+    margin-right: 1em;
+}
+#form input.text {
+    width: 180px;
+}

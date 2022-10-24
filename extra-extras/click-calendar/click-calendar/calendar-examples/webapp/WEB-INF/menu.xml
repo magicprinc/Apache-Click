@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<menu>
+    <menu label=" Home" path="home.htm" imageSrc="/assets/images/home.png"/>
+
+    <menu label=" Calendar" path="#" imageSrc="/assets/images/calendar.png">
+        <menu label="Calendar demo" path="calendar/calendar-demo.htm"/>
+        <menu label="FormTable with Calendars" path="calendar/form-table.htm"/>
+    </menu>
+
+</menu>

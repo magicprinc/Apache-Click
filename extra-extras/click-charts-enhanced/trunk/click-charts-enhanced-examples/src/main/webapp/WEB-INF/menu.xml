@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.
+-->
+
+<menu>
+  <menu label=" Home" path="index.htm" imageSrc="/assets/images/home.png">
+    <menu label="BorderPage Class" path="source-viewer.htm?filename=WEB-INF/classes/org/apache/click/examples/page/BorderPage.java" title="BorderPage Java source" target="_blank"/>
+    <menu label="Border Template HTML" path="source-viewer.htm?filename=border-template.htm" title="Page border HTML template" target="_blank" />
+    <menu separator="true"/>
+    <menu label="Javadoc API" path="javadoc/index.html" title="Examples HTML Javadoc API" target="_blank" />
+    <menu separator="true"/>
+    <menu label="click.xml" path="source-viewer.htm?filename=WEB-INF/click.xml" title="Click application descriptor" target="_blank" />
+    <menu label="web.xml" path="source-viewer.htm?filename=WEB-INF/web.xml" title="Web application descriptor" target="_blank" />
+  </menu>
+
+  <menu label="JQPlot Examples" path="#" imageSrc="/assets/images/intro.png">
+    <menu label="Basic Charts" path="jqplot/JQPlotsBasicChartsDemo.htm"/>
+    <menu separator="true"/>
+    <menu label="Bar Charts" path="jqplot/JQPlotsBarChartsDemo.htm"/>
+    <menu label="Pie Charts" path="jqplot/JQPlotsPieChartsDemo.htm"/>
+    <menu label="OHLC Charts" path="jqplot/JQPlotsOHLCChartsDemo.htm"/>
+    <menu label="Stacked bar and line charts" path="jqplot/JQPlotsStackedDemo.htm"/>
+    <menu label="Data points and bar charts" path="jqplot/JQPlotsPointLabelsDemo.htm"/>
+    <menu separator="true"/>
+    <menu label="Axis Autoscale" path="jqplot/JQPlotsAxisAutoScaleDemo.htm"/>
+    <menu label="Axis Label" path="jqplot/JQPlotsAxisLabelDemo.htm"/>
+    <menu label="Multiple Axis" path="jqplot/JQPlotsMultipleAxisDemo.htm"/>
+    <menu label="Logarithmic Axis" path="jqplot/JQPlotsLogarithmicAxisChartsDemo.htm"/>
+    <menu label="Date Axis" path="jqplot/JQPlotsDateAxisDemo.htm"/>
+    <menu label="Category Axis" path="jqplot/JQPlotsCategoryAxisDemo.htm"/>
+    <menu label="Rotated Axis Text" path="jqplot/JQPlotsRotatedAxisLabelDemo.htm"/>
+    <menu separator="true"/>
+    <menu label="Drag'n Drop and Trend Lines" path="jqplot/JQPlotsDragDropTrendLineDemo.htm"/>
+    <menu label="Data Point Highlighter" path="jqplot/JQPlotsHighlightDemo.htm"/>
+    <menu separator="true"/>
+    <menu label="Bezier Charts" path="jqplot/JQPlotsBezierChartsDemo.htm"/>
+    <menu label="Block Charts" imageSrc="/assets/images/delete.gif"/>
+    <menu label="Mekko Charts" imageSrc="/assets/images/delete.gif"/>
+    <menu label="Bubble Charts" path="jqplot/JQPlotsBubbleChartsDemo.htm"/>
+    <menu label="Donut Charts" path="jqplot/JQPlotsDonutChartsDemo.htm"/>
+    <menu label="Funnel Charts" path="jqplot/JQPlotsFunnelChartsDemo.htm"/>
+    <menu label="Meter Gauge" path="jqplot/JQPlotsMeterGaugeChartsDemo.htm"/>
+    <menu label="Enhanced Legend" path="jqplot/JQPlotsEnhancedLegendDemo.htm"/>
+    
+    
+  </menu>
+
+  <menu label="Flot Examples" path="#" imageSrc="/assets/images/intro.png">
+    <menu label="Basic Charts" path="flot/FlotBasicChartsDemo.htm"/>
+    <menu label="Pie Charts" path="flot/FlotPieChartsDemo.htm"/>
+    <menu separator="true"/>
+  </menu>
+
+</menu>

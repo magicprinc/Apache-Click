@@ -1,0 +1,32 @@
+Click Charts Release
+----------------------
+
+Release Procedures
+------------------
+1. ensure build.properties and README.html has correct version
+2. finalize CHANGELOG.txt
+3. run 'ant get-deps' to retrieve the latest dependencies
+4. run 'ant build-distribution' to build the jar and zip artifacts
+5. clean deploy to Tomcat and test click-charts-examples
+6. release file at http://code.google.com/p/click-charts/
+7. update project home page
+8. email release announcement to click mailing lists
+
+Maven Artifact Upload Procedures
+--------------------------------
+1. Ensure the 'sf.repo' server is setup in ~/.m2/settings.xml, otherwise maven won't authenticate at sourceforge. For example:
+   <settings>
+    <servers>
+      <server>
+        <id>sf.repo</id>
+        <username>SOURCEFORGE_USERNAME,click</username>
+        <password>SOURCEFORGE_PASSWORD</password>
+      </server>
+    </servers>
+  </settings>
+2. Ensure click-charts.pom has the correct dependencies and versions
+3. run 'ant build-maven-bundles'
+4. cd to directory maven-upload (this directory will be on the same level as the click-chart folder.
+   If Click Charts is available at 'c:/dev/click-chart', maven bundles will be under 'c:/dev/maven-upload')
+5. cd to 'maven-upload/click-charts' and execute the following command:
+5.1. mvn deploy:deploy-file -DpomFile=pom.xml -Dfile=click-charts-X.X.X.jar -Durl=sftp://web.sourceforge.net/home/groups/c/cl/click/htdocs/maven2/ -DrepositoryId=sf.repo

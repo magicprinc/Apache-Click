@@ -1,0 +1,123 @@
+<div>
+$link
+</div>
+
+<div id="result1">
+    <h3>Result 1 goes here</h3>
+</div>
+
+<div id="result2Container">
+    <span id="result2">Result 2 goes </span> <span id="result3">here</span>
+</div>
+<p/>
+This example demonstrates how to return multiple Controls or content from the
+server.
+<p/>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#linkId').click(function(e) {
+            e.preventDefault();
+
+            var link = this;
+            // Get the link URL
+            var url = Click.jq.getUrl(link);
+
+            // Get the link data (ID, event)
+            var data = Click.jq.getData({source: link, event: e});
+
+            $.ajax({
+                url: url,
+                data: data,
+                dataType: 'html',
+                success: function(data) {
+
+                    // Extract the elements (time) from the server response
+                    var elements=Click.jq.extractElements(data);
+
+                    // Add the returned content to the appropriate divs
+                    $('#result1').html(elements.result1);
+                    $('#result2').html(elements.result2);
+                    $('#result3').html(elements.result3);
+                    $('#result1').css('backgroundColor', '#FFFF00');
+                    startFade($('#result1')[0], "#FFFF00", "#ffffff", 1000);
+                    $('#result2Container').css('backgroundColor', '#FFFF00');
+                    startFade($('#result2Container')[0], "#FFFF00", "#ffffff", 1000);
+
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    // Handle any error that occurred
+                    Click.jq.handleError(xhr, textStatus, errorThrown);
+                }
+            });
+        })
+    });
+
+    function startFade(obj, startColor, endColor, duration)
+{
+    var startRGB = hexToRGB(startColor);
+    var endRGB = hexToRGB(endColor);
+    var diffRGB = {};
+
+    diffRGB.r = endRGB.r - startRGB.r;
+    diffRGB.g = endRGB.g - startRGB.g;
+    diffRGB.b = endRGB.b - startRGB.b;
+
+    var steps = duration/20;
+    changeBackgroundColor(obj, startRGB, diffRGB, steps, 1);
+
+}
+
+function changeBackgroundColor(obj, startRGB, diffRGB, steps, currentStep)
+{
+
+    var curRGB = {};
+    curRGB.r = startRGB.r + Math.round((diffRGB.r/steps) * currentStep);
+    curRGB.g = startRGB.g + Math.round((diffRGB.g/steps) * currentStep);
+    curRGB.b = startRGB.b + Math.round((diffRGB.b/steps) * currentStep);
+
+    obj.style.backgroundColor =  'rgb('+curRGB.r+','+curRGB.g+','+curRGB.b+')';
+
+    if (currentStep != steps)
+        setTimeout(function(){changeBackgroundColor(obj, startRGB, diffRGB, steps, ++currentStep);}, 20);
+}
+
+
+function hexToRGB(hex)
+{
+    hex = hex.toUpperCase( );
+    if( hex.substring(0,1)=='#')
+        hex = hex.substring(1);
+
+    var rgb = {};
+    rgb.r = parseInt(hex.substring(0,2), 16);
+    rgb.g = parseInt(hex.substring(2,4), 16);
+    rgb.b = parseInt(hex.substring(4,6), 16);
+
+    return rgb;
+}
+
+</script>
+
+<style type="text/css">
+    #result1 {
+        padding: 5px;
+        border: 1px solid gray;
+        width: 300px;
+}
+
+#result2Container{
+    border: 1px solid gray;
+    margin-top: 20px;
+        padding: 5px;
+        width: 300px;
+}
+    #result2 {
+}
+#result3{
+    font-size: 15px;
+    font-weight: bold;
+    text-decoration: underline;
+
+}
+</style>

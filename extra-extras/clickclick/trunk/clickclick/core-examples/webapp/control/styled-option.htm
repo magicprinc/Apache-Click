@@ -1,0 +1,184 @@
+<style type="text/css">
+b {font-size: 1.5em; font-weight: bold;} 
+u {border-bottom: 2px solid blue; font-size: 1.2em; text-decoration: none; display: block;}
+
+option, select {font-size: 1.3em; height: 26px; color: black; background-color: white; vertical-align:middle;}
+select[id*=_w_] {height: 150px;} /* firefox doesn't keep same size for selects with differen font-sizes, ID and Opera are OK */
+
+/* we could do this if it weren't for the javascript:
+option[id^="form_i"],option[id^="form_w_j"] {background-repeat: no-repeat; background-position: center left; padding-left: 30px;}
+*/
+
+#blankRule {}
+
+#form_a_aqua,    #form_w_b_aqua    {color: aqua;}
+#form_a_black,   #form_w_b_black   {color: black;}
+#form_a_blue,    #form_w_b_blue    {color: blue;}
+#form_a_fuchsia, #form_w_b_fuchsia {color: fuchsia;}
+#form_a_gray,    #form_w_b_gray    {color: gray;}
+#form_a_green,   #form_w_b_green   {color: green;}
+#form_a_lime,    #form_w_b_lime    {color: lime;}
+#form_a_maroon,  #form_w_b_maroon  {color: maroon;}
+#form_a_navy,    #form_w_b_navy    {color: navy;}
+
+#form_c_aqua,    #form_w_d_aqua    {background-color: aqua;}
+#form_c_black,   #form_w_d_black   {background-color: black; color: white;}
+#form_c_blue,    #form_w_d_blue    {background-color: blue; color: white;}
+#form_c_fuchsia, #form_w_d_fuchsia {background-color: fuchsia;}
+#form_c_gray,    #form_w_d_gray    {background-color: gray;}
+#form_c_green,   #form_w_d_green   {background-color: green;}
+#form_c_lime,    #form_w_d_lime    {background-color: lime;}
+#form_c_maroon,  #form_w_d_maroon  {background-color: maroon;}
+#form_c_navy,    #form_w_d_navy    {background-color: navy; color: white;}
+
+#form_e_blue,    #form_w_f_blue    {color: blue;}
+#form_e_fuchsia, #form_w_f_fuchsia {color: fuchsia;}
+#form_e_gray,    #form_w_f_gray    {color: gray;}
+#form_e_green,   #form_w_f_green   {color: green;}
+#form_e_lime,    #form_w_f_lime    {color: lime;}
+
+#form_g_Accept:first-letter,   #form_w_h_Accept:first-letter   {background-color: #CCFF99;}
+#form_g_Decline:first-letter,  #form_w_h_Decline:first-letter  {background-color: #FF3300;}
+#form_g_Hearts:first-letter,   #form_w_h_Hearts:first-letter   {color: red;}
+#form_g_Diamonds:first-letter, #form_w_h_Diamonds:first-letter {color: red;}
+
+#form_i_open,    #form_w_j_open    {background-image: url(../assets/images/lockopen.png); background-repeat: no-repeat; background-position: center left; padding-left: 30px;}
+#form_i_closed,  #form_w_j_closed  {background-image: url(../assets/images/lockclosed.png); background-repeat: no-repeat; background-position: center left; padding-left: 30px;}
+#form_i_color,   #form_w_j_color   {background-image: url(../click/colorpicker/colorscale.png); height: 24px; width: 100%;; background-repeat: no-repeat; background-position: center left; padding-left: 30px;}
+#form_i_nocolor, #form_w_j_nocolor {background-image: url(../click/colorpicker/nocolorchoose.gif); background-repeat: no-repeat; background-position: center left; padding-left: 30px;}
+#form_i_calend,  #form_w_j_calend  {background-image: url(../click/calendar/calendar.gif); background-repeat: no-repeat; background-position: center left; padding-left: 30px;}
+#form_i_folder,  #form_w_j_folder  {background-image: url(../click/tree/images/folder-open.png); background-repeat: no-repeat; background-position: center left; padding-left: 30px;}
+#form_i_keyb,    #form_w_j_keyb    {background-image: url(../click/keyboard.png); background-repeat: no-repeat; background-position: center left; padding-left: 30px;}
+
+#form_k_Ari,    #form_w_l_Ari    {font-family:Arial}
+#form_k_Arb,    #form_w_l_Arb    {font-family:'Arial Black'}
+#form_k_Arn,    #form_w_l_Arn    {font-family:'Arial Narrow'}
+#form_k_Boo,    #form_w_l_Boo    {font-family:'Book Antiqua'}
+#form_k_Cen,    #form_w_l_Cen    {font-family:'Century Gothic'}
+#form_k_Com,    #form_w_l_Com    {font-family:'Comic Sans MS'}
+#form_k_Cou,    #form_w_l_Cou    {font-family:'Courier New'}
+#form_k_Fix,    #form_w_l_Fix    {font-family:Fixedsys}
+#form_k_Fra,    #form_w_l_Fra    {font-family:'Franklin Gothic Medium'}
+#form_k_Gar,    #form_w_l_Gar    {font-family:Garamond}
+#form_k_Geo,    #form_w_l_Geo    {font-family:Georgia}
+#form_k_Imp,    #form_w_l_Imp    {font-family:Impact}
+#form_k_Luc,    #form_w_l_Luc    {font-family:'Lucida Console'}
+#form_k_Lus,    #form_w_l_Lus    {font-family:'Lucida Sans Unicode'}
+#form_k_San,    #form_w_l_San    {font-family:'Sans Serif'}
+#form_k_Pal,    #form_w_l_Pal    {font-family:'Palatino Linotype'}
+#form_k_Sys,    #form_w_l_Sys    {font-family:System}
+#form_k_Tah,    #form_w_l_Tah    {font-family:Tahoma}
+
+#form_m_pt1,    #form_w_n_pt1    {font-size:8pt}
+#form_m_pt2,    #form_w_n_pt2    {font-size:12pt}
+#form_m_pt3,    #form_w_n_pt3    {font-size:18pt}
+#form_m_pt4,    #form_w_n_pt4    {font-size:24pt; border-bottom: 2px dashed red}
+#form_m_em1,    #form_w_n_em1    {font-size:0.5em}
+#form_m_em2,    #form_w_n_em2    {font-size:1em}
+#form_m_em3,    #form_w_n_em3    {font-size:1.5em}
+#form_m_em4,    #form_w_n_em4    {font-size:2em; border-bottom: 2px dashed red}
+#form_m_small,  #form_w_n_small  {font-size:small}
+#form_m_medium, #form_w_n_medium {font-size:medium}
+#form_m_large,  #form_w_n_large  {font-size:large}
+#form_m_x-large,#form_w_n_x-large{font-size:x-large}
+}
+</style>
+
+$form
+
+<script language="JavaScript" type="text/javascript">
+var updateChanges;
+var blankRule;
+
+function copyStyle(from, to){
+if (!updateChanges) return;
+
+	var rule = findRule(from.id);
+	if (rule==undefined) { 
+		rule = blankRule;
+	}
+	var fromStyle = rule.style;
+	var toStyle = to.style;
+	var prop = "";
+//	alert("bg-color: " + fromStyle.backgroundColor);
+	
+    for(var it in fromStyle) {
+	    prop = "toStyle." + it + " = fromStyle." + it + ";";
+	    try {
+        	eval(prop);
+	    } catch(e) {
+	    	// Do nothing
+	    }
+	}
+}
+
+function toggleJavascript() {
+if (!isFirefox()) return;
+	try {
+		var sels = document.getElementsByTagName("select");
+		var sel;
+		var check = document.getElementById("javascriptCheckbox");
+		if (check.checked) {
+			updateChanges = true;
+			for (var i=0; i < sels.length; i++) {
+				sel = sels[i];
+				if (sel.id!=undefined) {
+					if ((sel.id.indexOf("_w_"))=="-1") { // only dropdownboxes, not lists
+						copyStyle(sel.options[sel.selectedIndex], sel);
+					}
+				}
+			}
+		} else {
+			for (var i in sels) {
+				sel = sels[i];
+				// don't change default
+				if (sel.id!=undefined && sel.id!="form_hidden") { // why are there 3 items more, even when length is correct??
+					if ((sel.id.indexOf("_w_"))=="-1") { // only dropdownboxes, not lists
+						copyStyle(blankRule, sel);
+					}
+				}
+			}
+			updateChanges = false;
+		}
+	} catch(err) {
+		alert("Error processing toggle: " + err.description);
+		return;
+	}	
+}
+
+function isFirefox() {
+	return (navigator.userAgent.indexOf("Firefox") != -1);
+}
+
+function findRule(rulename) {
+//	for(var i=0; i < document.styleSheets.length; i++) { // cheating
+		// document.write("<br><br>Stylesheet: " + i + "<br>----------------<br>");
+		var sc = document.styleSheets[6]; // shortcutting it a bit :-) can't do this if you want to use this script in a generic way
+		var selector;
+		var rules = (sc.cssRules==undefined) ? sc.rules : sc.cssRules;
+		// document.write("rules: " + rules.length);
+		for(var k=0; k < rules.length; k++) {
+			selector = rules[k].selectorText;
+			// document.write("<br> selector: " + selector); 
+			if (selector!=undefined && selector.indexOf(rulename)!=-1) {
+				return rules[k];
+			}
+		}
+//	} // end cheating
+	return undefined;
+}
+
+function init() {
+	if (isFirefox()) {
+		blankRule = findRule("option, select"); // IE uses uppercase, so this will not work on IE
+	}
+	if (blankRule==undefined) {
+		updateChanges = false;
+		document.getElementById("javascriptCheckbox").disabled = true;
+	} else {
+		toggleJavascript(); // setting initial values
+	}
+}
+
+init();
+</script>

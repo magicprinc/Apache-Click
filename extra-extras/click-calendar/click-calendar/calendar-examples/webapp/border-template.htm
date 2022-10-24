@@ -1,0 +1,28 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>Click Chart Example - $title</title>
+        <link rel="stylesheet" type="text/css" href="$context/assets/style.css" title="Style"></link>
+        <link rel="stylesheet" type="text/css" href="${context}/assets/css/syntax-highlighter.css"/>
+        <script type="text/javascript" src="${context}/assets/js/syntax-highlighter.js"></script>
+        ${cssImports}
+    </head>
+    
+    <body>
+        
+        <div id="header">
+            <span id="title">chart-example :: $title</span>
+        </div>
+        
+        #if ($rootMenu) 
+        #writeMenu($rootMenu) 
+        #end
+        
+        <div id="container">
+            #parse($path)
+        </div>
+        
+        ${jsImports}
+        <script type="text/javascript">prettyPrint();</script>
+    </body>
+</html>

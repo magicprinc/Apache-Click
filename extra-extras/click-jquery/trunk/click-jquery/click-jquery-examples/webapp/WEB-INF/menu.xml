@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<menu>
+    <menu label=" Home" path="home.htm" imageSrc="/assets/images/home.png"/>
+    <menu label="Basics" path="#">
+        <menu label="Effects" path="basic/effects.htm"/>
+        <menu label="Tooltip - clueTip" path="basic/tooltip1/tooltip.htm"/>
+        <menu label="Tooltip - jQuery Tools" path="basic/tooltip2/tooltip.htm"/>
+    </menu>
+    <menu label="Controls" path="#">
+        <menu label="JQuery UI Calendar" path="controls/calendar-demo.htm"/>
+        <menu label="JQuery UI Slider" path="controls/slider-demo.htm"/>
+        <menu label="JQuery UI Dialog" path="controls/dialog/dialog-demo.htm"/>
+        <menu label="Desktop Menu" path="controls/desktop-menu.htm"/>
+        <menu label="Superfish Menu" path="controls/superfish-menu.htm"/>
+        <menu label="Color Picker" path="controls/color-picker.htm"/>
+    </menu>
+    <menu label="Ajax" path="#">
+        <menu label="Text Update Demo" path="ajax/text-demo.htm"/>
+        <menu separator="true"/>
+        <menu label="Action Link Demo" path="ajax/action-link-demo.htm"/>
+        <menu label="Action Button Demo" path="ajax/action-button-demo.htm"/>
+        <menu label="Action Demo" path="ajax/action-demo.htm"/>
+        <menu label="Light-weight Action Link Demo" path="ajax/light-weight-action-link-demo.htm"/>
+        <menu separator="true"/>
+        <menu label="Table Demo" path="ajax/table-demo.htm"/>
+        <menu label="Stateful Table Demo" path="ajax/stateful-table-demo.htm"/>
+        <menu separator="true"/>
+        <menu label="Select Demo" path="ajax/select-demo.htm"/>
+        <menu label="Checkbox Demo" path="ajax/checkbox-demo.htm"/>
+        <menu separator="true"/>
+        <menu label="AutoComplete" path="ajax/auto-complete.htm"/>
+        <menu label="Advanced AutoComplete" path="ajax/advanced-auto-complete.htm"/>
+        <menu separator="true"/>
+        <menu label="Lazy Load Demo" path="ajax/lazy-load-demo.htm"/>
+        <menu separator="true"/>
+        <menu label="Ajax Polling Demo" path="ajax/poll/poll-demo.htm"/>
+        <menu label="Multiple Ajax Polling Demo" path="ajax/poll/multiple-poll-demo.htm"/>
+    </menu>
+    <menu label="Form" path="#">
+        <menu label="Form Demo" path="ajax/form/form-demo.htm"/>
+        <menu separator="true"/>
+        <menu label="Dynamic Form Basic Demo" path="ajax/form/dynamic-form-basic.htm"/>
+        <menu label="Dynamic Form Ajax Demo" path="ajax/form/dynamic-form-ajax.htm"/>
+        <menu separator="true"/>
+        <menu label="File Upload Demo" path="ajax/form/file-upload-demo.htm"/>
+        <menu separator="true"/>
+        <menu label="Form Validation Demo" path="ajax/form/validation/form-validation-demo.htm"/>
+        <menu label="JQuery Inline Validation Demo" path="ajax/form/validation/jquery-validation1-demo.htm"/>
+        <menu label="JQuery Validation Demo" path="ajax/form/validation/jquery-validation2-demo.htm"/>
+    </menu>
+    <menu label="Tree" path="#">
+        <menu label="Tree Demo" path="ajax/tree/tree-demo.htm"/>
+        <menu label="CRUD Tree Demo" path="ajax/tree/editable-tree-on-server.htm"/>
+        <menu label="Context Menu Tree Demo" path="ajax/tree/tree-with-context-menu.htm"/>
+    </menu>
+    <menu label="Charts" path="#">
+        <menu label="Line Chart" path="charts/line/line-chart.htm"/>
+        <menu label="Revenue Demo" path="charts/line/revenue-chart.htm"/>
+        <menu label="Interactive Line Chart" path="charts/line/interactive-chart.htm"/>
+        <menu label="Pie Chart" path="charts/pie/pie-chart.htm"/>
+        <menu label="Bar Chart" path="charts/bar/bar-chart.htm"/>
+        <menu separator="true"/>
+        <menu label="Dashboard Demo" path="charts/dashboard/dashboard.htm"/>
+    </menu>
+</menu>

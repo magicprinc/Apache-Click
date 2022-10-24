@@ -1,0 +1,49 @@
+<p>
+    Demonstration of Click's Ajax support.
+</p>
+<p>
+    Note this demo uses the bare essentials to show how Ajax is supported. No Ajax library such as
+    Prototype, JQuery, Mootools, YUI is used.
+    
+</p>
+
+<script type="text/javascript">
+    //Generic function to make Ajax requests to a url on the server
+    function ajax(url, vars, callbackFunction) {
+        // Create Ajax object for IE or standards browser
+        var request = window.ActiveXObject ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
+        request.open("POST", url, true);
+
+        request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+
+        // Set the X-Requested-With header. This way Click knows its an Ajax request.
+        // This header is the de-facto standard; most Ajax libraries such as Prototype, JQuery, Mootools, YUI
+        // sets this header.
+        request.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+
+        request.onreadystatechange = function() {
+            // request.readystate of 4 means the Ajax request is complete and we can retrieve the result
+            // request.status of 200 means the request was successful
+            if (request.readyState == 4 && request.status == 200) {
+                if (request.responseText) {
+                    callbackFunction(request.responseText);
+                }
+            }
+        };
+        request.send(vars);
+    }
+
+    function updateLog(response) {
+        var div = document.getElementById("log");
+        
+        div.innerHTML = response;
+    }
+</script>
+
+$link
+
+<p>
+    <div id="log">
+
+    </div>
+</p>    
