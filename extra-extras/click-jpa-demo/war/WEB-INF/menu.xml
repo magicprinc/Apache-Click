@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<menu>
+    <menu label=" Home" path="home.htm" imageSrc="/assets/images/home.png"/>
+    <menu label="Customer" path="#">
+        <menu label="Edit Customer" path="page/edit-customer.htm"/>
+        <menu label="View Customers" path="page/view-customers.htm"/>
+    </menu>
+</menu>

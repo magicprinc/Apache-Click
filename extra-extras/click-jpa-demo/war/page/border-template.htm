@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Click JPA Example - $title</title>
+        <link rel="stylesheet" type="text/css" href="$context/assets/style.css" title="Style"/>
+        <link rel="stylesheet" type="text/css" href="${context}/assets/css/syntax-highlighter.css"/>
+        <script type="text/javascript" src="${context}/assets/js/syntax-highlighter.js"></script>
+        ${headElements}
+    </head>
+
+    <body>
+
+        <div id="header">
+            <span id="title">JPA Example :: $title</span>
+            <span id="link">
+                <a target="_blank" href="http://code.google.com/p/click-jpa-demo/">Click-JPA</a>
+            </span>
+        </div>
+
+        #if ($rootMenu) 
+        #writeMenu($rootMenu) 
+        #end
+
+        <div id="container">
+            #parse($path)
+        </div>
+
+        ${jsElements}
+        <!-- Activate source code highlighting. -->
+        <script type="text/javascript">prettyPrint();</script>
+    </body>
+</html>

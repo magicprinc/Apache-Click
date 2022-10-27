@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="click-jpa" default="get-deps" basedir=".">
+    <description>Builds, tests, and runs the project Click JPA.</description>
+
+	<property file="build.properties"/>
+
+	<target name="get-deps" description="Sync this application dependencies"
+		depends="import-click-core, import-click-extras, deploy-click-resources, copy-source">
+	</target>
+
+    <target name="copy-source">
+        <copy todir="war/WEB-INF/classes">
+         <fileset dir="src">
+         </fileset>
+      </copy>
+    </target>
+
+	<target name="import-click-core" depends="build-click-core">
+		<copy todir="war/WEB-INF/lib" overwrite="true">
+			<fileset file="C:/dev/os/apache/click/click-svn/dist/click-${click.version}.jar">
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="import-click-extras" depends="build-click-extras">
+		<copy todir="war/WEB-INF/lib" overwrite="true">
+			<fileset file="C:/dev/os/apache/click/click-svn/dist/click-extras-${click.version}.jar">
+			</fileset>
+		</copy>
+	</target>
+	
+	<target name="build-click-core">
+		<ant antfile="C:/dev/os/apache/click/click-svn/build/build.xml" target="build-framework" inheritall="false"/>
+	</target>
+	
+	<target name="build-click-extras">
+		<ant antfile="C:/dev/os/apache/click/click-svn/build/build.xml" target="build-extras" inheritall="false"/>
+	</target>
+
+	<target name="deploy-click-resources" description="Deploy Click static resources">
+	    <taskdef name="deploy"
+	             classname="org.apache.click.tools.deploy.DeployTask"
+	             classpath="${click.dist}/lib/click-dev-tasks-1.1.jar"/>
+
+		<delete dir=".">
+			<include name="deployed*.html"/> 
+		</delete>
+
+	    <deploy dir="war/WEB-INF/" todir="war"/>
+	</target>
+
+</project>

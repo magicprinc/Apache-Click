@@ -1,0 +1,39 @@
+#*********************************
+ * Write drop down menu and Search
+ *********************************#
+
+#macro( writeMenu $rootMenu )
+
+<table id="menuTable" border="0" width="100%" cellspacing="0" cellpadding="0" style="margin-top: 2px;">
+<tr>
+
+<td>
+<div id="searchbar">
+<div class="menustyle" id="menu">
+  <ul class="menubar" id="dmenu">
+    #foreach ($topMenu in $rootMenu.children)
+        #if ($topMenu.children.empty)
+		  <li class="topitem">$topMenu</li>
+        #else
+		  <li class="topitem">$topMenu
+		    <ul class="submenu"
+            #foreach ($subMenu in $topMenu.children)
+                ><li>$subMenu</li
+		    #end
+            ></ul>
+		  </li>
+        #end
+    #end
+        <li class="topitem"><a target="_blank" href="$context/page/source-viewer.htm?filename=WEB-INF/classes/$srcPath" title="Page Java source"><img border="0" class="link" alt="" src="$context/assets/images/text_code_java.png"/> Page Java</a>
+        </li>
+        <li class="topitem"><a target="_blank" href="$context/page/source-viewer.htm?filename=$path" title="Page Content source"><img border="0" class="link" alt="" src="$context/assets/images/text_marked.png"/> Page HTML</a>
+        </li>
+	</ul>
+  </div>
+</div>
+</td>
+
+</tr>
+</table>
+
+#end

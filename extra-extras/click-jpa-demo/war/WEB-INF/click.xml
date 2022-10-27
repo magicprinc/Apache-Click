@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<click-app> 
+
+  <pages package="com.mycorp">
+ 	<page path="/home.htm" classname="page.HomePage"/>
+  </pages>
+
+  <mode value="production"/>
+
+  <log-service classname="org.apache.click.extras.service.JdkLogService"/>
+
+  <file-upload-service classname="org.apache.click.extras.gae.MemoryFileUploadService">
+    <property name="sizeMax" value="2000"/>
+    <property name="fileSizeMax" value="1000"/>
+  </file-upload-service>
+
+</click-app> 
