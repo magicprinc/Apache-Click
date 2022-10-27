@@ -71,6 +71,7 @@ dependencies {
   //implementation 'org.springframework:spring-context:3.2.18.RELEASE'
   //implementation 'org.springframework:spring-context-support:3.2.18.RELEASE'
   implementation 'org.springframework:spring-web:3.2.18.RELEASE'
+  implementation 'org.springframework.security:spring-security-core:3.2.10.RELEASE'
 
   implementation project(':click')
 
