@@ -18,27 +18,6 @@
  */
 package org.apache.click;
 
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.Writer;
-import java.lang.reflect.Field;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.UnavailableException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.apache.click.service.ConfigService;
 import org.apache.click.service.ConfigService.AutoBinding;
 import org.apache.click.service.LogService;
@@ -53,6 +32,28 @@ import org.apache.click.util.PageImports;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.StringUtils;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.UnavailableException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.Serial;
+import java.io.Writer;
+import java.lang.reflect.Field;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.TreeMap;
 
 /**
  * Provides the Click application HttpServlet.
@@ -105,7 +106,7 @@ public class ClickServlet extends HttpServlet {
 
     // -------------------------------------------------------------- Constants
 
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     /**
      * The <tt>mock page reference</tt> request attribute: key: &nbsp;
@@ -156,7 +157,7 @@ public class ClickServlet extends HttpServlet {
 
     /** The thread local page listeners. */
     private static final ThreadLocal<List<PageInterceptor>>
-        THREAD_LOCAL_INTERCEPTORS = new ThreadLocal<List<PageInterceptor>>();
+        THREAD_LOCAL_INTERCEPTORS = new ThreadLocal<>();
 
     // --------------------------------------------------------- Public Methods
 
@@ -251,9 +252,7 @@ public class ClickServlet extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    protected void doGet(HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException {
-
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         handleRequest(request, response, false);
     }
 
@@ -269,9 +268,7 @@ public class ClickServlet extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    protected void doPost(HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException {
-
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         handleRequest(request, response, true);
     }
 
@@ -352,17 +349,7 @@ public class ClickServlet extends HttpServlet {
                 return;
             }
 
-            if (page.isStateful()) {
-                synchronized (page) {
-                    processPage(page);
-                    processPageOnDestroy(page, startTime);
-                    // Mark page as already destroyed for finally block
-                    page = null;
-                }
-
-            } else {
-                processPage(page);
-            }
+            processPage(page);
 
         } catch (Exception e) {
             Class<? extends Page> pageClass =
@@ -383,14 +370,7 @@ public class ClickServlet extends HttpServlet {
 
             try {
                 if (page != null) {
-                    if (page.isStateful()) {
-                        synchronized (page) {
-                            processPageOnDestroy(page, startTime);
-                        }
-
-                    } else {
-                        processPageOnDestroy(page, startTime);
-                    }
+                   processPageOnDestroy(page, startTime);
                 }
 
                 for (PageInterceptor interceptor : getThreadLocalInterceptors()) {
@@ -441,8 +421,7 @@ public class ClickServlet extends HttpServlet {
             return;
         }
 
-        if (exception instanceof TemplateException) {
-            TemplateException te = (TemplateException) exception;
+        if (exception instanceof TemplateException te) {
             if (!te.isParseError()) {
                 logger.error("handleException: ", exception);
             }
@@ -466,32 +445,19 @@ public class ClickServlet extends HttpServlet {
             errorPage.setPageClass(pageClass);
             errorPage.setPath(ConfigService.ERROR_PATH);
 
-            processPageFields(errorPage, new FieldCallback() {
-                public void processField(String fieldName, Object fieldValue) {
-                    if (fieldValue instanceof Control) {
-                        Control control = (Control) fieldValue;
-                        if (control.getName() == null) {
-                            control.setName(fieldName);
-                        }
+            processPageFields(errorPage, (fieldName, fieldValue) -> {
+                if (fieldValue instanceof Control control) {
+                    if (control.getName() == null) {
+                        control.setName(fieldName);
+                    }
 
-                        if (!errorPage.getModel().containsKey(control.getName())) {
-                            errorPage.addControl(control);
-                        }
+                    if (!errorPage.getModel().containsKey(control.getName())) {
+                        errorPage.addControl(control);
                     }
                 }
             });
 
-            if (errorPage.isStateful()) {
-                synchronized (errorPage) {
-                    processPage(errorPage);
-                    processPageOnDestroy(errorPage, 0);
-                    // Mark page as already destroyed for finally block
-                    finalizeRef = null;
-                }
-
-            } else {
-                processPage(errorPage);
-            }
+            processPage(errorPage);
 
         } catch (Exception ex) {
             String message =
@@ -505,14 +471,7 @@ public class ClickServlet extends HttpServlet {
 
         } finally {
             if (finalizeRef != null) {
-                if (finalizeRef.isStateful()) {
-                    synchronized (finalizeRef) {
-                        processPageOnDestroy(finalizeRef, 0);
-                    }
-
-                } else {
-                    processPageOnDestroy(finalizeRef, 0);
-                }
+              processPageOnDestroy(finalizeRef, 0);
             }
         }
     }
@@ -662,16 +621,15 @@ public class ClickServlet extends HttpServlet {
         if (page.hasControls()) {
             List<Control> controls = page.getControls();
 
-            for (int i = 0, size = controls.size(); i < size; i++) {
-                Control control = controls.get(i);
+            for (Control control : controls) {
                 control.onInit();
 
                 if (logger.isTraceEnabled()) {
                     String controlClassName = control.getClass().getName();
                     controlClassName = controlClassName.substring(
-                        controlClassName.lastIndexOf('.') + 1);
+                      controlClassName.lastIndexOf('.') + 1);
                     String msg = "   invoked: '" + control.getName() + "' "
-                        + controlClassName + ".onInit()";
+                      + controlClassName + ".onInit()";
                     logger.trace(msg);
                 }
             }
@@ -696,9 +654,7 @@ public class ClickServlet extends HttpServlet {
         if (page.hasControls() && !context.isForward()) {
             List<Control> controls = page.getControls();
 
-            for (int i = 0, size = controls.size(); i < size; i++) {
-                Control control = controls.get(i);
-
+            for (Control control : controls) {
                 int initialListenerCount = 0;
                 if (logger.isTraceEnabled()) {
                     initialListenerCount = eventDispatcher.getEventSourceList().size();
@@ -713,7 +669,7 @@ public class ClickServlet extends HttpServlet {
                     String controlClassName = ClassUtils.getShortClassName(control.getClass());
 
                     String msg = "   invoked: '" + control.getName() + "' "
-                        + controlClassName + ".onProcess() : " + onProcessResult;
+                      + controlClassName + ".onProcess() : " + onProcessResult;
                     logger.trace(msg);
 
                     if (initialListenerCount != eventDispatcher.getEventSourceList().size()) {
@@ -780,16 +736,15 @@ public class ClickServlet extends HttpServlet {
         if (page.hasControls()) {
             List<Control> controls = page.getControls();
 
-            for (int i = 0, size = controls.size(); i < size; i++) {
-                Control control = controls.get(i);
+            for (Control control : controls) {
                 control.onRender();
 
                 if (logger.isTraceEnabled()) {
                     String controlClassName = control.getClass().getName();
                     controlClassName = controlClassName.substring(controlClassName.
-                        lastIndexOf('.') + 1);
+                      lastIndexOf('.') + 1);
                     String msg = "   invoked: '" + control.getName() + "' "
-                        + controlClassName + ".onRender()";
+                      + controlClassName + ".onRender()";
                     logger.trace(msg);
                 }
             }
@@ -967,7 +922,7 @@ public class ClickServlet extends HttpServlet {
 
         setRequestAttributes(page);
 
-        RequestDispatcher dispatcher = null;
+        RequestDispatcher dispatcher;
 
         String forward = page.getForward();
 
@@ -1120,16 +1075,15 @@ public class ClickServlet extends HttpServlet {
 
             List<Control> controls = page.getControls();
 
-            for (int i = 0, size = controls.size(); i < size; i++) {
+            for (Control control : controls) {
                 try {
-                    Control control = controls.get(i);
                     control.onDestroy();
 
                     if (logger.isTraceEnabled()) {
                         String controlClassName = control.getClass().getName();
                         controlClassName = controlClassName.substring(controlClassName.lastIndexOf('.') + 1);
-                        String msg =  "   invoked: '" + control.getName()
-                        + "' " + controlClassName + ".onDestroy()";
+                        String msg = "   invoked: '" + control.getName()
+                          + "' " + controlClassName + ".onDestroy()";
                         logger.trace(msg);
                     }
                 } catch (Throwable error) {
@@ -1161,11 +1115,7 @@ public class ClickServlet extends HttpServlet {
         try {
             page.onDestroy();
 
-            if (page.isStateful()) {
-                context.setSessionAttribute(page.getClass().getName(), page);
-            } else {
-                context.removeSessionAttribute(page.getClass().getName());
-            }
+            context.removeSessionAttribute(page.getClass().getName());
 
             if (logger.isTraceEnabled()) {
                 String shortClassName = page.getClass().getName();
@@ -1274,17 +1224,14 @@ public class ClickServlet extends HttpServlet {
 
             if (configService.getAutoBindingMode() != AutoBinding.NONE) {
 
-                processPageFields(newPage, new FieldCallback() {
-                    public void processField(String fieldName, Object fieldValue) {
-                        if (fieldValue instanceof Control) {
-                            Control control = (Control) fieldValue;
-                            if (control.getName() == null) {
-                                control.setName(fieldName);
-                            }
+                processPageFields(newPage, (fieldName, fieldValue) -> {
+                    if (fieldValue instanceof Control control) {
+                        if (control.getName() == null) {
+                            control.setName(fieldName);
+                        }
 
-                            if (!page.getModel().containsKey(control.getName())) {
-                                page.addControl(control);
-                            }
+                        if (!page.getModel().containsKey(control.getName())) {
+                            page.addControl(control);
                         }
                     }
                 });
@@ -1437,17 +1384,13 @@ public class ClickServlet extends HttpServlet {
 
         if (configService.getAutoBindingMode() != AutoBinding.NONE) {
 
-            processPageFields(page, new FieldCallback() {
-                public void processField(String fieldName, Object fieldValue) {
-                    if (fieldValue instanceof Control == false) {
-                        page.addModel(fieldName, fieldValue);
+            processPageFields(page, (fieldName, fieldValue) -> {
+                if (!(fieldValue instanceof Control control)) {
+                    page.addModel(fieldName, fieldValue);
 
-                    } else {
-                        // Add any controls not already added to model
-                        Control control = (Control) fieldValue;
-                        if (!page.getModel().containsKey(control.getName())) {
-                            page.addControl(control);
-                        }
+                } else {// Add any controls not already added to model
+                    if (!page.getModel().containsKey(control.getName())) {
+                        page.addControl(control);
                     }
                 }
             });
@@ -1476,8 +1419,7 @@ public class ClickServlet extends HttpServlet {
             String name = entry.getKey();
             Object value = entry.getValue();
 
-            if (value instanceof String) {
-                String strValue = (String) value;
+            if (value instanceof String strValue) {
                 if (!strValue.equalsIgnoreCase("Content-Encoding")) {
                     response.setHeader(name, strValue);
                 }
@@ -1517,16 +1459,12 @@ public class ClickServlet extends HttpServlet {
     protected void setRequestAttributes(final Page page) {
         final HttpServletRequest request = page.getContext().getRequest();
 
-        processPageFields(page, new FieldCallback() {
-            public void processField(String fieldName, Object fieldValue) {
-                if (fieldValue instanceof Control == false) {
-                    request.setAttribute(fieldName, fieldValue);
-                }  else {
-                    // Add any controls not already added to model
-                    Control control = (Control) fieldValue;
-                    if (!page.getModel().containsKey(control.getName())) {
-                        page.addControl(control);
-                    }
+        processPageFields(page, (fieldName, fieldValue) -> {
+            if (!(fieldValue instanceof Control control)) {
+                request.setAttribute(fieldName, fieldValue);
+            }  else {// Add any controls not already added to model
+                if (!page.getModel().containsKey(control.getName())) {
+                    page.addControl(control);
                 }
             }
         });
@@ -1606,13 +1544,9 @@ public class ClickServlet extends HttpServlet {
     protected Context createContext(HttpServletRequest request,
             HttpServletResponse response, boolean isPost) {
 
-        Context context = new Context(getServletContext(),
-                                      getServletConfig(),
-                                      request,
-                                      response,
-                                      isPost,
-                                      this);
-        return context;
+        return new Context(getServletContext(),
+             getServletConfig(), request, response,
+             isPost, this);
     }
 
     /**
@@ -1701,9 +1635,7 @@ public class ClickServlet extends HttpServlet {
         String path = getConfigService().getPagePath(pageClass);
 
         if (path == null) {
-            String msg =
-                "No path configured for Page class: " + pageClass.getName();
-            throw new IllegalArgumentException(msg);
+          throw new IllegalArgumentException("No path configured for Page class: " + pageClass.getName());
         }
 
         return (T) initPage(path, pageClass, request);
@@ -1738,8 +1670,7 @@ public class ClickServlet extends HttpServlet {
 
         // TODO Ajax requests shouldn't reach this code path since errors
         // are rendered directly
-        if (page instanceof ErrorPage) {
-            ErrorPage errorPage = (ErrorPage) page;
+        if (page instanceof ErrorPage errorPage) {
             errorPage.setMode(configService.getApplicationMode());
 
             // Notify the dispatcher and registry of the error
@@ -1749,7 +1680,7 @@ public class ClickServlet extends HttpServlet {
 
         boolean continueProcessing = performOnSecurityCheck(page, context);
 
-        ActionResult actionResult = null;
+        ActionResult actionResult;
         if (continueProcessing) {
 
             // Handle page method
@@ -1944,15 +1875,13 @@ public class ClickServlet extends HttpServlet {
      * @return a new application ConfigService instance
      * @throws Exception if an initialization error occurs
      */
-    @SuppressWarnings("unchecked")
-    ConfigService createConfigService(ServletContext servletContext)
-        throws Exception {
+    ConfigService createConfigService(ServletContext servletContext) throws Exception {
 
         Class<? extends ConfigService> serviceClass = XmlConfigService.class;
 
         String classname = servletContext.getInitParameter(CONFIG_SERVICE_CLASS);
         if (StringUtils.isNotBlank(classname)) {
-            serviceClass = ClickUtils.classForName(classname);
+            serviceClass = ClickUtils.castUnsafe(ClickUtils.classForName(classname));
         }
 
         return serviceClass.newInstance();
@@ -2029,9 +1958,7 @@ public class ClickServlet extends HttpServlet {
         Field[] fields = configService.getPageFieldArray(page.getClass());
 
         if (fields != null) {
-            for (int i = 0; i < fields.length; i++) {
-                Field field = fields[i];
-
+            for (Field field : fields) {
                 try {
                     Object fieldValue = field.get(page);
 
@@ -2047,14 +1974,9 @@ public class ClickServlet extends HttpServlet {
     }
 
     List<PageInterceptor> getThreadLocalInterceptors() {
-        List<PageInterceptor> listeners =
-                THREAD_LOCAL_INTERCEPTORS.get();
+        List<PageInterceptor> listeners = THREAD_LOCAL_INTERCEPTORS.get();
 
-        if (listeners != null) {
-            return listeners;
-        } else {
-            return Collections.emptyList();
-        }
+        return Objects.requireNonNullElse(listeners, Collections.emptyList());
     }
 
     void setThreadLocalInterceptors(List<PageInterceptor> listeners) {
@@ -2118,7 +2040,7 @@ public class ClickServlet extends HttpServlet {
     /**
      * Field iterator callback.
      */
-    static interface FieldCallback {
+    interface FieldCallback {
 
         /**
          * Callback method invoked for each field.
@@ -2126,7 +2048,7 @@ public class ClickServlet extends HttpServlet {
          * @param fieldName the field name
          * @param fieldValue the field value
          */
-        public void processField(String fieldName, Object fieldValue);
+        void processField(String fieldName, Object fieldValue);
 
     }
 
@@ -2168,11 +2090,9 @@ public class ClickServlet extends HttpServlet {
                 break;
             }
         }
-
         if (logger.isTraceEnabled()) {
             if (ajaxTarget == null) {
-                String msg = "   *no* target control was found for the Ajax request";
-                logger.trace(msg);
+                logger.trace("   *no* target control was found for the Ajax request");
 
             } else {
                 HtmlStringBuffer buffer = new HtmlStringBuffer();
@@ -2195,7 +2115,7 @@ public class ClickServlet extends HttpServlet {
      */
     private void logRequestParameters(HttpServletRequest request) {
 
-        Map<String, String[]> requestParams = new TreeMap<String, String[]>();
+        Map<String, String[]> requestParams = new TreeMap<>();
 
         Enumeration<?> e = request.getParameterNames();
         while (e.hasMoreElements()) {

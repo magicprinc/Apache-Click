@@ -18,6 +18,8 @@
  */
 package org.apache.click.util;
 
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.click.ActionResult;
 import org.apache.click.Context;
 import org.apache.click.Control;
@@ -31,12 +33,12 @@ import org.apache.click.control.Field;
 import org.apache.click.control.Form;
 import org.apache.click.service.ConfigService;
 import org.apache.click.service.LogService;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -51,7 +53,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -69,6 +70,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -78,12 +80,19 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.function.Supplier;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+
+import static java.lang.Character.toUpperCase;
+import static java.nio.charset.StandardCharsets.*;
 
 /**
  * Provides miscellaneous Form, String and Stream utility methods.
  */
+@Slf4j
 public class ClickUtils {
 
     // ------------------------------------------------------- Public Constants
@@ -437,7 +446,7 @@ public class ClickUtils {
         HTML_ENTITIES[8250] = "&rsaquo;";  //single right-pointing angle quotation mark,U+203A ISO proposed -->
         // <!-- rsaquo is proposed but not yet ISO standardized -->
         HTML_ENTITIES[8364] = "&euro;";    //  -- euro sign, U+20AC NEW -->
-    };
+    }
 
     /**
      * The array of escaped XML character values, indexed on char value.
@@ -453,7 +462,7 @@ public class ClickUtils {
         XML_ENTITIES[39] = "&#039;"; // ' - quote
         XML_ENTITIES[60] = "&lt;"; // < - less-than
         XML_ENTITIES[62] = "&gt;"; // > - greater-than
-    };
+    }
 
     // --------------------------------------------------------- Public Methods
 
@@ -526,8 +535,8 @@ public class ClickUtils {
                     gos.write(buffer.toString().getBytes());
 
                 } finally {
-                    ClickUtils.close(gos);
-                    ClickUtils.close(bos);
+                    close(gos);
+                    close(bos);
                 }
 
                 byte[] byteArray = bos.toByteArray();
@@ -544,10 +553,10 @@ public class ClickUtils {
             }
 
         } catch (IOException ex) {
-            ClickUtils.getLogService().error(ex.getMessage(), ex);
+            getLogService().error(ex.getMessage(), ex);
 
         } finally {
-            ClickUtils.close(os);
+            close(os);
         }
     }
 
@@ -855,17 +864,23 @@ public class ClickUtils {
 
     /**
      * Returns the <code>Class</code> object associated with the class or
-     * interface with the given string name, using the current Thread context
-     * class loader.
+     * interface with the given string name, using the current Thread context class loader.
+     *
+     * Unsafe! T = Object in runtime!
      *
      * @param classname the name of the class to load
-     * @return the <tt>Class</tt> object
+     * @return the {@link Class} object
      * @throws ClassNotFoundException if the class cannot be located
      */
-    public static Class classForName(String classname)
-            throws ClassNotFoundException {
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        return Class.forName(classname, true, classLoader);
+    @SuppressWarnings("unchecked")
+    public static <T> Class<T> classForName (String classname) throws ClassNotFoundException {
+        try {
+            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+            return (Class<T>) Class.forName(classname, true, classLoader);
+        } catch (Throwable ignore) {}
+
+        ClassLoader classLoader = ClassLoader.getPlatformClassLoader();
+        return (Class<T>) Class.forName(classname, true, classLoader);
     }
 
     /**
@@ -874,12 +889,11 @@ public class ClickUtils {
      *
      * @param closeable the closeable (Reader, Writer, Stream) to close.
      */
-    public static void close(Closeable closeable) {
+    public static void close (@Nullable AutoCloseable closeable) {
         if (closeable != null) {
             try {
                 closeable.close();
-            } catch (IOException ioe) {
-                // Ignore
+            } catch (Throwable ignore) {
             }
         }
     }
@@ -890,7 +904,7 @@ public class ClickUtils {
      * <p/>
      * The following objects will be added to the model:
      * <ul>
-     * <li>the Page {@link org.apache.click.Page#model model} Map key/value
+     * <li>the Page {@link Page#getModel() model} Map key/value
      * pairs
      * </li>
      * <li>context - the Servlet context path, e.g. <span class="">/mycorp</span>
@@ -901,7 +915,7 @@ public class ClickUtils {
      * <li>messages - the {@link MessagesMap} adaptor for the
      * {@link org.apache.click.Page#getMessages()} method.
      * </li>
-     * <li>path - the {@link org.apache.click.Page#path path} of the <tt>page</tt>
+     * <li>path - the {@link Page#getPath()} path} of the <tt>page</tt>
      * template.
      * </li>
      * <li>request - the page {@link javax.servlet.http.HttpServletRequest}
@@ -921,10 +935,10 @@ public class ClickUtils {
      */
     public static Map<String, Object> createTemplateModel(final Page page, Context context) {
 
-        ConfigService configService = ClickUtils.getConfigService(context.getServletContext());
+        ConfigService configService = getConfigService(context.getServletContext());
         LogService logger = configService.getLogService();
 
-        final Map<String, Object> model = new HashMap<String, Object>(page.getModel());
+        final Map<String, Object> model = new HashMap<>(page.getModel());
 
         final HttpServletRequest request = context.getRequest();
 
@@ -1131,7 +1145,7 @@ public class ClickUtils {
      * @return the list of XML child elements for the given name
      */
     public static List<Element> getChildren(Element parent, String name) {
-        List<Element> list = new ArrayList<Element>();
+        List<Element> list = new ArrayList<>();
         NodeList nodeList = parent.getChildNodes();
         for (int i = 0; i < nodeList.getLength(); i++) {
             Node node = nodeList.item(i);
@@ -1156,19 +1170,15 @@ public class ClickUtils {
      * @throws RuntimeException if the resource could not be found
      */
     public static InputStream getClickConfig(ServletContext servletContext) {
-        InputStream inputStream =
-            servletContext.getResourceAsStream(DEFAULT_APP_CONFIG);
+        InputStream inputStream = servletContext.getResourceAsStream(DEFAULT_APP_CONFIG);
 
         if (inputStream == null) {
-            inputStream = ClickUtils.getResourceAsStream("/click.xml", ClickUtils.class);
+            inputStream = getResourceAsStream("/click.xml", ClickUtils.class);
             if (inputStream == null) {
-                String msg =
-                    "could not find click app configuration file: "
-                    + DEFAULT_APP_CONFIG + " or click.xml on classpath";
-                throw new RuntimeException(msg);
+                throw new RuntimeException("could not find click app configuration file: "
+                  + DEFAULT_APP_CONFIG + " or click.xml on classpath");
             }
         }
-
         return inputStream;
     }
 
@@ -1228,7 +1238,7 @@ public class ClickUtils {
      * @return the Cookie object if it exists, otherwise null
      */
     public static Cookie getCookie(HttpServletRequest request, String name) {
-        Cookie cookies[] = request.getCookies();
+        Cookie[] cookies = request.getCookies();
 
         if (cookies == null || name == null || name.length() == 0) {
             return null;
@@ -1321,10 +1331,10 @@ public class ClickUtils {
     /**
      * Set the web application version string.
      *
-     * @param applicationVersion the web application version string
+     * @param appVersion the web application version string
      */
-    public static void setApplicationVersion(String applicationVersion) {
-        ClickUtils.applicationVersion = applicationVersion;
+    public static void setApplicationVersion (String appVersion) {
+        applicationVersion = appVersion;
         cachedApplicationVersionIndicator = null;
     }
 
@@ -1401,12 +1411,12 @@ public class ClickUtils {
         if (Context.hasThreadLocalContext()) {
 
             Context context = Context.getThreadLocalContext();
-            ConfigService configService = ClickUtils.getConfigService(context.getServletContext());
+            ConfigService configService = getConfigService(context.getServletContext());
 
             boolean isProductionModes = configService.isProductionMode()
                 || configService.isProfileMode();
 
-            if (isProductionModes && ClickUtils.isEnableResourceVersion(context)) {
+            if (isProductionModes && isEnableResourceVersion(context)) {
                 String version = getApplicationVersion();
                 if (StringUtils.isNotBlank(version)) {
                     cachedApplicationVersionIndicator = VERSION_INDICATOR_SEP
@@ -1454,11 +1464,7 @@ public class ClickUtils {
      * @return the control CSS selector or null if no selector can be found
      * @throws IllegalArgumentException if control is null
      */
-    public static String getCssSelector(Control control) {
-        if (control == null) {
-            throw new IllegalArgumentException("Control cannot be null");
-        }
-
+    public static String getCssSelector (@NonNull Control control) {
         String id = control.getId();
         String name = control.getName();
         String cssSelector = null;
@@ -1480,8 +1486,7 @@ public class ClickUtils {
             // as it doesn't render the "name" attribute. The "name" attribute
             // is used by links for bookmarking purposes. Instead set the class
             // attribute to the link's name and use that as the selector.
-            if (control instanceof ActionLink) {
-                ActionLink link = (ActionLink) control;
+            if (control instanceof ActionLink link) {
                 if (!link.hasAttribute("class")) {
                     link.setAttribute("class", '-' + name);
                 }
@@ -1547,13 +1552,7 @@ public class ClickUtils {
      * @param resource the classpath resource name
      * @param targetDir the target directory to deploy the resource to
      */
-    public static void deployFile(ServletContext servletContext,
-        String resource, String targetDir) {
-
-        if (servletContext == null) {
-            throw new IllegalArgumentException("Null servletContext parameter");
-        }
-
+    public static void deployFile (@NonNull ServletContext servletContext, String resource, String targetDir) {
         if (StringUtils.isBlank(resource)) {
             String msg = "Null resource parameter not defined";
             throw new IllegalArgumentException(msg);
@@ -1565,18 +1564,14 @@ public class ClickUtils {
             realTargetDir = realTargetDir + targetDir;
         }
 
-
         LogService logger = getConfigService(servletContext).getLogService();
 
         try {
-
             // Create files deployment directory
             File directory = new File(realTargetDir);
             if (!directory.exists()) {
                 if (!directory.mkdirs()) {
-                    String msg =
-                        "could not create deployment directory: " + directory;
-                    throw new IOException(msg);
+                    throw new IOException("could not create deployment directory: " + directory);
                 }
             }
 
@@ -1591,57 +1586,44 @@ public class ClickUtils {
             File destinationFile = new File(destination);
 
             if (!destinationFile.exists()) {
-                InputStream inputStream =
-                    getResourceAsStream(resource, ClickUtils.class);
+                InputStream inputStream = getResourceAsStream(resource, ClickUtils.class);
 
                 if (inputStream != null) {
-                    FileOutputStream fos = null;
-                    try {
-                        fos = new FileOutputStream(destinationFile);
-                        byte[] buffer = new byte[1024];
-                        while (true) {
-                            int length = inputStream.read(buffer);
-                            if (length <  0) {
-                                break;
-                            }
-                            fos.write(buffer, 0, length);
-                        }
+                    try (FileOutputStream fos = new FileOutputStream(destinationFile)) {
+                        copy(inputStream, fos);
 
                         if (logger.isTraceEnabled()) {
-                            int lastIndex =
-                                destination.lastIndexOf(File.separatorChar);
+                            int lastIndex = destination.lastIndexOf(File.separatorChar);
                             if (lastIndex != -1) {
-                                destination =
-                                    destination.substring(lastIndex + 1);
+                                destination = destination.substring(lastIndex + 1);
                             }
-                            String msg =
-                                "deployed " + targetDir + "/" + destination;
-                            logger.trace(msg);
+                            logger.trace("deployed " + targetDir + "/" + destination);
                         }
 
                     } finally {
-                        close(fos);
                         close(inputStream);
                     }
                 } else {
-                    String msg =
-                        "could not locate classpath resource: " + resource;
-                    throw new IOException(msg);
+                    throw new IOException("could not locate classpath resource: " + resource);
                 }
             }
-
-        } catch (IOException ioe) {
-            String msg =
-                "error occurred deploying resource " + resource
-                + ", error " + ioe;
-            logger.warn(msg);
-
-        } catch (SecurityException se) {
-            String msg =
-                "error occurred deploying resource " + resource
-                + ", error " + se;
-            logger.warn(msg);
+        } catch (IOException | SecurityException ioe) {
+            logger.warn("error occurred deploying resource " + resource, ioe);
         }
+    }
+
+    public static long copy (InputStream is, OutputStream os) throws IOException {
+        final byte[] buffer = new byte[4*1024];
+        int cnt = 0;
+        while (true) {
+            int length = is.read(buffer);
+            if (length <  0) {
+                break;
+            }
+            os.write(buffer, 0, length);
+            cnt += length;
+        }
+        return cnt;
     }
 
     /**
@@ -1652,15 +1634,9 @@ public class ClickUtils {
      * @param resources the array of classpath resource names
      * @param targetDir the target directory to deploy the resource to
      */
-    public static void deployFiles(ServletContext servletContext,
-            String[] resources, String targetDir) {
-
-        if (resources == null) {
-            throw new IllegalArgumentException("Null resources parameter");
-        }
-
+    public static void deployFiles (@NonNull ServletContext servletContext, @NonNull String[] resources, String targetDir) {
         for (String resource : resources) {
-            ClickUtils.deployFile(servletContext, resource, targetDir);
+            deployFile(servletContext, resource, targetDir);
         }
     }
 
@@ -1708,7 +1684,7 @@ public class ClickUtils {
 
             // a target dir list is required cause the ClickUtils.deployFile() is too inflexible to autodetect
             // required subdirectories.
-            List<String> targetDirList = new ArrayList<String>(fileList.size());
+            List<String> targetDirList = new ArrayList<>(fileList.size());
             for (int i = 0; i < fileList.size(); i++) {
                 String filePath = (String) fileList.get(i);
                 String destination = "";
@@ -1723,7 +1699,7 @@ public class ClickUtils {
             for (int i = 0; i < fileList.size(); i++) {
                 String source = (String) fileList.get(i);
                 String targetDirName = targetDirList.get(i);
-                ClickUtils.deployFile(servletContext, source, targetDirName);
+                deployFile(servletContext, source, targetDirName);
             }
 
         } catch (IOException e) {
@@ -1743,10 +1719,7 @@ public class ClickUtils {
      * @throws IllegalArgumentException if the object parameter is null, or if
      *      the object is not Serializable
      */
-    public static String encode(Object object) throws IOException {
-        if (object == null) {
-            throw new IllegalArgumentException("null object parameter");
-        }
+    public static String encode (@NonNull Object object) throws IOException {
         if (!(object instanceof Serializable)) {
             throw new IllegalArgumentException("parameter not Serializable");
         }
@@ -1768,57 +1741,41 @@ public class ClickUtils {
             close(bos);
         }
 
-        Base64 base64 = new Base64();
-
+        Base64.Encoder base64 = Base64.getEncoder();
         try {
-            byte[] byteData = base64.encode(bos.toByteArray());
-
-            return new String(byteData);
+            return base64.encodeToString(bos.toByteArray());
 
         } catch (Throwable t) {
-            String message =
-                "error occurred Base64 encoding: " + object + " : " + t;
-            throw new IOException(message);
+            throw new IOException("error occurred Base64 encoding: " + object, t);
         }
     }
 
     /**
      * Return an object from the {@link #encode(Object)} string.
      *
-     * @param string the encoded string
+     * @param base64String the encoded string
      * @return an object from the encoded
      * @throws ClassNotFoundException if the class could not be instantiated
      * @throws IOException if an data I/O error occurs
      */
-    public static Object decode(String string)
-            throws ClassNotFoundException, IOException {
-
-        Base64 base64 = new Base64();
-        byte[] byteData = null;
-
+    public static Object decode (@NonNull String base64String) throws ClassNotFoundException, IOException {
+        Base64.Decoder base64 = Base64.getDecoder();
+        byte[] byteData;
         try {
-            byteData = base64.decode(string.getBytes());
-
+            byteData = base64.decode(base64String);
         } catch (Throwable t) {
-            String message =
-                "error occurred Base64 decoding: " + string + " : " + t;
-            throw new IOException(message);
+            throw new IOException("error occurred Base64 decoding: "+ base64String, t);
         }
 
-        ByteArrayInputStream bis = null;
-        GZIPInputStream gis = null;
         ObjectInputStream ois = null;
         try {
-            bis = new ByteArrayInputStream(byteData);
-            gis = new GZIPInputStream(bis);
+            GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream(byteData));
             ois = new ObjectInputStream(gis);
 
             return ois.readObject();
 
         } finally {
             close(ois);
-            close(gis);
-            close(bis);
         }
     }
 
@@ -1968,16 +1925,10 @@ public class ClickUtils {
      * @param value the value to encode using "UTF-8"
      * @return an encoded URL string
      */
-    public static String encodeURL(Object value) {
-        if (value == null) {
-            throw new IllegalArgumentException("Null object parameter");
-        }
+    public static String encodeURL (@Nullable Object value) {
+        if (value == null) { return "";}
 
-        try {
-            return URLEncoder.encode(value.toString(), "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
+        return URLEncoder.encode(value.toString(), UTF_8);
     }
 
     /**
@@ -1992,16 +1943,10 @@ public class ClickUtils {
      * @param value the value to decode using "UTF-8"
      * @return an encoded URL string
      */
-    public static String decodeURL(Object value) {
-        if (value == null) {
-            throw new IllegalArgumentException("Null object parameter");
-        }
+    public static String decodeURL (@Nullable Object value) {
+        if (value == null) { return "";}
 
-        try {
-            return URLDecoder.decode(value.toString(), "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
+        return URLDecoder.decode(value.toString(), UTF_8);
     }
 
     /**
@@ -2019,24 +1964,10 @@ public class ClickUtils {
      * @param context the context providing the request character encoding
      * @return an encoded URL string
      */
-    public static String encodeUrl(Object object, Context context) {
-        if (object == null) {
-            throw new IllegalArgumentException("Null object parameter");
-        }
-        if (context == null) {
-            throw new IllegalArgumentException("Null context parameter");
-        }
-
+    public static String encodeUrl (@NonNull Object object, @NonNull Context context) {
         String charset = context.getRequest().getCharacterEncoding();
-
         try {
-            if (charset == null) {
-                return URLEncoder.encode(object.toString(), "UTF-8");
-
-            } else {
-                return URLEncoder.encode(object.toString(), charset);
-            }
-
+          return URLEncoder.encode(object.toString(), charset == null ? "UTF-8" : charset);
         } catch (UnsupportedEncodingException uee) {
             throw new RuntimeException(uee);
         }
@@ -2050,13 +1981,11 @@ public class ClickUtils {
      */
     public static String escapeHtml(String value) {
         if (requiresHtmlEscape(value)) {
-
             HtmlStringBuffer buffer = new HtmlStringBuffer(value.length() * 2);
 
             buffer.appendHtmlEscaped(value);
 
             return buffer.toString();
-
         } else {
             return value;
         }
@@ -2104,30 +2033,37 @@ public class ClickUtils {
      * @see org.apache.click.Control#setListener(Object, String)
      *
      * @param listener the object with the method to invoke
-     * @param method the name of the method to invoke
+     * @param methodName the name of the method to invoke
      * @return true if the listener method returned true
      */
-    public static boolean invokeListener(Object listener, String method) {
+    public static boolean invokeListener (Object listener, String methodName) throws IllegalArgumentException {
+        Object result = invokeMethod(listener, methodName);
 
+        if (result instanceof Boolean) {
+          return (Boolean) result;
+        } else {
+          throw new IllegalArgumentException("Invalid listener method, missing boolean return type: "+
+              getMethod(listener, methodName) +" in "+ listener+": "+listener.getClass().getName());
+        }
+    }
+
+    public static boolean invokeListener (Object listener, Method method) throws IllegalArgumentException {
         Object result = invokeMethod(listener, method);
 
         if (result instanceof Boolean) {
             return (Boolean) result;
-
         } else {
+            throw new IllegalArgumentException("Invalid listener method, missing boolean return type: "+
+              method +" in "+ listener+": "+listener.getClass().getName());
+        }
+    }
 
-            Method targetMethod = null;
-            try {
-                targetMethod = listener.getClass().getMethod(method);
-
-                String msg =
-                    "Invalid listener method, missing boolean return type: "
-                    + targetMethod;
-                throw new RuntimeException(msg);
-            } catch (Exception e) {
-                String msg = "Exception occurred invoking public method: " + targetMethod;
-                throw new RuntimeException(msg, e);
-            }
+    public static Method getMethod (Object listener, String methodName) throws IllegalArgumentException {
+        try {
+          return listener.getClass().getMethod(methodName);// Method targetMethod
+        } catch (Exception e) {
+          throw new IllegalArgumentException("Can't find public method: "+methodName+" in "+
+              listener+": "+listener.getClass().getName(), e);
         }
     }
 
@@ -2135,30 +2071,17 @@ public class ClickUtils {
      * Invoke the named method on the given target and return the Object result.
      *
      * @param target the target object with the method to invoke
-     * @param method the name of the method to invoke
+     * @param methodName the name of the method to invoke
      * @return an ActionResult instance
      */
-    public static ActionResult invokeAction(Object target, String method) {
-
-        Object result = invokeMethod(target, method);
+    public static ActionResult invokeAction(Object target, String methodName) {
+        Object result = invokeMethod(target, methodName);
 
         if (result == null || result instanceof ActionResult) {
-            return (ActionResult) result;
-
+          return (ActionResult) result;
         } else {
-
-            Method targetMethod = null;
-            try {
-                targetMethod = target.getClass().getMethod(method);
-
-                String msg =
-                    "Invalid target method, missing ActionResult return type: "
-                    + targetMethod;
-                throw new RuntimeException(msg);
-            } catch (Exception e) {
-                String msg = "Exception occurred invoking public method: " + targetMethod;
-                throw new RuntimeException(msg, e);
-            }
+          throw new IllegalArgumentException("Invalid target method, missing ActionResult return type: "+
+            getMethod(target, methodName)+" in "+ target+": "+target.getClass().getName());
         }
     }
 
@@ -2215,8 +2138,7 @@ public class ClickUtils {
         Context context = Context.getThreadLocalContext();
         ServletContext servletContext = context.getServletContext();
         ConfigService configService = getConfigService(servletContext);
-        LogService logService = configService.getLogService();
-        return logService;
+        return configService.getLogService();
     }
 
     /**
@@ -2227,10 +2149,7 @@ public class ClickUtils {
      * @param form the form to obtain the fields from
      * @return the list of contained form fields
      */
-    public static List<Field> getFormFields(Form form) {
-        if (form == null) {
-            throw new IllegalArgumentException("Null form parameter");
-        }
+    public static List<Field> getFormFields (@NonNull Form form) {
         return ContainerUtils.getInputFields(form);
     }
 
@@ -2246,22 +2165,19 @@ public class ClickUtils {
      * mimeType = ClickUtils.getMimeType("pdf");
      * </pre>
      *
-     * @param value the filename or extension to obtain the mime-type for
+     * @param filenameOrExt the filename or extension to obtain the mime-type for
      * @return the mime-type for the given filename/extension, or null if not
      * found
      */
-    public static String getMimeType(String value) {
-        if (value == null) {
-            throw new IllegalArgumentException("null filename/extension parameter");
-        }
+    @Nullable public static String getMimeType (@NonNull String filenameOrExt) {
+        String ext;
 
-        String ext = value;
-
-        int index = value.lastIndexOf(".");
+        int index = filenameOrExt.lastIndexOf(".");
         if (index != -1) {
-            ext = value.substring(index + 1);
+          ext = filenameOrExt.substring(index + 1);
+        } else {
+          ext = filenameOrExt;
         }
-
         try {
             ResourceBundle bundle = getBundle("org/apache/click/util/mime-type");
 
@@ -2283,11 +2199,7 @@ public class ClickUtils {
      * @param control the control to get the parent messages Map for
      * @return the top level parent's Map of localized messages
      */
-    public static Map<String, String> getParentMessages(Control control) {
-        if (control == null) {
-            throw new IllegalArgumentException("Null control parameter");
-        }
-
+    public static Map<String, String> getParentMessages (@NonNull Control control) {
         Object parent = control.getParent();
         if (parent == null) {
             return Collections.emptyMap();
@@ -2302,8 +2214,7 @@ public class ClickUtils {
                         return control.getMessages();
                     }
 
-                } else if (parent instanceof Page) {
-                    Page page = (Page) parent;
+                } else if (parent instanceof Page page) {
                     return page.getMessages();
 
                 } else if (parent != null) {
@@ -2312,7 +2223,6 @@ public class ClickUtils {
                 }
             }
         }
-
         return Collections.emptyMap();
     }
 
@@ -2372,27 +2282,18 @@ public class ClickUtils {
      * @param name the specific property name to find
      * @return the top level parent's Map of localized messages
      */
-    public static String getParentMessage(Control control, String name) {
-        if (control == null) {
-            throw new IllegalArgumentException("Null control parameter");
-        }
-        if (name == null) {
-            throw new IllegalArgumentException("Null name parameter");
-        }
-
+    @Nullable public static String getParentMessage (@NonNull Control control, @NonNull String name) {
         Object parent = control.getParent();
         if (parent == null) {
             return null;
 
         } else {
             String message = null;
-            while (parent != null) {
+            while (true) {
                 if (parent instanceof Control) {
                     control = (Control) parent;
-                    if (control != null) {
-                        if (control.getMessages().containsKey(name)) {
-                            message = control.getMessages().get(name);
-                        }
+                    if (control.getMessages().containsKey(name)) {
+                        message = control.getMessages().get(name);
                     }
 
                     parent = control.getParent();
@@ -2400,20 +2301,17 @@ public class ClickUtils {
                         return message;
                     }
 
-                } else if (parent instanceof Page) {
-                    Page page = (Page) parent;
+                } else if (parent instanceof Page page) {
                     if (page.getMessages().containsKey(name)) {
                         message = page.getMessages().get(name);
                     }
                     return message;
 
-                } else if (parent != null) {
-                    // Unknown parent class
-                    return null;
+                } else {
+                    return null;// Unknown parent class
                 }
             }
         }
-        return null;
     }
 
     /**
@@ -2425,7 +2323,7 @@ public class ClickUtils {
      * @return the parent page of the control or null if the control has no
      * parent
      */
-    public static Page getParentPage(Control control) {
+    @Nullable public static Page getParentPage(Control control) {
         Object parent = control.getParent();
 
         while (parent != null) {
@@ -2436,11 +2334,10 @@ public class ClickUtils {
             } else if (parent instanceof Page) {
                 return (Page) parent;
 
-            } else if (parent != null) {
+            } else {
                 throw new RuntimeException("Invalid parent class");
             }
         }
-
         return null;
     }
 
@@ -2452,7 +2349,7 @@ public class ClickUtils {
      */
     public static Map<String, Object> getRequestParameterMap(HttpServletRequest request) {
 
-        TreeMap<String, Object> requestParams = new TreeMap<String, Object>();
+        TreeMap<String, Object> requestParams = new TreeMap<>();
 
         Enumeration<?> paramNames = request.getParameterNames();
         while (paramNames.hasMoreElements()) {
@@ -2549,9 +2446,8 @@ public class ClickUtils {
      *     not found using the current <tt>Thread</tt> context <tt>ClassLoader</tt>.
      * @return the input stream of the resource if found or null otherwise
      */
-    public static InputStream getResourceAsStream(String name, Class<?> aClass) {
-        Validate.notNull(name, "Parameter name is null");
-        Validate.notNull(aClass, "Parameter aClass is null");
+    public static InputStream getResourceAsStream (@NonNull String name, @NonNull Class<?> aClass) {
+        // Validate.notNull(name, "Parameter name is null");
 
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
@@ -2559,7 +2455,6 @@ public class ClickUtils {
         if (inputStream == null) {
             inputStream = aClass.getResourceAsStream(name);
         }
-
         return inputStream;
     }
 
@@ -2598,20 +2493,14 @@ public class ClickUtils {
      * @param controlName the name of the control which state to remove
      * @param context the request context
      */
-    public static void removeState(Stateful control, String controlName, Context context) {
-        if (control == null) {
-            throw new IllegalStateException("Control cannot be null.");
-        }
+    public static void removeState (@NonNull Stateful control, String controlName, @NonNull Context context) {
         if (controlName == null) {
             throw new IllegalStateException(ClassUtils.getShortClassName(control.getClass())
                 + " name has not been set. State cannot be removed until the name is set");
         }
-        if (context == null) {
-            throw new IllegalStateException("Context cannot be null.");
-        }
 
         String resourcePath = context.getResourcePath();
-        Map pageMap = ClickUtils.getPageState(resourcePath, context);
+        Map pageMap = getPageState(resourcePath, context);
         if (pageMap != null) {
             Object pop = pageMap.remove(controlName);
 
@@ -2640,20 +2529,13 @@ public class ClickUtils {
      * @param controlName the name of the control which state to restore
      * @param context the request context
      */
-    public static void restoreState(Stateful control, String controlName, Context context) {
-        if (control == null) {
-            throw new IllegalStateException("Control cannot be null.");
-        }
+    public static void restoreState (@NonNull Stateful control, String controlName, @NonNull Context context) {
         if (controlName == null) {
             throw new IllegalStateException(ClassUtils.getShortClassName(control.getClass())
                 + " name has not been set. State cannot be restored until the name is set");
         }
-        if (context == null) {
-            throw new IllegalStateException("Context cannot be null.");
-        }
-
         String resourcePath = context.getResourcePath();
-        Map pageMap = ClickUtils.getPageState(resourcePath, context);
+        Map pageMap = getPageState(resourcePath, context);
         if (pageMap != null) {
             control.setState(pageMap.get(controlName));
         }
@@ -2670,18 +2552,11 @@ public class ClickUtils {
      * @param controlName the name of the control control which state to save
      * @param context the request context
      */
-    public static void saveState(Stateful control, String controlName, Context context) {
-        if (control == null) {
-            throw new IllegalStateException("Control cannot be null.");
-        }
+    public static void saveState (@NonNull Stateful control, String controlName, @NonNull Context context) {
         if (controlName == null) {
             throw new IllegalStateException(ClassUtils.getShortClassName(control.getClass())
                 + " name has not been set. State cannot be saved until the name is set");
         }
-        if (context == null) {
-            throw new IllegalStateException("Context cannot be null.");
-        }
-
         String resourcePath = context.getResourcePath();
         Map pageMap = getOrCreatePageState(resourcePath, context);
         Object state = control.getState();
@@ -2701,37 +2576,18 @@ public class ClickUtils {
         }
     }
 
-    /**
-     * Return the getter method name for the given property name.
-     *
-     * @param property the property name
+    public static final String GET_GETTER = "get";
+    public static final String IS_GETTER  = "is";
+    public static final String SETTER     = "set";
+
+    /** Return the "get" getter or "is" getter method name for the given property name.
+     * propName → PropName (UPPER case first letter)
      * @return the getter method name for the given property name.
      */
-    public static String toGetterName(String property) {
-        HtmlStringBuffer buffer = new HtmlStringBuffer(property.length() + 3);
-
-        buffer.append("get");
-        buffer.append(Character.toUpperCase(property.charAt(0)));
-        buffer.append(property.substring(1));
-
-        return buffer.toString();
+    public static String toPropertyName (String prefix, String propertyName) {
+        return prefix + toUpperCase(propertyName.charAt(0)) + propertyName.substring(1);
     }
 
-    /**
-     * Return the is getter method name for the given property name.
-     *
-     * @param property the property name
-     * @return the is getter method name for the given property name.
-     */
-    public static String toIsGetterName(String property) {
-        HtmlStringBuffer buffer = new HtmlStringBuffer(property.length() + 3);
-
-        buffer.append("is");
-        buffer.append(Character.toUpperCase(property.charAt(0)));
-        buffer.append(property.substring(1));
-
-        return buffer.toString();
-    }
 
     /**
      * Return a field label string from the given field name. For example:
@@ -2744,10 +2600,8 @@ public class ClickUtils {
      * @param name the field name
      * @return a field label string from the given field name
      */
-    public static String toLabel(String name) {
-        if (name == null) {
-            return "";
-        }
+    public static String toLabel (String name) {
+        if (name == null) { return "";}
 
         HtmlStringBuffer buffer = new HtmlStringBuffer();
 
@@ -2755,7 +2609,7 @@ public class ClickUtils {
             char aChar = name.charAt(i);
 
             if (i == 0) {
-                buffer.append(Character.toUpperCase(aChar));
+                buffer.append(toUpperCase(aChar));
 
             } else {
                 buffer.append(aChar);
@@ -2791,14 +2645,11 @@ public class ClickUtils {
      * @param plaintext the plain text value to encode
      * @return encoded MD5 string
      */
-    public static String toMD5Hash(String plaintext) {
-        if (plaintext == null) {
-            throw new IllegalArgumentException("Null plaintext parameter");
-        }
+    public static String toMD5Hash (@NonNull String plaintext) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
 
-            md.update(plaintext.getBytes("UTF-8"));
+            md.update(plaintext.getBytes(UTF_8));
 
             byte[] binaryData = md.digest();
 
@@ -2829,11 +2680,7 @@ public class ClickUtils {
      * @param label the field label or caption
      * @return a field name string from the given field label
      */
-    public static String toName(String label) {
-        if (label == null) {
-            throw new IllegalArgumentException("Null label parameter");
-        }
-
+    public static String toName (@NonNull String label) {
         boolean doneFirstLetter = false;
         boolean lastCharBlank = false;
         boolean hasWhiteSpace = (label.indexOf(' ') != -1);
@@ -2846,7 +2693,7 @@ public class ClickUtils {
                 if (Character.isJavaIdentifierPart(aChar)) {
                     if (lastCharBlank) {
                         if (doneFirstLetter) {
-                            buffer.append(Character.toUpperCase(aChar));
+                            buffer.append(toUpperCase(aChar));
                             lastCharBlank = false;
                         } else {
                             buffer.append(Character.toLowerCase(aChar));
@@ -2874,21 +2721,6 @@ public class ClickUtils {
         return buffer.toString();
     }
 
-    /**
-     * Return the setter method name for the given property name.
-     *
-     * @param property the property name
-     * @return the setter method name for the given property name.
-     */
-    public static String toSetterName(String property) {
-        HtmlStringBuffer buffer = new HtmlStringBuffer(property.length() + 3);
-
-        buffer.append("set");
-        buffer.append(Character.toUpperCase(property.charAt(0)));
-        buffer.append(property.substring(1));
-
-        return buffer.toString();
-    }
 
     /**
      * Returns true if Click resources (JavaScript, CSS, images etc) packaged
@@ -2903,20 +2735,9 @@ public class ClickUtils {
      * @param servletContext the application servlet context
      * @return true if writes are allowed, false otherwise
      */
-    public static boolean isResourcesDeployable(ServletContext servletContext) {
+    public static boolean isResourcesDeployable (ServletContext servletContext) {
         try {
-            boolean canWrite = (servletContext.getRealPath("/") != null);
-            if (!canWrite) {
-                return false;
-            }
-
-            // Since Google App Engine returns a value for getRealPath, check
-            // SecurityManager if writes are allowed
-            SecurityManager security = System.getSecurityManager();
-            if (security != null) {
-                security.checkWrite("/click");
-            }
-            return true;
+            return (servletContext.getRealPath("/") != null);
         } catch (Throwable e) {
             return false;
         }
@@ -2933,10 +2754,8 @@ public class ClickUtils {
      * @param buffer the string buffer to append the escaped value to
      */
     static void appendEscapeChar(char aChar, HtmlStringBuffer buffer) {
-        int index = aChar;
-
-        if (index < XML_ENTITIES.length && XML_ENTITIES[index] != null) {
-            buffer.append(XML_ENTITIES[index]);
+        if ((int) aChar < XML_ENTITIES.length && XML_ENTITIES[aChar] != null) {
+            buffer.append(XML_ENTITIES[aChar]);
 
         } else {
             buffer.append(aChar);
@@ -2973,10 +2792,8 @@ public class ClickUtils {
      * @param buffer the string buffer to append the escaped value to
      */
     static void appendHtmlEscapeChar(char aChar, HtmlStringBuffer buffer) {
-        int index = aChar;
-
-        if (index < HTML_ENTITIES.length && HTML_ENTITIES[index] != null) {
-            buffer.append(HTML_ENTITIES[index]);
+        if ((int) aChar < HTML_ENTITIES.length && HTML_ENTITIES[aChar] != null) {
+            buffer.append(HTML_ENTITIES[aChar]);
 
         } else {
             buffer.append(aChar);
@@ -3013,11 +2830,8 @@ public class ClickUtils {
      * @return true if the given character requires escaping
      */
     static boolean requiresEscape(char aChar) {
-        int index = aChar;
-
-        if (index < XML_ENTITIES.length) {
-            return XML_ENTITIES[index] != null;
-
+        if ((int) aChar < XML_ENTITIES.length) {
+            return XML_ENTITIES[aChar] != null;
         } else {
             return false;
         }
@@ -3030,10 +2844,8 @@ public class ClickUtils {
      * @param value the string value to test
      * @return true if the given string requires escaping of characters
      */
-    static boolean requiresEscape(String value) {
-        if (value == null) {
-            return false;
-        }
+    static boolean requiresEscape (@Nullable String value) {
+        if (value == null) { return false;}
 
         int length = value.length();
         for (int i = 0; i < length; i++) {
@@ -3041,7 +2853,6 @@ public class ClickUtils {
                 return true;
             }
         }
-
         return false;
     }
 
@@ -3052,10 +2863,8 @@ public class ClickUtils {
      * @return true if the given character requires HTML escaping
      */
     static boolean requiresHtmlEscape(char aChar) {
-        int index = aChar;
-
-        if (index < HTML_ENTITIES.length) {
-            return HTML_ENTITIES[index] != null;
+        if ((int) aChar < HTML_ENTITIES.length) {
+            return HTML_ENTITIES[aChar] != null;
 
         } else {
             return false;
@@ -3068,10 +2877,8 @@ public class ClickUtils {
      * @param value the string value to test
      * @return true if the given string requires HTML escaping of characters
      */
-    static boolean requiresHtmlEscape(String value) {
-        if (value == null) {
-            return false;
-        }
+    static boolean requiresHtmlEscape (@Nullable String value) {
+        if (value == null) { return false; }
 
         int length = value.length();
         for (int i = 0; i < length; i++) {
@@ -3079,7 +2886,6 @@ public class ClickUtils {
                 return true;
             }
         }
-
         return false;
     }
 
@@ -3095,23 +2901,20 @@ public class ClickUtils {
      * @param container the container which Fields and Links to bind
      * @param context the request context
      */
-    private static void bind(Container container, Context context) {
-        for (int i = 0; i < container.getControls().size(); i++) {
-            Control control = container.getControls().get(i);
-            if (control instanceof Container) {
+    private static void bind (@NonNull Container container, Context context) {
+        List<Control> containerControls = container.getControls();
+        for (Control control : containerControls) {
+            if (control instanceof Container childContainer) {
                 // Include fields but skip fieldSets
-                if (control instanceof Field) {
-                    Field field = (Field) control;
+                if (control instanceof Field field) {
                     bindField(field, context);
 
                 } else if (control instanceof AbstractLink) {
                     ((AbstractLink) control).bindRequestValue();
                 }
-                Container childContainer = (Container) control;
                 bind(childContainer, context);
 
-            } else if (control instanceof Field) {
-                Field field = (Field) control;
+            } else if (control instanceof Field field) {
                 bindField(field, context);
 
             } else if (control instanceof AbstractLink) {
@@ -3135,10 +2938,9 @@ public class ClickUtils {
      */
     private static boolean bindAndValidate(Container container, Context context) {
         boolean valid = true;
-        for (int i = 0; i < container.getControls().size(); i++) {
-            Control control = container.getControls().get(i);
-            if (control instanceof Container) {
-
+        List<Control> containerControls = container.getControls();
+        for (Control control : containerControls) {
+            if (control instanceof Container childContainer) {
                 // Bind and validate fields only
                 if (control instanceof Field) {
                     if (!bindAndValidate((Field) control, context)) {
@@ -3149,7 +2951,6 @@ public class ClickUtils {
                     ((AbstractLink) control).bindRequestValue();
                 }
 
-                Container childContainer = (Container) control;
                 if (!bindAndValidate(childContainer, context)) {
                     valid = false;
                 }
@@ -3193,7 +2994,7 @@ public class ClickUtils {
 
             boolean valid = form.isValid();
 
-            // Revert back to original error
+            // Revert to original error
             form.setError(errorReference);
 
             return valid;
@@ -3275,7 +3076,7 @@ public class ClickUtils {
      * @return the map where page state is stored in
      */
     private static Map getOrCreatePageState(String pagePath, Context context) {
-                Map pageMap = getPageState(pagePath, context);
+        Map pageMap = getPageState(pagePath, context);
         if (pageMap == null) {
             pageMap = new HashMap();
         }
@@ -3300,27 +3101,26 @@ public class ClickUtils {
         return pageMap;
     }
 
+    static void setAccessible (Method method) {
+        try {
+            method.trySetAccessible();
+        } catch (Throwable ignore){}
+    }
+
     /**
      * Invoke the named method on the given target object and return the result.
      *
      * @param target the target object with the method to invoke
-     * @param method the name of the method to invoke
+     * @param methodName the name of the method to invoke
      * @return Object the target method result
      */
-    private static Object invokeMethod(Object target, String method) {
-        if (target == null) {
-            throw new IllegalArgumentException("Null target parameter");
-        }
-        if (method == null) {
-            throw new IllegalArgumentException("Null method parameter");
-        }
+    private static Object invokeMethod (@NonNull Object target, @NonNull String methodName) {
+        return invokeMethod(target, getMethod(target, methodName));
+    }
 
-        Method targetMethod = null;
-        boolean isAccessible = true;
+    private static Object invokeMethod (Object target, Method targetMethod) {
         try {
             Class<?> targetClass = target.getClass();
-            targetMethod = targetClass.getMethod(method);
-
             // Change accessible for anonymous inner classes public methods
             // only. Conditional checks:
             // #1 - Target method is not accessible
@@ -3329,57 +3129,66 @@ public class ClickUtils {
             // #4 - Anonymous inner classes have no declaring class
             // #5 - Anonymous inner classes have $ in name
             if (!targetMethod.isAccessible()
-                && !Modifier.isPublic(targetClass.getModifiers())
-                && Modifier.isPublic(targetMethod.getModifiers())
-                && targetClass.getDeclaringClass() == null
-                && targetClass.getName().indexOf('$') != -1) {
-
-                isAccessible = false;
-                targetMethod.setAccessible(true);
+              && !Modifier.isPublic(targetClass.getModifiers())
+              && Modifier.isPublic(targetMethod.getModifiers())
+              && targetClass.getDeclaringClass() == null
+              && targetClass.getName().indexOf('$') != -1)
+            {
+                setAccessible(targetMethod);
             }
-
             return targetMethod.invoke(target);
 
         } catch (InvocationTargetException ite) {
-
             Throwable e = ite.getTargetException();
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
-
-            } else if (e instanceof Exception) {
-                String msg =
-                    "Exception occurred invoking public method: " + targetMethod;
-
-                throw new RuntimeException(msg, e);
-
             } else if (e instanceof Error) {
-                String msg =
-                    "Error occurred invoking public method: " + targetMethod;
-
-                throw new RuntimeException(msg, e);
-
+                throw (Error) e;
             } else {
-                String msg =
-                    "Error occurred invoking public method: " + targetMethod;
-
-                throw new RuntimeException(msg, e);
+                throw new IllegalStateException("Exception occurred invoking public method: "+targetMethod
+                  +" on "+target+": "+target.getClass(), e);
             }
-
         } catch (Exception e) {
-            String msg =
-                "Exception occurred invoking public method: " + targetMethod;
-
-            throw new RuntimeException(msg, e);
-
-        } finally {
-            if (targetMethod != null && !isAccessible) {
-                targetMethod.setAccessible(false);
-            }
+            throw new IllegalStateException("Exception occurred invoking public method: "+targetMethod
+              +" on "+target+": "+target.getClass(), e);
         }
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T castUnsafe (Object x) {
+    public static <T> T castUnsafe (Object x) throws ClassCastException, NullPointerException {
         return (T) x;
     }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T cast (Class<?> castToClass, Object x) throws ClassCastException, NullPointerException {
+        return (T) castToClass.cast(x);
+    }
+
+
+    /**
+     Provides a classloader object map cache - keyed on the current threads classloader.
+
+     ClassLoader → E (anything)
+     <pre><code>
+     // The cache map keyed by classloader
+     private final Map&lt;ClassLoader, E&gt; classLoaderMap = new ConcurrentHashMap<>();
+     </code></pre>
+
+     Return the cached variable for the current thread classloader.
+
+     @param <E> the class to cache against the current threads classloader
+     @return the cached variable for the current thread classloader.
+     */
+    public static <E> E classLoaderCacheGET (ConcurrentMap<ClassLoader,E> CLASSLOADER_CACHE, Supplier<E> supplyIfAbsent) {
+      // private final ConcurrentHashMap<ClassLoader,E> classLoaderMap = new ConcurrentHashMap<>();
+      final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+      return CLASSLOADER_CACHE.computeIfAbsent(cl, k->supplyIfAbsent.get());
+    }
+
+    public static <K,V> ConcurrentMap<K,V> classLoaderCacheGET (
+      ConcurrentMap<ClassLoader,ConcurrentMap<K,V>> CLASSLOADER_CACHE)
+    {
+        return classLoaderCacheGET(CLASSLOADER_CACHE, ConcurrentHashMap::new);
+    }
+
 }

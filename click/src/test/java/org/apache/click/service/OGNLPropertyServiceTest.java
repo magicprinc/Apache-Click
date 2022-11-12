@@ -2,7 +2,6 @@ package org.apache.click.service;
 
 import org.apache.click.servlet.MockServletContext;
 
-
 public class OGNLPropertyServiceTest extends PropertyServiceTestCase {
 	
 	@Override
@@ -24,5 +23,4 @@ public class OGNLPropertyServiceTest extends PropertyServiceTestCase {
 			throw new RuntimeException(e);
 		}
 	}
-	
 }

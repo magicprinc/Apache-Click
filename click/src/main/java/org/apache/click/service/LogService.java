@@ -81,7 +81,9 @@ public interface LogService {
      *
      * @param message the message to log
      */
-    public void debug(Object message);
+    void debug(Object message);
+
+    void debug(Object message, Object... args);
 
     /**
      * Log the given message and error at [debug] logging level.
@@ -126,7 +128,9 @@ public interface LogService {
      *
      * @param message the message to log
      */
-    public void trace(Object message);
+    void trace(Object message);
+
+    void trace(Object message, Object... args);
 
     /**
      * Log the given message and error at [trace] logging level.

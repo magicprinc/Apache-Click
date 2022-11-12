@@ -109,6 +109,12 @@ public class Slf4jLogService implements LogService {
     logger.debug(String.valueOf(message));
   }
 
+
+  @Override public void debug (Object message, Object... args) {
+    logger.debug(String.valueOf(message), args);
+  }
+
+
   /**
    * @see LogService#debug(Object, Throwable)
    *
@@ -191,6 +197,11 @@ public class Slf4jLogService implements LogService {
    */
   public void trace(Object message) {
     logger.trace(String.valueOf(message));
+  }
+
+
+  @Override public void trace (Object message, Object... args) {
+    logger.trace(String.valueOf(message), args);
   }
 
   /**

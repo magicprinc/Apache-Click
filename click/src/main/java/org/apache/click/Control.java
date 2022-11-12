@@ -18,15 +18,15 @@
  */
 package org.apache.click;
 
+import org.apache.click.element.Element;
+import org.apache.click.util.HtmlStringBuffer;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import javax.servlet.ServletContext;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.servlet.ServletContext;
-
-import org.apache.click.element.Element;
-import org.apache.click.util.HtmlStringBuffer;
 
 /**
  * Provides the interface for Page controls. Controls are also referred to
@@ -129,11 +129,11 @@ import org.apache.click.util.HtmlStringBuffer;
  * @see org.apache.click.util.PageImports
  */
 public interface Control extends Serializable {
- 
+
     /**
      * The global control messages bundle name: &nbsp; <tt>click-control</tt>.
      */
-    public static final String CONTROL_MESSAGES = "click-control";
+    String CONTROL_MESSAGES = "click-control";
 
     /**
      * Return the Page request Context of the Control.
@@ -144,7 +144,7 @@ public interface Control extends Serializable {
      *
      * @return the Page request Context
      */
-    public Context getContext();
+    Context getContext();
 
     /**
      * Return the list of HEAD {@link org.apache.click.element.Element elements}
@@ -214,7 +214,7 @@ public interface Control extends Serializable {
      *
      * @return the list of HEAD elements to be included in the page
      */
-    public List<Element> getHeadElements();
+    List<Element> getHeadElements();
 
     /**
      * Return HTML element identifier attribute "id" value.
@@ -223,7 +223,7 @@ public interface Control extends Serializable {
      *
      * @return HTML element identifier attribute "id" value
      */
-    public String getId();
+    String getId();
 
     /**
      * Set the controls event listener.
@@ -249,14 +249,14 @@ public interface Control extends Serializable {
      * will still be available on AbstractControl:
      * {@link org.apache.click.control.AbstractControl#setListener(java.lang.Object, java.lang.String)}
      */
-    public void setListener(Object listener, String method);
+    void setListener(Object listener, String method);
 
     /**
      * Return the localized messages <tt>Map</tt> of the Control.
      *
      * @return the localized messages <tt>Map</tt> of the Control
      */
-    public Map<String, String> getMessages();
+    Map<String, String> getMessages();
 
     /**
      * Return the name of the Control. Each control name must be unique in the
@@ -264,8 +264,8 @@ public interface Control extends Serializable {
      *
      * @return the name of the control
      */
-    public String getName();
- 
+    String getName();
+
     /**
      * Set the name of the Control. Each control name must be unique in the
      * containing Page model or the parent container.
@@ -277,21 +277,21 @@ public interface Control extends Serializable {
      * @param name of the control
      * @throws IllegalArgumentException if the name is null
      */
-    public void setName(String name);
+    void setName(String name);
 
     /**
      * Return the parent of the Control.
      *
      * @return the parent of the Control
      */
-    public Object getParent();
+    @Nullable Object getParent();
 
     /**
      * Set the parent of the  Control.
      *
      * @param parent the parent of the Control
      */
-    public void setParent(Object parent);
+    void setParent(Object parent);
 
     /**
      * The on deploy event handler, which provides classes the
@@ -316,7 +316,7 @@ public interface Control extends Serializable {
      *
      * @param servletContext the servlet context
      */
-    public void onDeploy(ServletContext servletContext);
+    void onDeploy(ServletContext servletContext);
 
     /**
      * The on initialize event handler. Each control will be initialized
@@ -332,7 +332,7 @@ public interface Control extends Serializable {
      * especially for {@link org.apache.click.control.Container}s which by default
      * call <em>onInit</em> on all their child controls as well.
      */
-    public void onInit();
+    void onInit();
 
     /**
      * The on process event handler. Each control will be processed when the
@@ -359,7 +359,7 @@ public interface Control extends Serializable {
      *
      * @return true to continue Page event processing or false otherwise
      */
-    public boolean onProcess();
+    boolean onProcess();
 
     /**
      * The on render event handler. This event handler is invoked prior to the
@@ -380,7 +380,7 @@ public interface Control extends Serializable {
      * especially for {@link org.apache.click.control.Container}s which by default
      * call <em>onRender</em> on all their child controls as well.
      */
-    public void onRender();
+    void onRender();
 
     /**
      * The on destroy request event handler. Control classes should use this
@@ -399,7 +399,7 @@ public interface Control extends Serializable {
      * especially for {@link org.apache.click.control.Container}s which by default
      * call <em>onDestroy</em> on all their child controls as well.
      */
-    public void onDestroy();
+    void onDestroy();
 
     /**
      * Render the control's HTML representation to the specified buffer. The
@@ -432,7 +432,7 @@ public interface Control extends Serializable {
      *
      * @param buffer the specified buffer to render the control's output to
      */
-    public void render(HtmlStringBuffer buffer);
+    void render(HtmlStringBuffer buffer);
 
     /**
      * Returns <tt>true</tt> if this control has any
@@ -441,14 +441,14 @@ public interface Control extends Serializable {
      * @return <tt>true</tt> if this control has any
      * <tt>Behavior</tt>s registered, <tt>false</tt> otherwise
      */
-    public boolean hasBehaviors();
+    boolean hasBehaviors();
 
     /**
      * Returns the list of behaviors for this control.
      *
      * @return the list with this control behaviors.
      */
-    public Set<Behavior> getBehaviors();
+    Set<Behavior> getBehaviors();
 
     /**
      * Returns <tt>true</tt> if this control is an Ajax target, <tt>false</tt>
@@ -491,5 +491,5 @@ public interface Control extends Serializable {
      * @return <tt>true</tt> if this control is an Ajax target, <tt>false</tt>
      * otherwise
      */
-    public boolean isAjaxTarget(Context context);
+    boolean isAjaxTarget(Context context);
 }

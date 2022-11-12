@@ -18,28 +18,27 @@
  */
 package org.apache.click.service;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.servlet.ServletContext;
-
-import org.apache.click.util.ClassLoaderCache;
+import org.apache.click.util.ClickUtils;
 import org.apache.click.util.PropertyUtils;
 import org.mvel2.MVEL;
 
+import javax.servlet.ServletContext;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
 /**
  * Provides an MVEL based property services.
+ *
+ * TODO compare MVEL, OGNL and self-made reflection in {@link PropertyUtils}
  */
 public class MVELPropertyService implements PropertyService {
+    /** Expression cache with support for multiple classloader caching */
+    private static final ConcurrentMap<ClassLoader, ConcurrentMap<String,Serializable>>
+        EXPRESSION_CL_CACHE = new ConcurrentHashMap<>();
 
-    // Expression cache with support for multiple classloader caching
-    private static final ClassLoaderCache<Map<String, Serializable>>
-        EXPRESSION_CL_CACHE = new ClassLoaderCache<Map<String, Serializable>>();
-
-    // Public Methods --------------------------------------------------------
 
     /**
      * @see PropertyService#onInit(ServletContext)
@@ -47,14 +46,10 @@ public class MVELPropertyService implements PropertyService {
      * @param servletContext the application servlet context
      * @throws IOException if an IO error occurs initializing the service
      */
-    public void onInit(ServletContext servletContext) throws IOException {
-    }
+    public void onInit (ServletContext servletContext) throws IOException {}
 
-    /**
-     * @see PropertyService#onDestroy()
-     */
-    public void onDestroy() {
-    }
+    /** @see PropertyService#onDestroy */
+    public void onDestroy() {}
 
     /**
      * @see PropertyService#getValue(Object, String)
@@ -63,7 +58,7 @@ public class MVELPropertyService implements PropertyService {
      * @param name the name of the property
      * @return the property value for the given source object and property name
      */
-    public Object getValue(Object source, String name) {
+    public Object getValue (Object source, String name) {
         return PropertyUtils.getValue(source, name);
     }
 
@@ -76,7 +71,7 @@ public class MVELPropertyService implements PropertyService {
      * this cache
      * @return the property value for the given source object and property name
      */
-    public Object getValue(Object source, String name, Map<?, ?> cache) {
+    public Object getValue (Object source, String name, Map<?,?> cache) {
         return PropertyUtils.getValue(source, name, cache);
     }
 
@@ -89,34 +84,18 @@ public class MVELPropertyService implements PropertyService {
      * @param name the name of the property to set
      * @param value the property value to set
      */
-    public void setValue(Object target, String name, Object value) {
-
+    public void setValue (Object target, String name, Object value) {
+        ConcurrentMap<String,Serializable> cache = ClickUtils.classLoaderCacheGET(EXPRESSION_CL_CACHE);
+        // "SomeObj.propertyName = value"
         String expression = target.getClass().getSimpleName() + "." + name + " = value";
 
-        Serializable compiledExpression = getExpressionCache().get(expression);
+        Serializable compiledExpression = cache.computeIfAbsent(expression,
+            s->MVEL.compileExpression(expression));
 
-        if (compiledExpression == null) {
-            compiledExpression = MVEL.compileExpression(expression);
-            getExpressionCache().put(expression, compiledExpression);
-        }
-
-        Map<String, Object> vars = new HashMap<String, Object>();
-        vars.put(target.getClass().getSimpleName(), target);
-        vars.put("value", value);
+        final Map<String,Object> vars = Map.of(
+            target.getClass().getSimpleName(), target, // "SomeObj" = real someObj object
+            "value", value); // "value" = real value
 
         MVEL.executeExpression(compiledExpression, vars);
     }
-
-    // Private Methods --------------------------------------------------------
-
-    private static Map<String, Serializable> getExpressionCache() {
-        Map<String, Serializable> expressionCache = EXPRESSION_CL_CACHE.get();
-        if (expressionCache == null) {
-            expressionCache = new ConcurrentHashMap<String, Serializable>();
-            EXPRESSION_CL_CACHE.put(expressionCache);
-        }
-
-        return expressionCache;
-    }
-
 }

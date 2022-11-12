@@ -18,6 +18,15 @@
  */
 package org.apache.click.util;
 
+import lombok.extern.slf4j.Slf4j;
+import org.apache.click.Page;
+import org.apache.click.service.TemplateException;
+import org.apache.commons.lang.StringUtils;
+
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -34,22 +43,12 @@ import java.util.ResourceBundle;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.apache.click.Page;
-import org.apache.click.service.TemplateException;
-import org.apache.commons.lang.StringUtils;
-
 /**
- * Provides an HTML &lt;div&gt; error report for the display of page error
- * information. This class is used by ErrorPage and ClickServlet for the
- * display of error information.
+ * Provides an HTML &lt;div&gt; error report for the display of page error information.
+ * This class is used by ErrorPage and ClickServlet for the display of error information.
  */
+@Slf4j
 public class ErrorReport {
-
     /** The Java language keywords. Used to render Java source code. */
     private static final String[] JAVA_KEYWORDS = { "package", "import",
             "class", "public", "protected", "private", "extends", "implements",
@@ -63,7 +62,6 @@ public class ErrorReport {
 
     /** The cause of the error. */
     protected final Throwable error;
-
 
     /** The line number of the error, or -1 if not defined. */
     protected int lineNumber;
@@ -101,45 +99,38 @@ public class ErrorReport {
      * @param servletContext the servlet context
      */
     public ErrorReport(Throwable error, Class<? extends Page> pageClass,
-            boolean isProductionMode, HttpServletRequest request,
-            ServletContext servletContext) {
-
+         boolean isProductionMode, HttpServletRequest request,
+        ServletContext servletContext)
+    {
         this.error = error;
         this.pageClass = pageClass;
         this.isProductionMode = isProductionMode;
         this.request = request;
         this.servletContext = servletContext;
 
-        if (error instanceof TemplateException
-            && ((TemplateException) error).isParseError()) {
-
-            TemplateException te = (TemplateException) error;
-
-            if (te.getTemplateName().charAt(0) == '/') {
-                sourceName = te.getTemplateName();
-            } else {
-                sourceName =  '/' + te.getTemplateName();
-            }
+        if (error instanceof TemplateException te && ((TemplateException) error).isParseError()) {
+            isParseError = true;
+            sourceName = te.getTemplateName().charAt(0)=='/' ? te.getTemplateName() : '/'+ te.getTemplateName();
             lineNumber = te.getLineNumber();
             columnNumber = te.getColumnNumber();
+            try {
+                InputStream is = servletContext.getResourceAsStream(sourceName);
 
-            InputStream is =
-                servletContext.getResourceAsStream(sourceName);
+                sourceReader = new LineNumberReader(new InputStreamReader(is));
 
-            sourceReader = new LineNumberReader(new InputStreamReader(is));
-            isParseError = true;
-
+            } catch (Exception e) {
+                log.warn("ErrorReport [parse error]: {} page: {} req: {} sourceName: {} lin: {} col: {}",
+                  error, pageClass, request, sourceName, lineNumber, columnNumber,  e);
+            }
         } else {
             isParseError = false;
             sourceName = null;
             columnNumber = -1;
 
             StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            getCause().printStackTrace(pw);
+            getCause().printStackTrace(new PrintWriter(sw));
 
-            StringTokenizer tokenizer =
-                new StringTokenizer(sw.toString(), "\n");
+            StringTokenizer tokenizer = new StringTokenizer(sw.toString(), "\n");
 
             try {
                 tokenizer.nextToken();
@@ -175,12 +166,11 @@ public class ErrorReport {
                         sourceReader = getJavaSourceReader(filename);
                     }
                 }
-
             } catch (Exception e) {
-                e.printStackTrace();
+              log.warn("ErrorReport [× parse error]: {} page: {} req: {}", error, pageClass, request, e);
             }
         }
-    }
+    }//new
 
     // Public Methods ---------------------------------------------------------
 
@@ -191,7 +181,6 @@ public class ErrorReport {
      *
      * @return a error HTML display string
      */
-    @SuppressWarnings("unchecked")
     public String toString() {
 
         if (isProductionMode()) {
@@ -253,7 +242,7 @@ public class ErrorReport {
         buffer.append("<table border='1' cellspacing='1' cellpadding='4' width='100%' style='background-color: white;'>");
         buffer.append("<tr><td colspan='2' style='color:white; background-color: navy; font-weight: bold'>Request</td></tr>");
 
-        Map<String, Object> requestAttributes = new TreeMap<String, Object>();
+        Map<String, Object> requestAttributes = new TreeMap<>();
         Enumeration attributeNames = request.getAttributeNames();
         while (attributeNames.hasMoreElements()) {
             String name = attributeNames.nextElement().toString();
@@ -275,7 +264,7 @@ public class ErrorReport {
         buffer.append("</a>");
         buffer.append("</td></tr>");
 
-        Map<String, Object> requestHeaders = new TreeMap<String, Object>();
+        Map<String, Object> requestHeaders = new TreeMap<>();
         Enumeration headerNames = request.getHeaderNames();
         while (headerNames.hasMoreElements()) {
             String name = headerNames.nextElement().toString();
@@ -294,7 +283,7 @@ public class ErrorReport {
         buffer.append(request.getMethod());
         buffer.append("</td></tr>");
 
-        Map<String, Object> requestParams = new TreeMap<String, Object>();
+        Map<String, Object> requestParams = new TreeMap<>();
         Enumeration paramNames = request.getParameterNames();
         while (paramNames.hasMoreElements()) {
             String name = paramNames.nextElement().toString();
@@ -325,7 +314,7 @@ public class ErrorReport {
         buffer.append("</a>");
         buffer.append("</td></tr>");
 
-        Map<String, Object> sessionAttributes = new TreeMap<String, Object>();
+        Map<String, Object> sessionAttributes = new TreeMap<>();
         if (request.getSession(false) != null) {
             HttpSession session = request.getSession();
             attributeNames = session.getAttributeNames();
@@ -352,7 +341,7 @@ public class ErrorReport {
      * @return the cause of the error
      */
     protected Throwable getCause() {
-        Throwable cause = null;
+        Throwable cause;
         if (error instanceof ServletException) {
             cause = ((ServletException) error).getRootCause();
             if (cause == null) {
@@ -486,7 +475,7 @@ public class ErrorReport {
 
         String webInfPath = rootPath + File.separator + "WEB-INF";
 
-        File sourceFile = null;
+        File sourceFile;
 
         File webInfDir = new File(webInfPath);
         if (webInfDir.isDirectory() && webInfDir.canRead()) {
@@ -494,7 +483,7 @@ public class ErrorReport {
             if (dirList != null) {
                 for (File file : dirList) {
                     if (file.isDirectory() && file.canRead()) {
-                        String sourcePath = file.toString() + filename;
+                        String sourcePath = file + filename;
                         sourceFile = new File(sourcePath);
                         if (sourceFile.isFile() && sourceFile.canRead()) {
 
@@ -623,13 +612,10 @@ public class ErrorReport {
      * @return a HTML encode stack trace string.
      */
     protected String getStackTrace() {
-
         StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        getCause().printStackTrace(pw);
+        getCause().printStackTrace(new PrintWriter(sw));
 
-        HtmlStringBuffer buffer
-            = new HtmlStringBuffer(sw.toString().length() + 80);
+        HtmlStringBuffer buffer = new HtmlStringBuffer(sw.toString().length() + 80);
         buffer.append("<pre><tt style='font-size:10pt;'>");
         buffer.append(ClickUtils.escapeHtml(sw.toString().trim()));
         buffer.append("</tt></pre>");
@@ -719,10 +705,6 @@ public class ErrorReport {
         final int currentLine = getSourceReader().getLineNumber();
         final int errorLine = getLineNumber();
 
-        if (Math.abs(currentLine - errorLine) <= 10) {
-            return false;
-        } else {
-            return true;
-        }
+        return Math.abs(currentLine - errorLine) > 10;
     }
 }

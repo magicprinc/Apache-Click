@@ -18,6 +18,17 @@
  */
 package org.apache.click;
 
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.click.element.Element;
+import org.apache.click.util.ClickUtils;
+import org.apache.click.util.Format;
+import org.apache.click.util.HtmlStringBuffer;
+import org.apache.click.util.PageImports;
+import org.apache.commons.lang.StringUtils;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -25,13 +36,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.click.element.Element;
-import org.apache.click.util.ClickUtils;
-import org.apache.click.util.Format;
-import org.apache.click.util.HtmlStringBuffer;
-import org.apache.click.util.PageImports;
-import org.apache.commons.lang.StringUtils;
 
 /**
  * Provides the Page request event handler class.
@@ -141,9 +145,10 @@ import org.apache.commons.lang.StringUtils;
  *
  * These Page properties are also used when rendering JSP pages.
  */
+@Slf4j
 public class Page implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     /**
      * The global page messages bundle name: &nbsp; <tt>click-page</tt>.
@@ -183,7 +188,7 @@ public class Page implements Serializable {
      * Velocity context. For JSP pages the model values are set as named
      * request attributes.
      */
-    protected Map<String, Object> model = new HashMap<String, Object>();
+    protected Map<String, Object> model = new HashMap<>();
 
     /** The Page header imports. */
     protected transient PageImports pageImports;
@@ -193,15 +198,6 @@ public class Page implements Serializable {
 
     /** The redirect path. */
     protected String redirect;
-
-    /**
-     * The page is stateful and should be saved to the users HttpSession
-     * between requests, default value is false.
-     *
-     * @deprecated stateful pages are not supported anymore, use stateful
-     * Controls instead
-     */
-    protected boolean stateful;
 
     /** The path of the page border template to render.*/
     protected String template;
@@ -373,19 +369,14 @@ public class Page implements Serializable {
      * @throws IllegalArgumentException if the control is null or if the name
      * of the control is not defined
      */
-    public void addControl(Control control) {
-        if (control == null) {
-            throw new IllegalArgumentException("Null control parameter");
-        }
+    public void addControl (@NonNull Control control) {
         if (StringUtils.isBlank(control.getName())) {
-            throw new IllegalArgumentException("Control name not defined: "
-                + control.getClass());
+            throw new IllegalArgumentException("Control name not defined: "+ control.getClass());
         }
 
         // Check if page already contains a named value
-        Object currentValue = getModel().get(control.getName());
-        if (currentValue != null && currentValue instanceof Control) {
-            Control currentControl = (Control) currentValue;
+        @Nullable Object currentValue = getModel().get(control.getName());
+        if (currentValue instanceof Control currentControl) {// => !null
             replaceControl(currentControl, control);
             return;
         }
@@ -426,7 +417,7 @@ public class Page implements Serializable {
      */
     public List<Control> getControls() {
         if (controls == null) {
-            controls = new ArrayList<Control>();
+            controls = new ArrayList<>();
         }
         return controls;
     }
@@ -600,7 +591,7 @@ public class Page implements Serializable {
      */
     public Map<String, Object> getHeaders() {
         if (headers == null) {
-            headers = new HashMap<String, Object>();
+            headers = new HashMap<>();
         }
         return headers;
     }
@@ -717,7 +708,7 @@ public class Page implements Serializable {
      */
     public List<Element> getHeadElements() {
         if (headElements == null) {
-            headElements = new ArrayList<Element>(2);
+            headElements = new ArrayList<>(2);
         }
         return headElements;
     }
@@ -975,15 +966,16 @@ public class Page implements Serializable {
      * Return true if the page is stateful and should be saved in the users
      * HttpSession between requests, default value is false.
      *
-     * @deprecated stateful pages are not supported anymore, use stateful
-     * Controls instead
      *
-     * @return true if the page is stateful and should be saved in the users
-     * session
+     * The page is stateful and should be saved to the users HttpSession
+     * between requests, default value is false.
+     *
+     * @deprecated stateful pages are not supported anymore, use stateful Controls instead
+      *
+     * @return true if the page is stateful and should be saved in the users session
      */
-    public boolean isStateful() {
-        return stateful;
-    }
+    @Deprecated
+    public static boolean isStateful() { return false;}
 
     /**
      * Set whether the page is stateful and should be saved in the users
@@ -1002,17 +994,19 @@ public class Page implements Serializable {
      * point Click will remove the Page from the HttpSession, freeing up memory
      * for the server.
      *
-     * @deprecated stateful pages are not supported anymore, use stateful
-     * Controls instead
+     * @deprecated stateful pages are not supported anymore, use stateful Controls instead
      *
      * @param stateful the flag indicating whether the page should be saved
      *         between user requests
      */
+    @Deprecated
     public void setStateful(boolean stateful) {
-        this.stateful = stateful;
-        if (isStateful()) {
-            getContext().getSession();
+        if (stateful) {
+          log.error("setStateful(true): stateful pages are not supported anymore, use stateful Controls instead");
         }
+//        this.stateful = stateful;
+//        if (isStateful()) {
+//            getContext().getSession();
     }
 
     /**
@@ -1206,8 +1200,7 @@ public class Page implements Serializable {
                 Object paramValue = entry.getValue();
 
                 // Check for multivalued parameter
-                if (paramValue instanceof String[]) {
-                    String[] paramValues = (String[]) paramValue;
+                if (paramValue instanceof String[] paramValues) {
                     for (int j = 0; j < paramValues.length; j++) {
                         buffer.append(paramName);
                         buffer.append("=");
@@ -1230,9 +1223,9 @@ public class Page implements Serializable {
 
             if (buffer.length() > 0) {
                 if (location.contains("?")) {
-                    location += "&" + buffer.toString();
+                    location += "&" + buffer;
                 } else {
-                    location += "?" + buffer.toString();
+                    location += "?" + buffer;
                 }
             }
         }

@@ -18,6 +18,12 @@
  */
 package org.apache.click.util;
 
+import lombok.NonNull;
+import org.apache.click.Context;
+import org.apache.click.service.ConfigService;
+import org.apache.commons.lang.Validate;
+
+import javax.servlet.ServletContext;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,12 +38,7 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.servlet.ServletContext;
-
-import org.apache.click.Context;
-import org.apache.click.service.ConfigService;
-import org.apache.commons.lang.Validate;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Provides a localized read only messages Map for Page and Control classes.
@@ -70,15 +71,15 @@ import org.apache.commons.lang.Validate;
 public class MessagesMap implements Map<String, String> {
 
     /** Cache of resource bundle and locales which were not found, with support for multiple class loaders. */
-    private static final ClassLoaderCache<Set<String>> NOT_FOUND_CLASSLOADER_CACHE
-        = new ClassLoaderCache<Set<String>>();
+    private static final ConcurrentHashMap<ClassLoader, Set<String>> NOT_FOUND_CLASSLOADER_CACHE
+        = new ConcurrentHashMap<>();
 
     /** Provides a synchronized cache of get value reflection methods, with support for multiple class loaders. */
-    protected static final ClassLoaderCache<Map<CacheKey, Map<String, String>>> MESSAGES_CLASSLOADER_CACHE
-        = new ClassLoaderCache<Map<CacheKey, Map<String, String>>>();
+    protected static final ConcurrentMap<ClassLoader, ConcurrentMap<CacheKey, Map<String,String>>> MESSAGES_CLASSLOADER_CACHE
+        = new ConcurrentHashMap<>();
 
     /** The cache key set load lock. */
-    protected static final Object CACHE_LOAD_LOCK = new Object();
+    protected static final Object[] CACHE_LOAD_LOCK = new Object[0];
 
     // ----------------------------------------------------- Instance Variables
 
@@ -292,30 +293,30 @@ public class MessagesMap implements Map<String, String> {
 
     /**
      * This method initializes and populates the internal{@link #messages} map
-     * and cache {@link #getMessagesCache()} if it is not already initialized.
+     * and {@link #MESSAGES_CLASSLOADER_CACHE} if it is not already initialized.
      * <p/>
-     * <b>Please Note:</b> populating the cache {@link #getMessagesCache()} is not thread safe
+     * <b>Please Note:</b> populating the cache messagesCache is not thread safe
      * and access to the cache must be properly synchronized.
      */
     protected void ensureInitialized() {
         if (messages == null) {
 
-            CacheKey resourceKey = new CacheKey(globalBaseName,
-                baseClass.getName(), locale.toString());
+            CacheKey resourceKey = new CacheKey(globalBaseName, baseClass.getName(), locale.toString());
 
-            messages = getMessagesCache().get(resourceKey);
+            ConcurrentMap<CacheKey, Map<String, String>> messageCache = ClickUtils.classLoaderCacheGET(MESSAGES_CLASSLOADER_CACHE);//messagesCache→Map<CacheKey, Map<String,String>>
+            messages = messageCache.get(resourceKey);
 
             if (messages != null) {
                 return;
             }
 
-            messages = new HashMap<String, String>();
+            messages = new HashMap<>();
 
             synchronized (CACHE_LOAD_LOCK) {
 
                 loadResourceValuesIntoMap(globalBaseName, messages);
 
-                List<String> classnameList = new ArrayList<String>();
+                List<String> classnameList = new ArrayList<>();
 
                 // Build class list
                 Class<?> aClass = baseClass;
@@ -336,7 +337,7 @@ public class MessagesMap implements Map<String, String> {
                 ServletContext servletContext = Context.getThreadLocalContext().getServletContext();
                 ConfigService configService = ClickUtils.getConfigService(servletContext);
                 if (configService.isProductionMode() || configService.isProfileMode()) {
-                    getMessagesCache().put(resourceKey, messages);
+                    messageCache.put(resourceKey, messages);
                 }
             }
         }
@@ -355,7 +356,9 @@ public class MessagesMap implements Map<String, String> {
 
         String resourceKey = resourceBundleName + locale.toString();
 
-        if (!getNotFoundCache().contains(resourceKey)) {
+        Set<String> notFoundCache = ClickUtils.classLoaderCacheGET(NOT_FOUND_CLASSLOADER_CACHE, HashSet::new);//notFoundCache→Set<String>
+
+        if (!notFoundCache.contains(resourceKey)) {
             try {
                 ResourceBundle resources = createResourceBundle(resourceBundleName, locale);
 
@@ -365,90 +368,35 @@ public class MessagesMap implements Map<String, String> {
                     String value = resources.getString(name);
                     map.put(name, value);
                 }
-
             } catch (MissingResourceException mre) {
-                getNotFoundCache().add(resourceKey);
+                notFoundCache.add(resourceKey);
             }
         }
     }
 
-    // Private Methods --------------------------------------------------------
-
-    protected static Set<String> getNotFoundCache() {
-        Set<String> notFoundCache = NOT_FOUND_CLASSLOADER_CACHE.get();
-        if (notFoundCache == null) {
-            notFoundCache = new HashSet<String>();
-            NOT_FOUND_CLASSLOADER_CACHE.put(notFoundCache);
-        }
-
-        return notFoundCache;
-    }
-
-    protected static Map<CacheKey, Map<String, String>> getMessagesCache() {
-        Map<CacheKey, Map<String, String>> messagesCache = MESSAGES_CLASSLOADER_CACHE.get();
-        if (messagesCache == null) {
-            messagesCache = new ConcurrentHashMap<CacheKey, Map<String, String>>();
-            MESSAGES_CLASSLOADER_CACHE.put(messagesCache);
-        }
-
-        return messagesCache;
-    }
 
     /**
-     * See DRY Performance article by Kirk Pepperdine.
-     * <p/>
-     * http://www.javaspecialists.eu/archive/Issue134.html
+     <a href="http://www.javaspecialists.eu/archive/Issue134.html">
+     See DRY Performance article by Kirk Pepperdine.
+     </a>@param globalBaseName  Global base name to encapsulate in cache key.
+
+     @param baseClass Base class name to encapsulate in cache key.
+     @param locale    Locale to encapsulate in cache key.
      */
-    private static class CacheKey {
-
-        /** Global base name to encapsulate in cache key. */
-        private final String globalBaseName;
-
-        /** Base class name to encapsulate in cache key. */
-        private final String baseClass;
-
-        /** Locale to encapsulate in cache key. */
-        private final String locale;
-
+     private record CacheKey(@NonNull String globalBaseName, @NonNull String baseClass, @NonNull String locale) {
         /**
-         * Constructs a new CacheKey for the given baseName, baseClass and
-         * locale.
-         *
-         * @param globalBaseName the base name to build the cache key for
-         * @param baseClass the base class name to build the cache key for
-         * @param locale the request locale to build the cache key for
-         */
-        public CacheKey(String globalBaseName, String baseClass, String locale) {
-            if (globalBaseName == null) {
-                throw new IllegalArgumentException("Null globalBaseName parameter");
-            }
-            if (baseClass == null) {
-                throw new IllegalArgumentException("Null baseClass parameter");
-            }
-            if (locale == null) {
-                throw new IllegalArgumentException("Null locale parameter");
-            }
-            this.globalBaseName = globalBaseName;
-            this.baseClass = baseClass;
-            this.locale = locale;
-        }
-
-        /**
-         * @see Object#equals(Object)
-         *
-         * @param o the object with which to compare this instance with
-         * @return true if the specified object is the same as this object
+         @param o the object with which to compare this instance with
+         @return true if the specified object is the same as this object
+         @see Object#equals(Object)
          */
         @Override
-        public final boolean equals(Object o) {
+        public boolean equals (Object o) {
             if (this == o) {
                 return true;
             }
-            if (!(o instanceof CacheKey)) {
+            if (!(o instanceof CacheKey that)) {
                 return false;
             }
-
-            CacheKey that = (CacheKey) o;
 
             if (!globalBaseName.equals(that.globalBaseName)) {
                 return false;
@@ -458,23 +406,7 @@ public class MessagesMap implements Map<String, String> {
                 return false;
             }
 
-            if (!locale.equals(that.locale)) {
-                return false;
-            }
-
-            return true;
-        }
-
-        /**
-         * @see Object#hashCode()
-         *
-         * @return a hash code value for this object.
-         */
-        @Override
-        public final int hashCode() {
-            return globalBaseName.hashCode()
-                * 31 + baseClass.hashCode()
-                * 31 + locale.hashCode();
+            return locale.equals(that.locale);
         }
     }
 }

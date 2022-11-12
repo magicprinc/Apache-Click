@@ -18,6 +18,11 @@
  */
 package org.apache.click.service;
 
+import lombok.NonNull;
+import ognl.OgnlOps;
+import ognl.OgnlRuntime;
+import ognl.TypeConverter;
+
 import java.lang.reflect.Array;
 import java.lang.reflect.Member;
 import java.math.BigDecimal;
@@ -25,12 +30,6 @@ import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Map;
-
-import org.apache.commons.lang.Validate;
-
-import ognl.OgnlOps;
-import ognl.OgnlRuntime;
-import ognl.TypeConverter;
 
 /**
  * Provides an OGNL TypeConverter class.
@@ -40,8 +39,6 @@ import ognl.TypeConverter;
  * capabilities.
  */
 public class OGNLTypeConverter implements TypeConverter {
-
-    // Public Methods ---------------------------------------------------------
 
     /**
      * Converts the given value to a given type.  The OGNL context, target,
@@ -58,7 +55,6 @@ public class OGNLTypeConverter implements TypeConverter {
      * @return Converted value of type toType or TypeConverter.NoConversionPossible
      *  to indicate that the conversion was not possible.
      */
-    @SuppressWarnings("rawtypes")
     public Object convertValue(Map context,
                                Object target,
                                Member member,
@@ -99,28 +95,28 @@ public class OGNLTypeConverter implements TypeConverter {
 
             } else {
                 if ((toType == Integer.class) || (toType == Integer.TYPE)) {
-                    result = Integer.valueOf((int) OgnlOps.longValue(value));
+                    result = (int) OgnlOps.longValue(value);
 
                 } else if ((toType == Double.class) || (toType == Double.TYPE)) {
-                    result = new Double(OgnlOps.doubleValue(value));
+                    result = OgnlOps.doubleValue(value);
 
                 } else if ((toType == Boolean.class) || (toType == Boolean.TYPE)) {
                     result = Boolean.valueOf(value.toString());
 
                 } else if ((toType == Byte.class) || (toType == Byte.TYPE)) {
-                    result = Byte.valueOf((byte) OgnlOps.longValue(value));
+                    result = (byte) OgnlOps.longValue(value);
 
                 } else if ((toType == Character.class) || (toType == Character.TYPE)) {
-                    result = Character.valueOf((char) OgnlOps.longValue(value));
+                    result = (char) OgnlOps.longValue(value);
 
                 } else if ((toType == Short.class) || (toType == Short.TYPE)) {
-                    result = Short.valueOf((short) OgnlOps.longValue(value));
+                    result = (short) OgnlOps.longValue(value);
 
                 } else if ((toType == Long.class) || (toType == Long.TYPE)) {
-                    result = Long.valueOf(OgnlOps.longValue(value));
+                    result = OgnlOps.longValue(value);
 
                 } else if ((toType == Float.class) || (toType == Float.TYPE)) {
-                    result = new Float(OgnlOps.doubleValue(value));
+                    result = (float) OgnlOps.doubleValue(value);
 
                 } else if (toType == BigInteger.class) {
                     result = OgnlOps.bigIntValue(value);
@@ -172,9 +168,7 @@ public class OGNLTypeConverter implements TypeConverter {
      * @param value the date value string
      * @return the time value in milliseconds or Long.MIN_VALUE if not determined
      */
-    protected long getTimeFromDateString(String value) {
-        Validate.notNull(value, "Null value string");
-
+    protected long getTimeFromDateString (@NonNull String value) {
         value = value.trim();
 
         if (value.length() == 0) {
@@ -288,10 +282,10 @@ public class OGNLTypeConverter implements TypeConverter {
         }
 
         if (c == Boolean.class) {
-            return BigDecimal.valueOf(((Boolean) value).booleanValue() ? 1 : 0);
+            return BigDecimal.valueOf((Boolean) value ? 1 : 0);
         }
         if (c == Character.class) {
-            return BigDecimal.valueOf(((Character) value).charValue());
+            return BigDecimal.valueOf((Character) value);
         }
 
         return new BigDecimal(value.toString().trim());
