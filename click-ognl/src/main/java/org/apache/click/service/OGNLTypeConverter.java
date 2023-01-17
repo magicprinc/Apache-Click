@@ -19,6 +19,7 @@
 package org.apache.click.service;
 
 import lombok.NonNull;
+import ognl.DefaultTypeConverter;
 import ognl.OgnlOps;
 import ognl.OgnlRuntime;
 import ognl.TypeConverter;
@@ -37,6 +38,7 @@ import java.util.Map;
  * This class is adapted from the OGNL <tt>DefaultTypeConverter</tt>, by
  * Luke Blanshard and Drew Davidson, and provides additional Date conversion
  * capabilities.
+ * @see DefaultTypeConverter
  */
 public class OGNLTypeConverter implements TypeConverter {
 
