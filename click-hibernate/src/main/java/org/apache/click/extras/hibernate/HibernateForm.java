@@ -1,31 +1,10 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.click.extras.hibernate;
-
-import java.io.Serializable;
 
 import org.apache.click.control.Checkbox;
 import org.apache.click.control.Field;
 import org.apache.click.control.Form;
 import org.apache.click.control.HiddenField;
 import org.apache.click.util.ClickUtils;
-
 import org.apache.click.util.HtmlStringBuffer;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.EntityMode;
@@ -35,6 +14,9 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.metadata.ClassMetadata;
 import org.hibernate.type.Type;
+
+import java.io.Serial;
+import java.io.Serializable;
 
 /**
  * Provides Hibernate data aware Form control: &nbsp; &lt;form method='POST'&gt;.
@@ -124,315 +106,313 @@ import org.hibernate.type.Type;
  * @see SessionFilter
  */
 public class HibernateForm extends Form {
+  @Serial private static final long serialVersionUID = -7134198516606088333L;
 
-    private static final long serialVersionUID = -7134198516606088333L;
+  /** The form value object classname parameter name. */
+  protected static final String FO_CLASS = "FO_CLASS";
 
-    /** The form value object classname parameter name. */
-    protected static final String FO_CLASS = "FO_CLASS";
+  /** The form value object id parameter name. */
+  protected static final String FO_ID = "FO_ID";
 
-    /** The form value object id parameter name. */
-    protected static final String FO_ID = "FO_ID";
+  // ----------------------------------------------------- Instance Variables
 
-    // ----------------------------------------------------- Instance Variables
+  /** The value object class name hidden field. */
+  protected HiddenField classField;
 
-    /** The value object class name hidden field. */
-    protected HiddenField classField;
+  /** The value object identifier hidden field. */
+  protected HiddenField oidField;
 
-    /** The value object identifier hidden field. */
-    protected HiddenField oidField;
+  /** The Hibernate session. */
+  protected Session session;
 
-    /** The Hibernate session. */
-    protected Session session;
+  /** The Hibernate session factory. */
+  protected SessionFactory sessionFactory;
 
-    /** The Hibernate session factory. */
-    protected SessionFactory sessionFactory;
+  /**
+   * The flag specifying that object validation meta data has been applied to
+   * the form fields.
+   */
+  protected boolean metaDataApplied = false;
 
-    /**
-     * The flag specifying that object validation meta data has been applied to
-     * the form fields.
-     */
-    protected boolean metaDataApplied = false;
+  // ----------------------------------------------------------- Constructors
 
-    // ----------------------------------------------------------- Constructors
+  /**
+   * Create a new HibernateForm with the given form name and value object
+   * class.
+   *
+   * @param name the form name
+   * @param valueClass the value object class
+   */
+  public HibernateForm(String name, Class<?> valueClass) {
+    super(name);
 
-    /**
-     * Create a new HibernateForm with the given form name and value object
-     * class.
-     *
-     * @param name the form name
-     * @param valueClass the value object class
-     */
-    public HibernateForm(String name, Class<?> valueClass) {
-        super(name);
+    if (valueClass == null) {
+      throw new IllegalArgumentException("Null valueClass parameter");
+    }
 
-        if (valueClass == null) {
-            throw new IllegalArgumentException("Null valueClass parameter");
+    classField = new HiddenField(FO_CLASS, String.class);
+    classField.setValue(valueClass.getName());
+    add(classField);
+
+    String classname = getClassname(valueClass);
+
+    ClassMetadata classMetadata =
+        getSessionFactory().getClassMetadata(classname);
+
+    Type identifierType = classMetadata.getIdentifierType();
+    oidField = new HiddenField(FO_ID, identifierType.getReturnedClass());
+    add(oidField);
+  }
+
+
+  // --------------------------------------------------------- Public Methods
+
+  /**
+   * Return the form Hibernate <tt>Session</tt>. If form session is not
+   * defined this method will obtain a session from the
+   * {@link SessionContext}.
+   * <p/>
+   * Applications using alternative Hibernate <tt>Session</tt> sources should
+   * set the form's session using the {@link #setSession(Session)} method.
+   *
+   * @return the form Hibernate session
+   */
+  public Session getSession() {
+    if (session == null) {
+      session = SessionContext.getSession();
+    }
+    return session;
+  }
+
+  /**
+   * Set the user's Hibernate <tt>Session</tt>.
+   *
+   * @param session the user's Hibernate session
+   */
+  public void setSession(Session session) {
+    this.session = session;
+  }
+
+  /**
+   * Return the application Hibernate <tt>SessionFactory</tt>.
+   * If session factory is not defined this method will obtain the session
+   * factory from the {@link SessionContext}.
+   * <p/>
+   * Applications using an alternative Hibernate <tt>SessionFactory</tt>
+   * sources should set the form's session factory using the
+   * {@link #setSessionFactory(SessionFactory)} method.
+   *
+   * @return the user's Hibernate session
+   */
+  public SessionFactory getSessionFactory() {
+    if (sessionFactory == null) {
+      sessionFactory = SessionContext.getSessionFactory();
+    }
+    return sessionFactory;
+  }
+
+  /**
+   * Set the form Hibernate <tt>SessionFactory</tt>.
+   *
+   * @param sessionFactory the Hibernate SessionFactory
+   */
+  public void setSessionFactory(SessionFactory sessionFactory) {
+    this.sessionFactory = sessionFactory;
+  }
+
+  /**
+   * Return a Hibernate value object from the form with the form field values
+   * copied into the object's properties.
+   *
+   * @return the Hibernate object from the form with the form field values
+   * applied to the object properties.
+   */
+  public Object getValueObject() {
+    if (StringUtils.isNotBlank(classField.getValue())) {
+      try {
+        Class<?> valueClass = ClickUtils.classForName(classField.getValue());
+
+        Serializable oid = (Serializable) oidField.getValueObject();
+
+        Object valueObject;
+        if (oid != null) {
+          valueObject = getSession().load(valueClass, oid);
+        } else {
+          valueObject = valueClass.newInstance();
         }
 
-        classField = new HiddenField(FO_CLASS, String.class);
-        classField.setValue(valueClass.getName());
-        add(classField);
+        copyTo(valueObject);
 
-        String classname = getClassname(valueClass);
+        return valueObject;
 
-        ClassMetadata classMetadata =
-            getSessionFactory().getClassMetadata(classname);
-
-        Type identifierType = classMetadata.getIdentifierType();
-        oidField = new HiddenField(FO_ID, identifierType.getReturnedClass());
-        add(oidField);
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
     }
+    return null;
+  }
 
+  /**
+   * Set the given Hibernate value object in the form, copying the object's
+   * properties into the form field values.
+   *
+   * @param valueObject the Hibernate value object to set
+   */
+  public void setValueObject(Object valueObject) {
+    if (valueObject != null) {
 
-    // --------------------------------------------------------- Public Methods
+      String classname = getClassname(valueObject.getClass());
 
-    /**
-     * Return the form Hibernate <tt>Session</tt>. If form session is not
-     * defined this method will obtain a session from the
-     * {@link SessionContext}.
-     * <p/>
-     * Applications using alternative Hibernate <tt>Session</tt> sources should
-     * set the form's session using the {@link #setSession(Session)} method.
-     *
-     * @return the form Hibernate session
-     */
-    public Session getSession() {
-        if (session == null) {
-            session = SessionContext.getSession();
-        }
-        return session;
+      ClassMetadata classMetadata =
+          getSessionFactory().getClassMetadata(classname);
+
+      Object identifier =
+          classMetadata.getIdentifier(valueObject, EntityMode.POJO);
+      oidField.setValueObject(identifier);
+
+      copyFrom(valueObject);
     }
+  }
 
-    /**
-     * Set the user's Hibernate <tt>Session</tt>.
-     *
-     * @param session the user's Hibernate session
-     */
-    public void setSession(Session session) {
-        this.session = session;
-    }
+  /**
+   * Save or update the object to the database and return true.
+   * If a <tt>HibernateException</tt> occurs the <tt>Transaction</tt> will be
+   * rolled back the exception will be raised.
+   * <p/>
+   * If no object is added to the form using <tt>setValueObject()</tt>
+   * then this method will: <ul>
+   * <li>create a new instance of the Class</li>
+   * <li>copy the form's field values to the objects properties</li>
+   * <li>save the new object to the database</li>
+   * </ul>
+   * <p/>
+   * If an existing persistent object is added to the form using
+   * <tt>setValueObject()</tt> then this method will: <ul>
+   * <li>load the persistent object record from the database</li>
+   * <li>copy the form's field values to the objects properties</li>
+   * <li>update the object in the database</li>
+   * </ul>
+   *
+   * @return true if the object was saved or false otherwise
+   * @throws HibernateException if a persistence error occurred
+   */
+  public boolean saveChanges() throws HibernateException {
+    Object valueObject = getValueObject();
 
-    /**
-     * Return the application Hibernate <tt>SessionFactory</tt>.
-     * If session factory is not defined this method will obtain the session
-     * factory from the {@link SessionContext}.
-     * <p/>
-     * Applications using an alternative Hibernate <tt>SessionFactory</tt>
-     * sources should set the form's session factory using the
-     * {@link #setSessionFactory(SessionFactory)} method.
-     *
-     * @return the user's Hibernate session
-     */
-    public SessionFactory getSessionFactory() {
-        if (sessionFactory == null) {
-            sessionFactory = SessionContext.getSessionFactory();
-        }
-        return sessionFactory;
-    }
+    Transaction transaction = null;
+    try {
+      Session session = getSession();
 
-    /**
-     * Set the form Hibernate <tt>SessionFactory</tt>.
-     *
-     * @param sessionFactory the Hibernate SessionFactory
-     */
-    public void setSessionFactory(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
-    }
+      transaction = session.beginTransaction();
 
-    /**
-     * Return a Hibernate value object from the form with the form field values
-     * copied into the object's properties.
-     *
-     * @return the Hibernate object from the form with the form field values
-     * applied to the object properties.
-     */
-    public Object getValueObject() {
-        if (StringUtils.isNotBlank(classField.getValue())) {
-            try {
-                Class<?> valueClass = ClickUtils.classForName(classField.getValue());
+      session.saveOrUpdate(valueObject);
 
-                Serializable oid = (Serializable) oidField.getValueObject();
+      transaction.commit();
 
-                Object valueObject = null;
-                if (oid != null) {
-                    valueObject = getSession().load(valueClass, oid);
-                } else {
-                    valueObject = valueClass.newInstance();
-                }
+      return true;
 
-                copyTo(valueObject);
-
-                return valueObject;
-
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Set the given Hibernate value object in the form, copying the object's
-     * properties into the form field values.
-     *
-     * @param valueObject the Hibernate value object to set
-     */
-    public void setValueObject(Object valueObject) {
-        if (valueObject != null) {
-
-            String classname = getClassname(valueObject.getClass());
-
-            ClassMetadata classMetadata =
-                getSessionFactory().getClassMetadata(classname);
-
-            Object identifier =
-                classMetadata.getIdentifier(valueObject, EntityMode.POJO);
-            oidField.setValueObject(identifier);
-
-            copyFrom(valueObject);
-        }
-    }
-
-    /**
-     * Save or update the object to the database and return true.
-     * If a <tt>HibernateException</tt> occurs the <tt>Transaction</tt> will be
-     * rolled back the exception will be raised.
-     * <p/>
-     * If no object is added to the form using <tt>setValueObject()</tt>
-     * then this method will: <ul>
-     * <li>create a new instance of the Class</li>
-     * <li>copy the form's field values to the objects properties</li>
-     * <li>save the new object to the database</li>
-     * </ul>
-     * <p/>
-     * If an existing persistent object is added to the form using
-     * <tt>setValueObject()</tt> then this method will: <ul>
-     * <li>load the persistent object record from the database</li>
-     * <li>copy the form's field values to the objects properties</li>
-     * <li>update the object in the database</li>
-     * </ul>
-     *
-     * @return true if the object was saved or false otherwise
-     * @throws HibernateException if a persistence error occurred
-     */
-    public boolean saveChanges() throws HibernateException {
-        Object valueObject = getValueObject();
-
-        Transaction transaction = null;
+    } catch (HibernateException he) {
+      if (transaction != null) {
         try {
-            Session session = getSession();
+          transaction.rollback();
+        } catch (HibernateException re) {
+          // ignore
+        }
+      }
+      throw he;
+    }
+  }
 
-            transaction = session.beginTransaction();
+  /**
+   * This method applies the object meta data to the form fields and then
+   * invokes the <tt>super.onProcess()</tt> method.
+   *
+   * @see Form#onProcess()
+   *
+   * @return true to continue Page event processing or false otherwise
+   */
+  @Override
+  public boolean onProcess() {
+    applyMetaData();
+    return super.onProcess();
+  }
 
-            session.saveOrUpdate(valueObject);
+  /**
+   * Render the HTML representation of the HibernateForm.
+   * <p/>
+   * This method applies the object meta data to the form fields and then
+   * invokes the <tt>super.toString()</tt> method.
+   *
+   * @see #toString()
+   *
+   * @param buffer the specified buffer to render the control's output to
+   */
+  @Override
+  public void render(HtmlStringBuffer buffer) {
+    applyMetaData();
+    super.render(buffer);
+  }
 
-            transaction.commit();
+  // ------------------------------------------------------ Protected Methods
 
-            return true;
+  /**
+   * Applies the <tt>ClassMetadata</tt> validation database meta data to the
+   * form fields.
+   * <p/>
+   * The field validation attributes include:
+   * <ul>
+   * <li>required - is a mandatory field and cannot be null</li>
+   * </ul>
+   */
+  protected void applyMetaData() {
+    if (metaDataApplied) {
+      return;
+    }
 
-        } catch (HibernateException he) {
-            if (transaction != null) {
-                try {
-                   transaction.rollback();
-                } catch (HibernateException re) {
-                    // ignore
-                }
+    try {
+      Class<?> valueClass = ClickUtils.classForName(classField.getValue());
+
+      String classname = getClassname(valueClass);
+
+      ClassMetadata metadata = getSessionFactory().getClassMetadata(classname);
+
+      String[] propertyNames = metadata.getPropertyNames();
+
+      boolean[] propertyNullability = metadata.getPropertyNullability();
+
+      for (int i = 0; i < propertyNames.length; i++) {
+        Field field = getField(propertyNames[i]);
+        if (field != null) {
+          boolean isMandatory = !propertyNullability[i];
+          if (!field.isRequired() && isMandatory) {
+            if (!(field instanceof Checkbox)) {
+              field.setRequired(true);
             }
-            throw he;
+          }
         }
+      }
+
+    } catch (ClassNotFoundException cnfe) {
+      throw new RuntimeException(cnfe);
     }
 
-    /**
-     * This method applies the object meta data to the form fields and then
-     * invokes the <tt>super.onProcess()</tt> method.
-     *
-     * @see Form#onProcess()
-     *
-     * @return true to continue Page event processing or false otherwise
-     */
-    @Override
-    public boolean onProcess() {
-        applyMetaData();
-        return super.onProcess();
+    metaDataApplied = true;
+  }
+
+  /**
+   * Return the original classname for the given class removing any CGLib
+   * proxy information.
+   *
+   * @param aClass the class to obtain the original name from
+   * @return the original classname for the given class
+   */
+  protected String getClassname(Class<?> aClass) {
+
+    String classname = aClass.getName();
+    if (classname.contains("$$")) {
+      classname = classname.substring(0, classname.indexOf("$"));
     }
 
-    /**
-     * Render the HTML representation of the HibernateForm.
-     * <p/>
-     * This method applies the object meta data to the form fields and then
-     * invokes the <tt>super.toString()</tt> method.
-     *
-     * @see #toString()
-     *
-     * @param buffer the specified buffer to render the control's output to
-     */
-    @Override
-    public void render(HtmlStringBuffer buffer) {
-        applyMetaData();
-        super.render(buffer);
-    }
-
-    // ------------------------------------------------------ Protected Methods
-
-    /**
-     * Applies the <tt>ClassMetadata</tt> validation database meta data to the
-     * form fields.
-     * <p/>
-     * The field validation attributes include:
-     * <ul>
-     * <li>required - is a mandatory field and cannot be null</li>
-     * </ul>
-     */
-    protected void applyMetaData() {
-        if (metaDataApplied) {
-            return;
-        }
-
-        try {
-            Class<?> valueClass = ClickUtils.classForName(classField.getValue());
-
-            String classname = getClassname(valueClass);
-
-            ClassMetadata metadata = getSessionFactory().getClassMetadata(classname);
-
-            String[] propertyNames = metadata.getPropertyNames();
-
-            boolean[] propertyNullability = metadata.getPropertyNullability();
-
-            for (int i = 0; i < propertyNames.length; i++) {
-                Field field = getField(propertyNames[i]);
-                if (field != null) {
-                    boolean isMandatory = !propertyNullability[i];
-                    if (!field.isRequired() && isMandatory) {
-                        if (!(field instanceof Checkbox)) {
-                            field.setRequired(true);
-                        }
-                    }
-                }
-            }
-
-        } catch (ClassNotFoundException cnfe) {
-            throw new RuntimeException(cnfe);
-        }
-
-        metaDataApplied = true;
-    }
-
-    /**
-     * Return the original classname for the given class removing any CGLib
-     * proxy information.
-     *
-     * @param aClass the class to obtain the original name from
-     * @return the original classname for the given class
-     */
-    protected String getClassname(Class<?> aClass) {
-
-        String classname = aClass.getName();
-        if (classname.contains("$$")) {
-            classname = classname.substring(0, classname.indexOf("$"));
-        }
-
-        return classname;
-    }
-
+    return classname;
+  }
 }

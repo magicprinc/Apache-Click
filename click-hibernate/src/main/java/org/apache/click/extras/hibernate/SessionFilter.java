@@ -1,21 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.click.extras.hibernate;
 
 import javax.servlet.Filter;
@@ -24,7 +6,6 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-
 import java.io.IOException;
 
 /**
@@ -59,50 +40,49 @@ import java.io.IOException;
  */
 public class SessionFilter implements Filter {
 
-    /**
-     * Initialize the Hibernate Configuration and SessionFactory.
-     *
-     * @see Filter#init(FilterConfig)
-     *
-     * @param filterConfig the filter configuration
-     * @throws ServletException if an initialization error occurs
-     */
-    public void init(FilterConfig filterConfig) throws ServletException {
-        // Load the SessionContext class initializing the SessionFactory
-        try {
-            SessionContext context = new SessionContext();
-            context.onInit(filterConfig.getServletContext());
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new ServletException(e);
-        }
+  /**
+   * Initialize the Hibernate Configuration and SessionFactory.
+   *
+   * @see Filter#init(FilterConfig)
+   *
+   * @param filterConfig the filter configuration
+   * @throws ServletException if an initialization error occurs
+   */
+  @Override public void init(FilterConfig filterConfig) throws ServletException {
+    // Load the SessionContext class initializing the SessionFactory
+    try {
+      SessionContext context = new SessionContext();
+      context.onInit(filterConfig.getServletContext());
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw new ServletException(e);
     }
+  }
 
-    /**
-     * @see Filter#destroy()
-     */
-    public void destroy() {
+  /**
+   * @see Filter#destroy()
+   */
+  @Override public void destroy (){}
+
+  /**
+   * Close any user defined sessions if present.
+   *
+   * @see Filter#doFilter(ServletRequest, ServletResponse, FilterChain)
+   *
+   * @param request the servlet request
+   * @param response the servlet response
+   * @param chain the filter chain
+   * @throws IOException if an I/O error occurs
+   * @throws ServletException if a servlet error occurs
+   */
+  @Override public void doFilter(ServletRequest request, ServletResponse response,
+      FilterChain chain) throws IOException, ServletException {
+
+    chain.doFilter(request, response);
+
+    if (SessionContext.hasSession()) {
+      SessionContext.close();
     }
-
-    /**
-     * Close any user defined sessions if present.
-     *
-     * @see Filter#doFilter(ServletRequest, ServletResponse, FilterChain)
-     *
-     * @param request the servlet request
-     * @param response the servlet response
-     * @param chain the filter chain
-     * @throws IOException if an I/O error occurs
-     * @throws ServletException if a servlet error occurs
-     */
-    public void doFilter(ServletRequest request, ServletResponse response,
-            FilterChain chain) throws IOException, ServletException {
-
-        chain.doFilter(request, response);
-
-        if (SessionContext.hasSession()) {
-            SessionContext.close();
-        }
-    }
+  }
 
 }
