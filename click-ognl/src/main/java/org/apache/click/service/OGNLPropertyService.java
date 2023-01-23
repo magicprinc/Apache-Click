@@ -1,6 +1,9 @@
 package org.apache.click.service;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.SneakyThrows;
+import lombok.val;
 import ognl.MemberAccess;
 import ognl.Node;
 import ognl.Ognl;
@@ -11,16 +14,16 @@ import ognl.TypeConverter;
 import javax.servlet.ServletContext;
 import java.io.IOException;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Provides an OGNL based property services.
  */
 public class OGNLPropertyService implements PropertyService {
   /** OGNL Expression cache with support for multiple classloader caching */
-  private static final ConcurrentMap<String,Node> EXPRESSION_CACHE = new ConcurrentHashMap<>();
-  // Caffeine.newBuilder().maximumSize(10_000).expireAfterWrite(Duration.ofMinutes(5))
+  private final Cache<String,Node> EXPRESSION_CACHE =
+      Caffeine.newBuilder().maximumSize(10_000).expireAfterAccess(1, TimeUnit.HOURS).build();
+  //private static final ConcurrentMap<String,Node> EXPRESSION_CACHE = new ConcurrentHashMap<>();
 
   /** The OGNL object member accessor. */
   protected MemberAccess memberAccess = new DefaultMemberAccess();
@@ -35,10 +38,10 @@ public class OGNLPropertyService implements PropertyService {
    * @param servletContext the application servlet context
    * @throws IOException if an IO error occurs initializing the service
    */
-  public void onInit (ServletContext servletContext) throws IOException {}
+  @Override public void onInit (ServletContext servletContext) throws IOException {}
 
   /** @see PropertyService#onDestroy() */
-  public void onDestroy (){}
+  @Override public void onDestroy (){}
 
   /**
    * Return the property value for the given object and property name.
@@ -55,25 +58,36 @@ public class OGNLPropertyService implements PropertyService {
    * @see PropertyService#getValue(Object, String)
    *
    * @param source the source object
-   * @param name the name of the property
+   * @param propertyName the name of the property
    * @return the property value for the given source object and property name
    */
-  public Object getValue (Object source, String name){
+  @Override public Object getValue (Object source, String propertyName){
     // return PropertyUtils.getValue(source, name);
     try {
-      OgnlContext ognlContext = (OgnlContext) Ognl.createDefaultContext(source, memberAccess, null, typeConverter);// Map
+      val name = propertyName.trim();
+      val ognlContext = createContext(source);
 
       //ConcurrentMap<String, Object> expressionCache = ClickUtils.classLoaderCacheGET(EXPRESSION_CL_CACHE);// expressionCache→ConcurrentMap<String,Object>
-      Node expression = EXPRESSION_CACHE.computeIfAbsent(name, k -> ognlParseExpression(name));
+      Node expression = cacheOrParse(source, name);
 
       return Ognl.getValue(expression, ognlContext, source);
 
     } catch (Exception e){// OgnlException | IllegalCallerException
       throw new IllegalArgumentException("Ognl.parseExpression/getValue failed: ("+source.getClass().getName()+
-          ") "+source+"."+name,
+          ") "+source+"."+propertyName,
           e instanceof OgnlException ? e : e.getCause());
     }
   }
+
+  private OgnlContext createContext (Object root){
+    return (OgnlContext) Ognl.createDefaultContext(root, memberAccess, null, typeConverter);// Map
+  }
+
+  private Node cacheOrParse (Object root, String name) {
+    return EXPRESSION_CACHE.asMap().computeIfAbsent(PropertyService.distinctClassName(root)+'#'+name,
+        k -> ognlParseExpression(name));
+  }
+
 
   /**
    * Return the property value for the given object and property name.
@@ -100,7 +114,7 @@ public class OGNLPropertyService implements PropertyService {
    * this cache
    * @return the property value for the given source object and property name
    */
-  public Object getValue(Object source, String name, Map<?,?> cache) {
+  @Override public Object getValue(Object source, String name, Map<?,?> cache) {
     //return PropertyUtils.getValue(source, name, cache);
     return getValue(source, name);
   }
@@ -114,12 +128,13 @@ public class OGNLPropertyService implements PropertyService {
    * @param propertyName the name of the property to set
    * @param newValue the property value to set
    */
-  public void setValue (Object target, String propertyName, Object newValue) {
+  @Override public void setValue (Object target, String propertyName, Object newValue) {
     try {
-      OgnlContext ognlContext = (OgnlContext) Ognl.createDefaultContext(target, memberAccess, null, typeConverter);// Map
+      val name = propertyName.trim();
+      val ognlContext = createContext(target);
 
       //ConcurrentMap<String, Object> expressionCache = ClickUtils.classLoaderCacheGET(EXPRESSION_CL_CACHE);// expressionCache→ConcurrentMap<String,Object>
-      Node expression = EXPRESSION_CACHE.computeIfAbsent(propertyName,  k -> ognlParseExpression(propertyName));
+      Node expression = cacheOrParse(target, name);
 
       Ognl.setValue(expression, ognlContext, target, newValue);
 
