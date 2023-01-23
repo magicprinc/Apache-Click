@@ -1,4 +1,0 @@
-#summary How to get started with ClickClick
-
-== Intro ==
-To get started, first build the latest !ClickClick sources from the trunk. See `trunk/clickclick/readme.html` for details.
