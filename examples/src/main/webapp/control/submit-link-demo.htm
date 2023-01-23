@@ -1,0 +1,79 @@
+<!--
+#* Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.*#
+-->
+
+This page demonstrates some usage patterns of the SubmitLink control.
+
+<h3>Demo1</h3>
+
+In this first demo is shown how the Form is submitted when the SubmitLink is
+clicked.
+
+$demo1
+
+#if ($demo1Msg)
+<p class="infoMsg"> $demo1Msg</p>
+#end
+
+<h3>Demo2</h3>
+
+In this second demo is shown how the SubmitLink's parameters are
+submitted together with the Form.
+
+$demo2
+
+#if ($demo2Msg)
+<p class="infoMsg"> $demo2Msg</p>
+#end
+
+<h3>Demo3</h3>
+
+This demo shows how the SubmitLink can be used outside of a Form. When a SubmitLink
+is not inside a Form it behaves like a normal ActionLink.
+
+<p/>
+
+Click $standaloneLink to demonstrate.
+
+#if ($demo3Msg)
+<p class="infoMsg"> $demo3Msg</p>
+#end
+
+<h3>Demo4</h3>
+
+<script type="text/javascript">
+    function confirmSubmit(link, formName, msg) {
+        var confirm = window.confirm(msg);
+        if (confirm) {
+            return Click.submitLinkAction(link, formName);
+        } else {
+            return false;
+        }
+    }
+</script>
+
+This demo shows how a confirmation message can be displayed before the
+SubmitLink submits the Form.
+
+<p/>
+
+$demo4
+
+#if ($demo4Msg)
+<p class="infoMsg"> $demo4Msg</p>
+#end

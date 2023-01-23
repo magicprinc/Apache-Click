@@ -1,0 +1,115 @@
+<!--
+#* Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.*#
+-->
+
+This <a target="blank" class="external" href="http://en.wikipedia.org/wiki/AJAX">AJAX</a>
+example pulls the customer details for the selected customer and shows the
+results without refreshing the page.
+
+Please select one of the customers:
+<p/>
+
+<table cellspacing="8" cellpadding="8">
+   <tr>
+      <td> $customerSelect </td>
+      <td> <div id="customerDetails"/> </td>
+   </tr>
+</table>
+
+<p>&nbsp;</p>
+
+The <a target="blank" class="external" href="http://www.prototypejs.org/">Prototype</a>
+JavaScript library is used in this example. Please also see the
+<a target="blank" class="external" href="http://www.prototypejs.org/learn/introduction-to-ajax">Introduction to Ajax</a>
+for a good tutorial.
+<p/>
+This HTML page contains a customer Select control 
+and a &lt;div id='<span class="st">customerDetails</span>'/&gt; element:
+
+<pre class="codeHtml">
+&lt;table cellspacing="8" cellpadding="8">
+   &lt;tr>
+      &lt;td> &lt;select name="customerSelect"&gt;...&lt;/select&gt; &lt;/td>
+      &lt;td> &lt;div id="<span class="st">customerDetails</span>"/> &lt;/td>
+   &lt;/tr>
+&lt;/table>
+</pre>
+
+<p/>
+When you click on the select, an HTTP request (e.g. <tt>GET ajax-select.htm?pageAction=onChangeCustomer&customerId=202</tt>)
+is made to the page to get the customers details. These details are returned as HTML with a content-type of 'text/html':
+<pre class="codeHtml">
+&lt;table border="0" cellspacing="2" cellpadding="2">
+  &lt;tr>
+    &lt;td&gt;&lt;b&gt;Name&lt;/b&gt;&lt;/td&gt;
+    &lt;td>Alison Smart&lt;/td&gt;
+  &lt;/tr&gt;
+  ...
+&lt;/table&gt;
+</pre>
+
+Prototype's Ajax.Updater then updates the inner HTML of the page registered
+&lt;div id='<span class="st">customerDetails</span>'/&gt; element with the HTML
+content returned from the server.
+<p/>
+Below is the necessary JavaScript to perform the Ajax request.
+<p/>
+As soon as the browser DOM is loaded, Prototype's
+<a target="_blank" class="external" href="http://www.prototypejs.org/api/event/observe">observe</a>
+function is used to register a "<span class="green">change</span>" listener on the
+"<span class="blue">customerSelect</span>" control. When you select an
+option, the Ajax.Updater is invoked to retrieve the customer details and update the
+target "<span class="red">customerDetails</span>" div:
+
+<pre class="codeHtml">
+&lt;html&gt;
+...
+&lt;body&gt;
+...
+
+  <span class="red">$</span>jsImports
+
+  &lt;script type='text/javascript' src='<a href="/click/prototype/prototype.js">prototype.js</a>'&gt;&lt;/script&gt;
+
+  &lt;script type='text/javascript'&gt;
+    // Wait until browser DOM is loaded
+    document.observe("dom:loaded", function() {
+
+      // Observe the selected element's "change" event, which triggers the given function.
+      // Note that $selector is a Velocity variable passed in from the AjaxSelect.java Page
+      $('<span class="blue">customerSelect</span>').observe('<span class="green">change</span>', function(event){
+
+        // Retrieve the source of the event, in this case the Select control
+        var select = Event.element(event);
+
+        // Ajax.Updater requests the customer for the given customerId parameter
+        // and replaces the inner HTML of customerDetails div
+        new <span class="maroon">Ajax.Updater</span>('<span class="red">customerDetails</span>', '<span class="blue">/click-examples/ajax/select/ajax-select.htm</span>', {
+          <span class="green">method</span>: <span class="blue">'get'</span>,
+          <span class="green">parameters</span>: {<span class="blue">'pageAction'</span> : 'onChangeCustomer', <span class="blue">'customerId'</span> : select.value}
+        });
+      });
+    });
+  &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+The initialization code above is contained in the 
+<a href="$context/source-viewer.htm?filename=ajax/select/ajax-select.js">ajax-select.js</a>
+template.

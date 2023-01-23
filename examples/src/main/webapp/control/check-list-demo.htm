@@ -1,0 +1,76 @@
+<!--
+#* Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.*#
+-->
+
+<style type="text/css">
+.checkListLabel { 
+	border-bottom: 1px solid #769550; 
+	padding: 0.2em 0.2em 0.2em 25px; 
+}
+.checkListLabel:hover, .checkListLabel.hover { 
+	background: #306B34; 
+	color: #fff; 
+}
+		
+/* Checklist 1 */
+.cl1 {
+	border: 1px dotted #a17c04;
+	color: #a05a04;
+	font-family: "Trebuchet MS", Tahoma, Geneva, Arial, sans-serif;
+	font-size: 0.9em;
+	height: 19em;
+}
+.cl1 .alt { background: #f8f6ed; }
+.cl1 label { padding: 0.2em 0.2em 0.2em 25px; }
+.cl1 label:hover, .cl3 label.hover { background: #EFE9D4; color: #a05a04; }	
+
+/* Checklist 2 */
+.cl2 {
+	background: #67893d;
+	color: #D1DCC5;
+	font-family: Tahoma, Geneva, Arial, sans-serif;
+	width: 50%;
+}
+.cl2 input { vertical-align: middle; }
+.cl2 li { background: #67893d; }
+</style>
+
+$form
+
+<p>&nbsp;</p>
+
+#if ($showSelected)
+
+ <b>Standard list selection</b>:
+ #foreach ($item in $list1)
+	$item,
+ #end
+ <p/>
+
+ <b>Sortable list selection</b>:
+ #foreach ($item in $list2)
+	$item,
+ #end
+ <p/>
+	
+ <b>Sortable list order</b>:
+ #foreach ($item in $list2Order)
+	${item},
+ #end
+
+#end
