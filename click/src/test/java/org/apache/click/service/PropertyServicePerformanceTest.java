@@ -1,12 +1,15 @@
 package org.apache.click.service;
 
 import junit.framework.TestCase;
+import org.apache.click.extras.spring.SPELPropertyService;
 import org.apache.click.util.ChildObject;
 import org.apache.click.util.ParentObject;
+import org.apache.click.util.PropertyUtils;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class PropertyServicePerformanceTest extends TestCase {
@@ -14,62 +17,70 @@ public class PropertyServicePerformanceTest extends TestCase {
   // todo plus w/o reflection  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! todo todo todo
 
   public void test_MVELService() throws Exception {
-    PropertyService ps = new MVELPropertyService();
-    TestRunner testRunner = new TestRunner(ps, false);
-    testRunner.testPropertyServiceRead(ps);
-    testRunner.testPropertyServiceWrite(ps);//warm-up
-    TestRunner.reset();
-
-    for (int i = 0; i < 100; i++) {
-      Thread testThread = new Thread(new TestRunner(ps, i == 49));
-      testThread.start();
-    }
-
-    Thread.sleep(10_000);
+    loopIt(new MVELPropertyService());
   }
 
   public void test_OGNLService() throws Exception {
-    TestRunner.reset();
+    loopIt(new OGNLPropertyService());
+  }
 
-    PropertyService ps = new OGNLPropertyService();
+  public void test_SpELService() throws Exception {
+    loopIt(new SPELPropertyService());
+  }
 
-    for (int i = 0; i < 50; i++) {
-      Thread testThread = new Thread(new TestRunner(ps, i == 49));
-      testThread.start();
-    }
-
-    Thread.sleep(10_000);
+  public void test_Reflection() throws Exception {
+    loopIt(new PropertyUtils());
   }
 
 
-  public class TestRunner implements Runnable {
+  public void loopIt (PropertyService ps) throws Exception {
+    warmUp(ps);
+
+    for (int i = 0; i < 100; i++) {
+      Thread testThread = new Thread(new TestRunner(ps));
+      testThread.start();
+    }
+
+    while (TestRunner.thread.get()<100){
+      Thread.sleep(1_000);
+    }
+
+    System.err.printf("%1s cumulative  read test in %2d ms \n", ps.getClass().getSimpleName(), TestRunner.readDuration.get());
+    System.err.printf("%1s cumulative write test in %2d ms \n", ps.getClass().getSimpleName(), TestRunner.writeDuration.get());
+  }
+
+
+  private static void warmUp (PropertyService ps) {
+    long read = TestRunner.testPropertyServiceRead(ps);
+    long write = TestRunner.testPropertyServiceWrite(ps);//warm-up
+    System.err.printf("WWW %1s cumulative  read test in %2d ms \n", ps.getClass().getSimpleName(), read);
+    System.err.printf("WWW %1s cumulative write test in %2d ms \n", ps.getClass().getSimpleName(), write);
+    TestRunner.reset();
+  }
+
+
+  public static class TestRunner implements Runnable {
     public static final AtomicLong readDuration = new AtomicLong();
     public static final AtomicLong writeDuration = new AtomicLong();
+    public static final AtomicInteger thread = new AtomicInteger();
 
     static void reset () {
-      readDuration.set(0);
-      writeDuration.set(0);
+      readDuration.set(0);  writeDuration.set(0);  thread.set(0);
     }
 
     final PropertyService propertyService;
-    final boolean print;
 
-    public TestRunner(PropertyService propertyService, boolean print) {
+    public TestRunner(PropertyService propertyService) {
       this.propertyService = propertyService;
-      this.print = print;
     }
 
     public void run() {
-      long read  = readDuration.addAndGet(testPropertyServiceRead(propertyService));
-      long write = writeDuration.addAndGet(testPropertyServiceWrite(propertyService));
-
-      if (print) {
-        System.err.printf("%1s cumulative  read test in %2d ms \n", propertyService.getClass().getSimpleName(), read);
-        System.err.printf("%1s cumulative write test in %2d ms \n", propertyService.getClass().getSimpleName(), write);
-      }
+      readDuration.addAndGet(testPropertyServiceRead(propertyService));
+      writeDuration.addAndGet(testPropertyServiceWrite(propertyService));
+      thread.incrementAndGet();
     }
 
-    long testPropertyServiceRead(PropertyService propertyService) {
+    static long testPropertyServiceRead(PropertyService propertyService) {
       long start = System.currentTimeMillis();
 
       for (int i = 0; i < 10_000; i++) {
@@ -78,7 +89,7 @@ public class PropertyServicePerformanceTest extends TestCase {
       return System.currentTimeMillis() - start;// duration millis
     }
 
-    long testPropertyServiceWrite(PropertyService propertyService) {
+    static long testPropertyServiceWrite(PropertyService propertyService) {
       long start = System.currentTimeMillis();
 
       for (int i = 0; i < 10000; i++) {
@@ -86,15 +97,13 @@ public class PropertyServicePerformanceTest extends TestCase {
       }
       return System.currentTimeMillis() - start;// duration millis
     }
-
   }//TestRunner
 
 
+  static final Map<?, ?> cache = new HashMap<>(); // NOT USED
 
-
-  private void performReadTest(PropertyService propertyService) {
+  static void performReadTest(PropertyService propertyService) {
     ParentObject testObject = new ParentObject();
-    Map<?, ?> cache = new HashMap<>();
 
     assertNull(propertyService.getValue(testObject, "name", cache));
     assertNull(propertyService.getValue(testObject, "value", cache));
@@ -131,7 +140,7 @@ public class PropertyServicePerformanceTest extends TestCase {
     assertEquals("malcolm", propertyService.getValue(map, "name"));
   }
 
-  private void performWriteTest(PropertyService propertyService, int index) {
+  static void performWriteTest(PropertyService propertyService, int index) {
     ParentObject parentObject = new ParentObject();
 
     propertyService.setValue(parentObject, "name", "malcolm" + index);
