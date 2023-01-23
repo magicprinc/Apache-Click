@@ -18,17 +18,16 @@
  */
 package org.apache.click.servlet;
 
+import org.apache.click.util.HtmlStringBuffer;
+import org.apache.commons.lang.StringUtils;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpSession;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpSession;
-
-import org.apache.click.util.HtmlStringBuffer;
-import org.apache.commons.lang.StringUtils;
 
 /**
  * Mock implementation of {@link javax.servlet.http.HttpSession}.
@@ -196,6 +195,7 @@ public class MockSession implements HttpSession {
      * @return an array of String  objects specifying the names of all the
      * objects bound to this session
      */
+    @Deprecated
     public String[] getValueNames() {
         return attributes.keySet().toArray(new String[attributes.size()]);
     }
@@ -231,6 +231,7 @@ public class MockSession implements HttpSession {
      *
      * @param name the name of the object to remove from this session
      */
+    @Deprecated
     public void removeValue(String name) {
         attributes.remove(name);
     }
@@ -260,6 +261,7 @@ public class MockSession implements HttpSession {
      * @param name a string specifying the name of the object
      * @return the object with the specified name
      */
+    @Deprecated
     public Object getValue(String name) {
         return attributes.get(name);
     }
@@ -280,6 +282,7 @@ public class MockSession implements HttpSession {
      * @param name the name to which the object is bound; cannot be null
      * @param value the object to be bound; cannot be null
      */
+    @Deprecated
     public void putValue(String name, Object value) {
         attributes.put(name, value);
     }

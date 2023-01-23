@@ -21,10 +21,10 @@ package org.apache.click;
 import junit.framework.TestCase;
 import org.apache.click.ajax.DefaultAjaxBehavior;
 import org.apache.click.control.Submit;
-import org.apache.click.servlet.MockServletConfig;
-import org.apache.click.servlet.MockServletContext;
 import org.apache.click.servlet.MockRequest;
 import org.apache.click.servlet.MockResponse;
+import org.apache.click.servlet.MockServletConfig;
+import org.apache.click.servlet.MockServletContext;
 
 /**
  * MockContext tests.
@@ -46,7 +46,7 @@ public class MockContextTest extends TestCase {
      */
     public void testContext() {
         MockServletContext servletContext = new MockServletContext();
-        MockContext.initContext(new MockServletConfig(servletContext), 
+        MockContext.initContext(new MockServletConfig(servletContext),
             new MockRequest(), new MockResponse(), new ClickServlet());
     }
 
@@ -66,7 +66,7 @@ public class MockContextTest extends TestCase {
         submit.setActionListener(new ActionListener() {
             private static final long serialVersionUID = 1L;
 
-            public boolean onAction(Control source) {
+            @Override public boolean onAction(Control source) {
                 // When action is invoked, set flag to true
                 return submitCalled = true;
             }
@@ -104,7 +104,7 @@ public class MockContextTest extends TestCase {
         submit.setActionListener(new ActionListener() {
             private static final long serialVersionUID = 1L;
 
-            public boolean onAction(Control source) {
+            @Override public boolean onAction(Control source) {
                 // When action is invoked, set flag to true
                 return true;
             }
@@ -391,14 +391,14 @@ public class MockContextTest extends TestCase {
      */
     public void testInitContextCleanup() {
         MockContext.initContext();
-        assertEquals(1, Context.getContextStack().size());
-        assertEquals(1, ActionEventDispatcher.getDispatcherStack().size());
-        assertEquals(1, ControlRegistry.getRegistryStack().size());
+        assertEquals(1, Context.getContextStackSize());
+        assertEquals(1, ActionEventDispatcher.getDispatcherStackSize());
+        assertEquals(1, ControlRegistry.getRegistryStackSize());
 
         MockContext.initContext();
-        assertEquals(1, Context.getContextStack().size());
-        assertEquals(1, ActionEventDispatcher.getDispatcherStack().size());
-        assertEquals(1, ControlRegistry.getRegistryStack().size());
-        
+        assertEquals(1, Context.getContextStackSize());
+        assertEquals(1, ActionEventDispatcher.getDispatcherStackSize());
+        assertEquals(1, ControlRegistry.getRegistryStackSize());
+
     }
 }

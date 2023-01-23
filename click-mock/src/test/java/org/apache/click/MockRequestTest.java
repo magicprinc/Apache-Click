@@ -19,8 +19,10 @@
 package org.apache.click;
 
 import junit.framework.TestCase;
-import org.apache.click.servlet.MockRequest;
 import org.apache.click.control.TextArea;
+import org.apache.click.servlet.MockRequest;
+
+import java.io.Serial;
 
 /**
  * Sanity tests for MockRequest.
@@ -47,9 +49,9 @@ public class MockRequestTest extends TestCase {
 
         // Registry a listener which must be invoked
         textArea.setActionListener(new ActionListener() {
-            private static final long serialVersionUID = 1L;
+            @Serial private static final long serialVersionUID = 1L;
 
-            public boolean onAction(Control source) {
+            @Override public boolean onAction(Control source) {
                 // When action is invoked, set flag to true
                 return actionCalled = true;
             }
@@ -63,11 +65,11 @@ public class MockRequestTest extends TestCase {
         assertTrue(textArea.isValid());
         assertEquals("textvalue", textArea.getValue());
         assertEquals("textvalue", textArea.getValueObject());
-        
-        // Check that getParameterMap() is modifiable by adding a 
+
+        // Check that getParameterMap() is modifiable by adding a
         // key/value pair.
         context = (MockContext) Context.getThreadLocalContext();
-        context.getRequest().getParameterMap().put("textvalue", 
+        context.getRequest().getParameterMap().put("textvalue",
           textArea.getValue());
     }
 }

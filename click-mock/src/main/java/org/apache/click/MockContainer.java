@@ -18,21 +18,23 @@
  */
 package org.apache.click;
 
-import org.apache.click.servlet.MockServletContext;
-import org.apache.click.servlet.MockServletConfig;
-import org.apache.click.servlet.MockResponse;
 import org.apache.click.servlet.MockRequest;
-import java.io.File;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
+import org.apache.click.servlet.MockResponse;
+import org.apache.click.servlet.MockServletConfig;
+import org.apache.click.servlet.MockServletContext;
+import org.apache.click.servlet.MockSession;
+import org.apache.commons.lang.StringUtils;
+
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.click.servlet.MockSession;
-import org.apache.commons.lang.StringUtils;
+import java.io.File;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.Serial;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Provides a mock container for testing Click Pages.
@@ -594,7 +596,7 @@ public class MockContainer {
      * @return the class that Page forwarded to
      */
     public Class<? extends Page> getForwardPageClass() {
-        if (Context.getContextStack().isEmpty()) {
+        if (Context.getThreadLocalContext() == null){
             return null;
         }
         if (getRequest().getForward() == null) {
@@ -619,10 +621,10 @@ public class MockContainer {
      * @return the Class that Page redirected to
      */
     public Class<? extends Page> getRedirectPageClass() {
-        if (Context.getContextStack().isEmpty()) {
+        if (Context.getThreadLocalContext() == null){
             return null;
         }
-        if (getResponse().getRedirectUrl() == null) {
+        if (getResponse().getRedirectUrl() == null){
             return null;
         }
         Context context = Context.getThreadLocalContext();
@@ -659,13 +661,13 @@ public class MockContainer {
      * @see #start()
      */
     void reset() {
-        Context.getContextStack().clear();
+        Context.clearThreadLocalContext();
         HttpServletResponse response = getResponse();
         if (response != null) {
             response.reset();
         }
-        ActionEventDispatcher.getDispatcherStack().clear();
-        ControlRegistry.getRegistryStack().clear();
+        ActionEventDispatcher.clearThreadLocalDispatcher();
+        ControlRegistry.clearThreadLocalRegistry();
     }
 
     /**
@@ -735,9 +737,8 @@ public class MockContainer {
      * printing nested stackTraces.
      */
     static class CleanRuntimeException extends RuntimeException {
-
         /** Serialization version indicator. */
-        private static final long serialVersionUID = 1L;
+        @Serial private static final long serialVersionUID = 1L;
 
         /**
          * Default constructor.

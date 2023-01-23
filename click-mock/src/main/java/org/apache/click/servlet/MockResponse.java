@@ -18,6 +18,9 @@
  */
 package org.apache.click.servlet;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -34,10 +37,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
-
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * Mock implementation of {@link javax.servlet.http.HttpServletResponse}.
@@ -189,6 +188,7 @@ public class MockResponse implements HttpServletResponse {
      * @param url The url to encode
      * @return The encoded url
      */
+    @Deprecated
     public String encodeRedirectUrl(final String url) {
         return url;
     }
@@ -211,6 +211,7 @@ public class MockResponse implements HttpServletResponse {
      * @param url The url to encode
      * @return The encoded url
      */
+    @Deprecated
     public String encodeUrl(final String url) {
         return url;
     }
@@ -691,6 +692,7 @@ public class MockResponse implements HttpServletResponse {
      * @param msg The message
      * @deprecated
      */
+    @Deprecated
     public void setStatus(final int status, final String msg) {
         setStatus(status);
     }

@@ -721,6 +721,7 @@ public class MockRequest implements HttpServletRequest {
      *
      * @deprecated Use ServletContext.getRealPath(String) instead.
      */
+    @Deprecated
     public String getRealPath(String name) {
         return servletContext.getRealPath(name);
     }
@@ -1092,6 +1093,7 @@ public class MockRequest implements HttpServletRequest {
      *
      * @return Always false
      */
+    @Deprecated
     public boolean isRequestedSessionIdFromUrl() {
         return false;
     }

@@ -672,6 +672,7 @@ public class MockServletContext implements ServletContext {
      * @return null
      *
      */
+    @Deprecated
     public Servlet getServlet(String name) {
         return null;
     }
@@ -690,6 +691,7 @@ public class MockServletContext implements ServletContext {
      *
      * @return null
      */
+    @Deprecated
     public Enumeration<String> getServletNames() {
         return null;
     }
@@ -699,6 +701,7 @@ public class MockServletContext implements ServletContext {
      *
      * @return null
      */
+    @Deprecated
     public Enumeration<?> getServlets() {
         return null;
     }
@@ -709,6 +712,7 @@ public class MockServletContext implements ServletContext {
      * @param e The exception to log
      * @param msg The message to log
      */
+    @Deprecated
     public void log(Exception e, String msg) {
         log(msg, e);
     }
