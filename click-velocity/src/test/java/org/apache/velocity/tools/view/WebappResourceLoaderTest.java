@@ -1,7 +1,6 @@
 package org.apache.velocity.tools.view;
 
 import org.apache.click.MockContext;
-import org.apache.click.servlet.MockServletContext;
 import org.apache.commons.collections.ExtendedProperties;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.runtime.RuntimeServices;
@@ -13,7 +12,11 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 public class WebappResourceLoaderTest {
@@ -46,7 +49,7 @@ public class WebappResourceLoaderTest {
 
     Resource fileResource = mock(Resource.class);
     when(fileResource.getName()).thenReturn("test.txt");
-    var msc = (MockServletContext) ctx.getServletContext();
+    var msc = ctx.getServletContext();
     assertNull(msc.getWebappPath());
     assertNull(msc.getWebappRoot());
     msc.setWebappPath("src/test/resources/");

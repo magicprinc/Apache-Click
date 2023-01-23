@@ -14,7 +14,9 @@ import java.util.Collections;
 import static org.apache.click.util.ClickTestUtils.deleteDir;
 import static org.apache.click.util.ClickTestUtils.makeTmpDir;
 import static org.apache.click.util.ClickTestUtils.makeXmlStream;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 public class VelocityTemplateServiceTest {
@@ -73,7 +75,7 @@ public class VelocityTemplateServiceTest {
 
     // ClickUtils.getConfigService(ctx.getServletContext())
     ConfigService clickConfigService = mock(ConfigService.class);
-    when(clickConfigService.getApplicationMode()).thenReturn("debug");
+    when(clickConfigService.getApplicationMode()).thenReturn(ConfigService.Mode.DEBUG);
     when(clickConfigService.getCharset()).thenReturn("KAKA");
     when(clickConfigService.getServletContext()).thenReturn(ctx.getServletContext());
     ctx.getServletContext().setAttribute(ConfigService.CONTEXT_NAME, clickConfigService);
