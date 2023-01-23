@@ -76,7 +76,10 @@ dependencies {
 
   implementation project(':click')
 
-  // TEST
+  //implementation 'org.apache.cayenne:cayenne-project:3.1.3'
+  implementation 'org.apache.cayenne:cayenne-server:3.0.2'
+
+  //*** TEST TEST TEST
 
   testImplementation 'junit:junit:4.+'
   testImplementation 'org.mockito:mockito-inline:+'
@@ -84,7 +87,6 @@ dependencies {
   testRuntimeOnly 'org.slf4j:slf4j-simple:1.7.+'
 
   testImplementation project(':click-mock')
-  testImplementation project(':click-velocity')
 }
 
 idea {
