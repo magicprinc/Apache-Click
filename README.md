@@ -106,3 +106,26 @@ To build the documentation (PDF and HTML) please see:
 Further information on building Click is available here:
 
    `documentation/docs/developer-guide/building.html`
+
+
+2022-2023
+
+Main site: 
+https://click.apache.org/
+
+User guide, documents, book:
+
+https://click.apache.org/docs/user-guide.html
+https://click.apache.org/docs/user-guide/htmlsingle/click-book.html
+https://click.apache.org/docs/user-guide/html/index.html
+https://click.apache.org/docs/user-guide/pdf/click-book.pdf
+
+Why Click?
+https://click.apache.org/docs/why-click.html
+
+FAQ
+https://click.apache.org/docs/faq.html
+
+GitHub
+https://github.com/magicprinc/Apache-Click
+https://github.com/apache/click
