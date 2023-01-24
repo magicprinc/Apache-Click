@@ -12,6 +12,7 @@ import org.apache.click.examples.page.springsecurity.secure.SecurePage;
 import org.apache.click.examples.service.UserService;
 import org.apache.click.extras.control.EmailField;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -38,7 +39,7 @@ public class CreateAccountPage extends BorderPage {
   private final PasswordField passwordAgainField = new PasswordField("passwordAgain", "Password again", true);
   private final HiddenField redirectField = new HiddenField("redirect", String.class);
 
-  @Resource(name="authenticationManager")
+  @Autowired(required = false) //@Resource(name="authenticationManager")  todo deleted Spring Security!!! see also: spring-bean.xml
   private AuthenticationManager authenticationManager;
 
   @Resource(name="userService")

@@ -1,21 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.click.examples.page;
 
 import org.apache.click.Page;
@@ -49,116 +31,114 @@ import java.io.Serial;
  */
 @Component
 public class EditCustomer extends BorderPage {
+  @Serial private static final long serialVersionUID = 1L;
 
-    @Serial private static final long serialVersionUID = 1L;
+  private final Form form = new Form("form");
+  private final HiddenField referrerField = new HiddenField("referrer", String.class);
+  private final HiddenField idField = new HiddenField("id", Integer.class);
 
-    private Form form = new Form("form");
-    private HiddenField referrerField = new HiddenField("referrer", String.class);
-    private HiddenField idField = new HiddenField("id", Integer.class);
+  // Bindable variables can automatically have their value set by request parameters
+  @Bindable public Integer id;
+  @Bindable public String referrer; // todo MVEL can't set value even after Field.setAccessible(true)
 
-    // Bindable variables can automatically have their value set by request parameters
-    @Bindable protected Integer id;
-    @Bindable protected String referrer;
+  @Resource(name="customerService")
+  private CustomerService customerService;
 
-    @Resource(name="customerService")
-    private CustomerService customerService;
 
-    // Constructor -----------------------------------------------------------
+  public EditCustomer() {
+    addControl(form);
 
-    public EditCustomer() {
-        addControl(form);
+    form.add(referrerField);
 
-        form.add(referrerField);
+    form.add(idField);
 
-        form.add(idField);
+    FieldSet fieldSet = new FieldSet("customer");
+    form.add(fieldSet);
 
-        FieldSet fieldSet = new FieldSet("customer");
-        form.add(fieldSet);
+    TextField nameField = new TextField("name", true);
+    nameField.setMinLength(5);
+    nameField.setFocus(true);
+    fieldSet.add(nameField);
 
-        TextField nameField = new TextField("name", true);
-        nameField.setMinLength(5);
-        nameField.setFocus(true);
-        fieldSet.add(nameField);
+    fieldSet.add(new EmailField("email"));
 
-        fieldSet.add(new EmailField("email"));
+    IntegerField ageField = new IntegerField("age");
+    ageField.setMinValue(1);
+    ageField.setMaxValue(120);
+    ageField.setWidth("40px");
+    fieldSet.add(ageField);
 
-        IntegerField ageField = new IntegerField("age");
-        ageField.setMinValue(1);
-        ageField.setMaxValue(120);
-        ageField.setWidth("40px");
-        fieldSet.add(ageField);
+    DoubleField holdingsField = new DoubleField("holdings");
+    holdingsField.setTextAlign("right");
+    fieldSet.add(holdingsField);
 
-        DoubleField holdingsField = new DoubleField("holdings");
-        holdingsField.setTextAlign("right");
-        fieldSet.add(holdingsField);
+    fieldSet.add(new InvestmentSelect("investments"));
+    fieldSet.add(new DateField("dateJoined"));
+    fieldSet.add(new Checkbox("active"));
 
-        fieldSet.add(new InvestmentSelect("investments"));
-        fieldSet.add(new DateField("dateJoined"));
-        fieldSet.add(new Checkbox("active"));
+    form.add(new Submit("ok", "  OK  ", this, "onOkClick"));
+    form.add(new Submit("cancel", this, "onCancelClick"));
+  }
 
-        form.add(new Submit("ok", "  OK  ", this, "onOkClick"));
-        form.add(new Submit("cancel", this, "onCancelClick"));
+  // Event Handlers ---------------------------------------------------------
+
+  /**
+   * When page is first displayed on the GET request.
+   *
+   * @see Page#onGet()
+   */
+  @Override
+  public void onGet() {
+    if (id != null) {
+      Customer customer = customerService.getCustomerForID(id);
+
+      if (customer != null) {
+        // Copy customer data to form. The idField value will be set by
+        // this call
+        form.copyFrom(customer);
+      }
     }
 
-    // Event Handlers ---------------------------------------------------------
-
-    /**
-     * When page is first displayed on the GET request.
-     *
-     * @see Page#onGet()
-     */
-    @Override
-    public void onGet() {
-        if (id != null) {
-            Customer customer = customerService.getCustomerForID(id);
-
-            if (customer != null) {
-                // Copy customer data to form. The idField value will be set by
-                // this call
-                form.copyFrom(customer);
-            }
-        }
-
-        if (referrer != null) {
-            // Set HiddenField to bound referrer field
-            referrerField.setValue(referrer);
-        }
+    if (referrer != null) {
+      // Set HiddenField to bound referrer field
+      referrerField.setValue(referrer);
     }
+  }
 
-    public boolean onOkClick() {
-        if (form.isValid()) {
-            Integer id = (Integer) idField.getValueObject();
-            Customer customer = customerService.getCustomerForID(id);
+  public boolean onOkClick() {
+    if (form.isValid()) {
+      Integer id = (Integer) idField.getValueObject();
+      Customer customer = customerService.getCustomerForID(id);
 
-            if (customer == null) {
-                customer = new Customer();
-            }
-            form.copyTo(customer);
+      if (customer == null) {
+        customer = new Customer();
+      }
+      form.copyTo(customer);
 
-            customerService.saveCustomer(customer);
+      customerService.saveCustomer(customer);
 
-            String referrer = referrerField.getValue();
-            if (referrer != null) {
-                setRedirect(referrer);
-            } else {
-                setRedirect(HomePage.class);
-            }
+      String referrer = referrerField.getValue();
+      if (referrer != null) {
+        setRedirect(referrer);
+      } else {
+        setRedirect(HomePage.class);
+      }
 
-            return true;
+      return true;
 
-        } else {
-            return true;
-        }
+    } else {
+      return true;
     }
+  }
 
-    public boolean onCancelClick() {
-        String referrer = referrerField.getValue();
-        if (referrer != null) {
-            setRedirect(referrer);
-        } else {
-            setRedirect(HomePage.class);
-        }
-        return true;
+  public boolean onCancelClick() {
+    String referrer = referrerField.getValue();
+    if (referrer != null) {
+      setRedirect(referrer);
+    } else {
+      setRedirect(HomePage.class);
     }
+    return true;
+  }
 
 }
