@@ -11,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Serial;
 
 /**
  * Provides a Java source code, HTML and XML examples rendering page.
@@ -18,232 +19,210 @@ import java.io.InputStreamReader;
  * @author Malcolm Edgar
  */
 public class SourceViewer extends BorderPage {
+  @Serial private static final long serialVersionUID = 1761309857296092283L;
 
-    private static final String[] HTML_KEYWORDS = { "html", "head", "style",
-            "script", "title", "link", "body", "h1", "h2", "h3", "h4", "h5",
-            "h6", "p", "hr", "br", "span", "table", "tr", "th", "td", "a", "b",
-            "i", "u", "ul", "ol", "li", "form", "div", "input", "fieldset",
-            "pre", "tt", "ajax-response", "response", "%@", "%@taglib",
-            "jsp:include", "c:forEach", "c:choose", "c:when", "c:otherwise",
-            "fmt:formatNumber", "fmt:formatDate", "center" };
+  private static final String[] HTML_KEYWORDS = { "html", "head", "style",
+      "script", "title", "link", "body", "h1", "h2", "h3", "h4", "h5",
+      "h6", "p", "hr", "br", "span", "table", "tr", "th", "td", "a", "b",
+      "i", "u", "ul", "ol", "li", "form", "div", "input", "fieldset",
+      "pre", "tt", "ajax-response", "response", "%@", "%@taglib",
+      "jsp:include", "c:forEach", "c:choose", "c:when", "c:otherwise",
+      "fmt:formatNumber", "fmt:formatDate", "center" };
 
-    private static final String[] XML_KEYWORDS = { "click-app", "pages",
-            "page", "excludes", "headers", "header", "format", "mode", "type",
-            "filter-name", "filter-class", "filter-mapping", "filter",
-            "web-app", "display-name", "description", "servlet-mapping",
-            "servlet-name", "servlet-class", "init-param", "param-name",
-            "param-value", "servlet", "load-on-startup", "security-constraint",
-            "web-resource-collection", "auth-constraint", "role-name",
-            "login-config", "auth-method", "realm-name", "security-role",
-            "url-pattern", "welcome-file-list", "welcome-file", "Context",
-            "ResourceLink", "menu", "?xml", "controls", "control",
-            "listener-class", "listener" };
+  private static final String[] XML_KEYWORDS = { "click-app", "pages",
+      "page", "excludes", "headers", "header", "format", "mode", "type",
+      "filter-name", "filter-class", "filter-mapping", "filter",
+      "web-app", "display-name", "description", "servlet-mapping",
+      "servlet-name", "servlet-class", "init-param", "param-name",
+      "param-value", "servlet", "load-on-startup", "security-constraint",
+      "web-resource-collection", "auth-constraint", "role-name",
+      "login-config", "auth-method", "realm-name", "security-role",
+      "url-pattern", "welcome-file-list", "welcome-file", "Context",
+      "ResourceLink", "menu", "?xml", "controls", "control",
+      "listener-class", "listener" };
 
-    private static final String[] VELOCITY_KEYWORDS = { "#if", "#if(",
-            "#elseif", "#elseif(", "#else", "#else(", "#end", "#set", "#set(",
-            "#include", "#include(", "#parse", "#parse(", "#stop", "#macro",
-            "#macro(", "#foreach", "#foreach(", "##", "#*", "*#", "#" };
+  private static final String[] VELOCITY_KEYWORDS = { "#if", "#if(",
+      "#elseif", "#elseif(", "#else", "#else(", "#end", "#set", "#set(",
+      "#include", "#include(", "#parse", "#parse(", "#stop", "#macro",
+      "#macro(", "#foreach", "#foreach(", "##", "#*", "*#", "#" };
 
-    private boolean isJava = false;
+  private boolean isJava = false;
 
-    private boolean isXml = false;
+  private boolean isXml = false;
 
-    private boolean isHtml = false;
+  private boolean isHtml = false;
 
-    /**
-     * @see Page#onGet()
-     */
-    @Override
-    public void onGet() {
-        HttpServletRequest request = getContext().getRequest();
+  /**
+   * @see Page#onGet()
+   */
+  @Override public void onGet (){
+    HttpServletRequest request = getContext().getRequest();
 
-        String filename = request.getParameter("filename");
+    String filename = request.getParameter("filename");
 
-        if (filename != null) {
-            loadFilename(filename);
+    if (filename != null) {
+      loadFilename(filename);
 
-        } else {
-            addModel("error", "filename not defined");
-        }
+    } else {
+      addModel("error", "filename not defined");
+    }
+  }
+
+  private void loadFilename (String filename){
+    ServletContext context = getContext().getServletContext();
+
+    // Orion server requires '/' prefix to find resources
+    String resourceFilename = filename.charAt(0) != '/' ? "/" + filename : filename;
+
+    InputStream in = null;
+    try {
+      in = context.getResourceAsStream(resourceFilename);
+
+      if (in == null && filename.endsWith(".htm")){
+        resourceFilename = resourceFilename.substring(0, resourceFilename.length()-4) +".jsp";
+
+        in = context.getResourceAsStream(resourceFilename);
+      }
+
+      if (in != null){
+
+        loadResource(in, filename);
+
+      } else {
+        addModel("error", "File " + resourceFilename + " not found");
+      }
+
+    } catch (IOException e){
+      addModel("error", "Could not read " + resourceFilename);
+
+    } finally {
+      ClickUtils.close(in);
+    }
+  }
+
+  private void loadResource (InputStream inputStream, String name) throws IOException {
+    isJava = name.endsWith(".java");
+    isXml = name.endsWith(".xml");
+    isHtml = name.endsWith(".htm") || name.endsWith(".html") || name.endsWith(".vm") || name.endsWith(".jsp");
+
+    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+
+    HtmlStringBuffer buffer = new HtmlStringBuffer();
+
+    String line; ;
+
+    while ((line = reader.readLine()) != null){
+      buffer.append(getEncodedLine(line)).append("\n");
     }
 
-    private void loadFilename(String filename) {
-        ServletContext context = getContext().getServletContext();
-
-        // Orion server requires '/' prefix to find resources
-        String resourceFilename =
-            (filename.charAt(0) != '/') ? "/" + filename : filename;
-
-        InputStream in = null;
-        try {
-            in = context.getResourceAsStream(resourceFilename);
-
-            if (in == null && filename.endsWith(".htm")) {
-                resourceFilename =
-                    resourceFilename.substring(0, resourceFilename.length() - 4)
-                    + ".jsp";
-
-                in = context.getResourceAsStream(resourceFilename);
-            }
-
-            if (in != null) {
-
-                loadResource(in, filename);
-
-            } else {
-                addModel("error", "File " + resourceFilename + " not found");
-            }
-
-        } catch (IOException e) {
-            addModel("error", "Could not read " + resourceFilename);
-
-        } finally {
-            ClickUtils.close(in);
-        }
+    if (isHtml) {
+      addModel("templateSource", buffer.toString());
+    } else {
+      addModel("source", buffer.toString());
     }
 
-    private void loadResource(InputStream inputStream, String name)
-            throws IOException {
+    addModel("name", name);
+  }
 
-        isJava = name.endsWith(".java");
-        isXml = name.endsWith(".xml");
-        isHtml = name.endsWith(".htm");
-        if (!isHtml) {
-            isHtml = name.endsWith(".html");
-        }
-        if (!isHtml) {
-            isHtml = name.endsWith(".vm");
-        }
-        if (!isHtml) {
-            isHtml = name.endsWith(".jsp");
-        }
+  private String getEncodedLine (String line){
+    if (isHtml) {
+      line = ClickUtils.escapeHtml(line);
 
-        BufferedReader reader =
-            new BufferedReader(new InputStreamReader(inputStream));
+      for (String keyword : HTML_KEYWORDS){
+        line = renderHtmlKeywords(line, keyword);
+      }
 
-        HtmlStringBuffer buffer = new HtmlStringBuffer();
+      for (String keyword : VELOCITY_KEYWORDS){
+        line = renderVelocityKeywords(line, keyword);
+      }
 
-        String line = reader.readLine();
+      String renderedDollar = "<font color=\"red\">$</font>";
 
-        while (line != null) {
-            buffer.append(getEncodedLine(line));
-            buffer.append("\n");
-            line = reader.readLine();
-        }
+      line = StringUtils.replace(line, "$", renderedDollar);
 
-        if (isHtml) {
-            addModel("templateSource", buffer.toString());
-        } else {
-            addModel("source", buffer.toString());
-        }
+    } else if (isXml) {
+      line = ClickUtils.escapeHtml(line);
 
-        addModel("name", name);
+      for (String keyword : XML_KEYWORDS){
+        line = renderXmlKeywords(line, keyword);
+      }
+
+    } else {
+      line = ClickUtils.escapeHtml(line);
     }
 
-    private String getEncodedLine(String line) {
+    return line;
+  }
 
-        if (isHtml) {
-            line = ClickUtils.escapeHtml(line);
+  private String renderVelocityKeywords(String line, String token) {
+    String markupToken = renderVelocityToken(token);
 
-            for (int i = 0; i < HTML_KEYWORDS.length; i++) {
-                String keyword = HTML_KEYWORDS[i];
-                line = renderHtmlKeywords(line, keyword);
-            }
+    line = StringUtils.replace(line, " " + token + " ", " " + markupToken + " ");
 
-            for (int i = 0; i < VELOCITY_KEYWORDS.length; i++) {
-                String keyword = VELOCITY_KEYWORDS[i];
-                line = renderVelocityKeywords(line, keyword);
-            }
-
-            String renderedDollar = "<font color=\"red\">$</font>";
-
-            line = StringUtils.replace(line, "$", renderedDollar);
-
-        } else if (isXml) {
-            line = ClickUtils.escapeHtml(line);
-
-            for (int i = 0; i < XML_KEYWORDS.length; i++) {
-                String keyword = XML_KEYWORDS[i];
-                line = renderXmlKeywords(line, keyword);
-            }
-
-        } else {
-            line = ClickUtils.escapeHtml(line);
-        }
-
-        return line;
+    if (line.startsWith(token)) {
+      line = markupToken + line.substring(token.length());
     }
 
-    private String renderVelocityKeywords(String line, String token) {
-        String markupToken = renderVelocityToken(token);
-
-        line = StringUtils.replace
-            (line, " " + token + " ", " " + markupToken + " ");
-
-        if (line.startsWith(token)) {
-            line = markupToken + line.substring(token.length());
-        }
-
-        if (line.endsWith(token)) {
-            line = line.substring(0, line.length() - token.length())
-                    + markupToken;
-        }
-
-        return line;
+    if (line.endsWith(token)) {
+      line = line.substring(0, line.length() - token.length())
+          + markupToken;
     }
 
-    private String renderHtmlKeywords(String line, String token) {
+    return line;
+  }
 
-        String markupToken = "&lt;" + token + "&gt;";
-        String renderedToken = "&lt;" + renderHtmlToken(token) + "&gt;";
-        line = StringUtils.replace(line, markupToken, renderedToken);
+  private String renderHtmlKeywords(String line, String token) {
 
-        markupToken = "&lt;" + token + "/&gt;";
-        renderedToken = "&lt;" + renderHtmlToken(token) + "/&gt;";
-        line = StringUtils.replace(line, markupToken, renderedToken);
+    String markupToken = "&lt;" + token + "&gt;";
+    String renderedToken = "&lt;" + renderHtmlToken(token) + "&gt;";
+    line = StringUtils.replace(line, markupToken, renderedToken);
 
-        markupToken = "&lt;/" + token + "&gt;";
-        renderedToken = "&lt;/" + renderHtmlToken(token) + "&gt;";
-        line = StringUtils.replace(line, markupToken, renderedToken);
+    markupToken = "&lt;" + token + "/&gt;";
+    renderedToken = "&lt;" + renderHtmlToken(token) + "/&gt;";
+    line = StringUtils.replace(line, markupToken, renderedToken);
 
-        markupToken = "&lt;" + token + " ";
-        renderedToken = "&lt;" + renderHtmlToken(token) + " ";
-        line = StringUtils.replace(line, markupToken, renderedToken);
+    markupToken = "&lt;/" + token + "&gt;";
+    renderedToken = "&lt;/" + renderHtmlToken(token) + "&gt;";
+    line = StringUtils.replace(line, markupToken, renderedToken);
 
-        return line;
-    }
+    markupToken = "&lt;" + token + " ";
+    renderedToken = "&lt;" + renderHtmlToken(token) + " ";
+    line = StringUtils.replace(line, markupToken, renderedToken);
 
-    private String renderXmlKeywords(String line, String token) {
+    return line;
+  }
 
-        String markupToken = "&lt;" + token + "&gt;";
-        String renderedToken = "&lt;" + renderXmlToken(token) + "&gt;";
-        line = StringUtils.replace(line, markupToken, renderedToken);
+  private String renderXmlKeywords(String line, String token) {
 
-        markupToken = "&lt;" + token + "/&gt;";
-        renderedToken = "&lt;" + renderXmlToken(token) + "/&gt;";
-        line = StringUtils.replace(line, markupToken, renderedToken);
+    String markupToken = "&lt;" + token + "&gt;";
+    String renderedToken = "&lt;" + renderXmlToken(token) + "&gt;";
+    line = StringUtils.replace(line, markupToken, renderedToken);
 
-        markupToken = "&lt;/" + token + "&gt;";
-        renderedToken = "&lt;/" + renderXmlToken(token) + "&gt;";
-        line = StringUtils.replace(line, markupToken, renderedToken);
+    markupToken = "&lt;" + token + "/&gt;";
+    renderedToken = "&lt;" + renderXmlToken(token) + "/&gt;";
+    line = StringUtils.replace(line, markupToken, renderedToken);
 
-        markupToken = "&lt;" + token + " ";
-        renderedToken = "&lt;" + renderXmlToken(token) + " ";
-        line = StringUtils.replace(line, markupToken, renderedToken);
+    markupToken = "&lt;/" + token + "&gt;";
+    renderedToken = "&lt;/" + renderXmlToken(token) + "&gt;";
+    line = StringUtils.replace(line, markupToken, renderedToken);
 
-        return line;
-    }
+    markupToken = "&lt;" + token + " ";
+    renderedToken = "&lt;" + renderXmlToken(token) + " ";
+    line = StringUtils.replace(line, markupToken, renderedToken);
 
-    private String renderHtmlToken(String token) {
-        return "<font color=\"#00029F\">" + token + "</font>";
-    }
+    return line;
+  }
 
-    private String renderXmlToken(String token) {
-        return "<font color=\"#00029F\">" + token + "</font>";
-    }
+  private String renderHtmlToken(String token) {
+    return "<font color=\"#00029F\">" + token + "</font>";
+  }
 
-    private String renderVelocityToken(String token) {
-        return "<font color=\"red\">" + token + "</font>";
-    }
+  private String renderXmlToken(String token) {
+    return "<font color=\"#00029F\">" + token + "</font>";
+  }
+
+  private String renderVelocityToken(String token) {
+    return "<font color=\"red\">" + token + "</font>";
+  }
 
 }

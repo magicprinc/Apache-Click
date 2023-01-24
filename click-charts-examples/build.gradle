@@ -3,6 +3,7 @@ plugins {
   id 'war'
   id 'application'
   id 'idea'
+  id 'maven-publish'
 
   // https://github.com/bmuschko/gradle-tomcat-plugin
   id "com.bmuschko.tomcat" version "latest.release"
@@ -52,6 +53,7 @@ dependencies {
   implementation project(':click')
   implementation project(':click-extras')
   implementation project(':click-velocity')
+  implementation project(':click-charts')
 
   // we need to put it in .war
   implementation 'org.slf4j:slf4j-simple:1.7.+'
@@ -96,4 +98,15 @@ test {
 lombok {
   version = "latest.release"
   sha256 = "" // don't verify lombok.jar
+}
+
+publishing {
+  publications { // artifactId = folder name
+    maven(MavenPublication) {
+      from components.java
+    }
+  }
+}
+java {
+  withSourcesJar()
 }
