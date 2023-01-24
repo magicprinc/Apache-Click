@@ -1,0 +1,99 @@
+plugins {
+  id 'java'
+  id 'war'
+  id 'application'
+  id 'idea'
+
+  // https://github.com/bmuschko/gradle-tomcat-plugin
+  id "com.bmuschko.tomcat" version "latest.release"
+
+  id 'io.franzbecker.gradle-lombok' version 'latest.release'
+}
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+}
+
+sourceCompatibility = 17
+
+tasks.withType(JavaCompile).configureEach {
+  options.encoding = 'UTF-8'
+  options.compilerArgs.addAll(['-Xlint:all', '-parameters', '-g', '-Xmaxwarns', '999'])
+  options.release.set(17) // javac --release 7..18+
+  options.deprecation = false // todo step2 deprecated...
+}
+
+dependencies {
+  // https://javadoc.io/doc/com.google.errorprone/error_prone_annotations/latest/index.html
+  implementation("com.google.errorprone:error_prone_annotations:latest.release")
+  // https://javadoc.io/doc/com.google.code.findbugs/jsr305/latest/index.html  [x] remove? jsr305→jsr308 ^ Nope! This is THE WINNER!
+  implementation("com.google.code.findbugs:jsr305:latest.release")
+  implementation("javax.annotation:javax.annotation-api:1.3.2")
+
+
+  implementation 'javax.servlet:servlet-api:2.5'
+
+  implementation 'org.slf4j:slf4j-api:1.7.+'
+  implementation("org.slf4j:jcl-over-slf4j:1.7.+")
+  implementation("org.slf4j:log4j-over-slf4j:1.7.+")
+
+  implementation 'com.google.guava:guava:31.1-jre'
+  implementation 'org.mvel:mvel2:latest.release'// 2.4.14
+
+  implementation("com.github.ben-manes.caffeine:caffeine:latest.release")
+
+  implementation 'org.apache.commons:commons-lang3:3.+'
+  implementation 'commons-lang:commons-lang:2.+'
+  implementation 'commons-fileupload:commons-fileupload:1.3.+'
+
+  implementation "org.apache.velocity:velocity:1.+"
+
+  implementation project(':click')
+  implementation project(':click-extras')
+  implementation project(':click-velocity')
+
+  // we need to put it in .war
+  implementation 'org.slf4j:slf4j-simple:1.7.+'
+
+  //*** TEST TEST TEST
+
+  testImplementation 'junit:junit:4.+'
+  testImplementation 'org.mockito:mockito-inline:+'
+
+
+  testImplementation project(':click-mock')
+
+
+  // https://github.com/bmuschko/gradle-tomcat-plugin + id "com.bmuschko.tomcat" version "latest.release"
+  def tomcatVersion = '8.0.+'
+  tomcat "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}",
+      "org.apache.tomcat.embed:tomcat-embed-logging-juli:${tomcatVersion}",
+      "org.apache.tomcat.embed:tomcat-embed-jasper:${tomcatVersion}"
+
+}
+
+idea {
+  module {
+    downloadJavadoc = true
+    downloadSources = true
+  }
+}
+
+test {
+  useJUnit()
+  maxHeapSize = "500m"
+  enableAssertions = true
+
+  testLogging.showStandardStreams = true // show standard out & err of the test JVM on the console
+
+  System.setProperty("slf4j.detectLoggerNameMismatch", "true")
+  System.setProperty("file.encoding", "UTF-8")
+  System.setProperty("user.language", "en")
+  Locale.setDefault(new Locale("en", "US"));
+}
+
+lombok {
+  version = "latest.release"
+  sha256 = "" // don't verify lombok.jar
+}

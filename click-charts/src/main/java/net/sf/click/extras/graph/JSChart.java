@@ -13,12 +13,12 @@
  */
 package net.sf.click.extras.graph;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.click.control.AbstractControl;
 import org.apache.click.element.JsScript;
 import org.apache.click.util.HtmlStringBuffer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Provides a abstract JavaScript Chart control.

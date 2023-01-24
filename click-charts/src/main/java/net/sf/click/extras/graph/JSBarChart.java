@@ -13,11 +13,12 @@
  */
 package net.sf.click.extras.graph;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.apache.click.Context;
 import org.apache.click.element.JsImport;
 import org.apache.click.util.ClickUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Provides a Bar Chart control based on JavaScript only.
