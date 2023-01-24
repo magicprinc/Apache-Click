@@ -8,6 +8,7 @@ import org.apache.commons.lang.StringUtils;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -83,6 +84,26 @@ public class SourceViewer extends BorderPage {
 
         in = context.getResourceAsStream(resourceFilename);
       }
+
+      if (in == null && filename.endsWith(".java")){
+        in = ClickUtils.getClassLoader().getResourceAsStream(filename);
+
+        if (in == null){// WEB-INF/classes/net/sf/click/examples/page/SourceViewer.java
+          if (filename.startsWith("WEB-INF/classes/")){
+            filename = filename.substring(16);
+          } else if (filename.startsWith("/WEB-INF/classes/")){
+            filename = filename.substring(17);
+          }
+
+          in = ClickUtils.getClassLoader().getResourceAsStream(filename);
+          if (in == null){// ok. There are no sources... Maybe we are still under gradle?
+
+            try {
+              in = new FileInputStream("./src/main/java/"+filename);
+            } catch (IOException ignore){}// just best-effort last attempt..
+          }
+        }
+      }//i .java
 
       if (in != null){
 
