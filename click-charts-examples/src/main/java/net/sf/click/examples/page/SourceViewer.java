@@ -40,7 +40,12 @@ public class SourceViewer extends BorderPage {
       "login-config", "auth-method", "realm-name", "security-role",
       "url-pattern", "welcome-file-list", "welcome-file", "Context",
       "ResourceLink", "menu", "?xml", "controls", "control",
-      "listener-class", "listener" };
+      "listener-class", "listener", "beans",  "bean", "context-param",
+      "context:component-scan", "property", "constructor-arg",
+      "list", "value", "ref", "beans:beans", "beans:bean", "http",
+      "intercept-url", "form-login", "logout", "beans:property",
+      "beans:list", "beans:ref", "authentication-provider",
+      "page-interceptor", "property-service" };
 
   private static final String[] VELOCITY_KEYWORDS = { "#if", "#if(",
       "#elseif", "#elseif(", "#else", "#else(", "#end", "#set", "#set(",
@@ -64,6 +69,7 @@ public class SourceViewer extends BorderPage {
     if (filename != null) {
       loadFilename(filename);
 
+      getModel().put("title", "Source Viewer : " + filename); // ?
     } else {
       addModel("error", "filename not defined");
     }
@@ -246,4 +252,7 @@ public class SourceViewer extends BorderPage {
     return "<font color=\"red\">" + token + "</font>";
   }
 
+  private String renderComment(String comment) {
+    return "<font color=\"#3F7F5F\">" + comment + "</font>";
+  }
 }
