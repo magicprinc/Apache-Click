@@ -232,7 +232,7 @@ public class MockContext extends Context {
 
       ActionEventDispatcher.pushThreadLocalDispatcher(actionEventDispatcher);
       ControlRegistry.pushThreadLocalRegistry(controlRegistry);
-      Context.setThreadLocalContext(mockContext);
+      Context.pushThreadLocalContext(mockContext);
 
       return (MockContext) Context.getThreadLocalContext();
     } catch (Exception e) {
