@@ -13,3 +13,5 @@ include 'template'
 
 include 'click-charts'
 include 'click-charts-examples'
+
+include 'click-jquery'
