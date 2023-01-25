@@ -18,8 +18,6 @@
  */
 package org.apache.click.extras.panel;
 
-import java.util.HashMap;
-import java.util.Map;
 import junit.framework.TestCase;
 import org.apache.click.ActionListener;
 import org.apache.click.Control;
@@ -27,6 +25,10 @@ import org.apache.click.MockContext;
 import org.apache.click.Page;
 import org.apache.click.control.ActionLink;
 import org.apache.click.control.Panel;
+
+import java.io.Serial;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TabbedPanelTest extends TestCase {
 
@@ -126,9 +128,9 @@ public class TabbedPanelTest extends TestCase {
         tabbedPanel.add(new Panel("panel2"));
 
         tabbedPanel.setTabListener(new ActionListener() {
-            private static final long serialVersionUID = 1L;
+            @Serial private static final long serialVersionUID = 1L;
 
-            public boolean onAction(Control source) {
+            @Override public boolean onAction(Control source) {
                 return false;
             }
         });
