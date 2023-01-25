@@ -18,3 +18,4 @@ include 'click-jquery'
 include 'click-jquery-examples'
 
 include 'extra-clickclick'
+include 'extra-clickclick-examples'
