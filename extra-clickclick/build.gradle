@@ -68,6 +68,7 @@ dependencies {
 
 
   implementation project(':click')
+  implementation project(':click-extras')
 
   //*** TEST TEST TEST
 

@@ -16,3 +16,5 @@ include 'click-charts-examples'
 
 include 'click-jquery'
 include 'click-jquery-examples'
+
+include 'extra-clickclick'
