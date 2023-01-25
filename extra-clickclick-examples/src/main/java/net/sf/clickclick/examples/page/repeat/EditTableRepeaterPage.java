@@ -48,7 +48,7 @@ public class EditTableRepeaterPage extends BorderPage {
 
     Repeater repeater = new Repeater() {
 
-      public void buildRow(final Object item, final RepeaterRow row, final int index) {
+      @Override public void buildRow(final Object item, final RepeaterRow row, final int index) {
         Customer customer = (Customer) item;
 
         DataRow tableRow = new DataRow();

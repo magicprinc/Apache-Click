@@ -38,7 +38,7 @@ public class RepeatFormPage extends AbstractRepeatPage {
 
     repeater = new Repeater("repeater") {
 
-      public void buildRow(final Object item, final RepeaterRow row,
+      @Override public void buildRow(final Object item, final RepeaterRow row,
           final int index) {
 
         HorizontalPanel horizontalPanel = new HorizontalPanel();

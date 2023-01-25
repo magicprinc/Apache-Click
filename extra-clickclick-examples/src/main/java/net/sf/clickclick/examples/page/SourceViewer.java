@@ -253,7 +253,4 @@ public class SourceViewer extends BorderPage {
     return "<font color=\"red\">" + token + "</font>";
   }
 
-  private String renderComment(String comment) {
-    return "<font color=\"#3F7F5F\">" + comment + "</font>";
-  }
 }

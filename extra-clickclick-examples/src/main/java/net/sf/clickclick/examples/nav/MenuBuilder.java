@@ -130,7 +130,7 @@ public class MenuBuilder {
   private static FlexiMenu createPageHtmlMenu(String label) {
     FlexiMenu menu = new FlexiMenu() {
 
-      public String getHref() {
+      @Override public String getHref() {
         Context context = Context.getThreadLocalContext();
         Class<? extends Page> pageClass = context.getPageClass(context.getResourcePath());
         setPath("source-viewer.htm?filename=" + context.getPagePath(pageClass));
