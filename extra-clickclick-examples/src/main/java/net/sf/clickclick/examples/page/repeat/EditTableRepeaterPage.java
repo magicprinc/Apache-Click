@@ -1,20 +1,6 @@
-/*
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package net.sf.clickclick.examples.page.repeat;
 
 import net.sf.clickclick.control.Text;
-import net.sf.clickclick.control.data.DataDecorator;
 import net.sf.clickclick.control.data.DataRow;
 import net.sf.clickclick.control.html.table.Cell;
 import net.sf.clickclick.control.html.table.HtmlTable;
@@ -23,8 +9,6 @@ import net.sf.clickclick.control.repeater.RepeaterRow;
 import net.sf.clickclick.examples.domain.Customer;
 import net.sf.clickclick.examples.page.BorderPage;
 import org.apache.click.ActionListener;
-import org.apache.click.Context;
-import org.apache.click.Control;
 import org.apache.click.control.ActionLink;
 import org.apache.click.control.FieldSet;
 import org.apache.click.control.Form;
@@ -35,157 +19,143 @@ import org.apache.click.dataprovider.DataProvider;
 import org.apache.click.extras.control.DateField;
 import org.apache.click.extras.control.DoubleField;
 import org.apache.click.extras.control.IntegerField;
-import org.apache.click.util.HtmlStringBuffer;
 import org.apache.commons.lang.StringUtils;
 
+import java.io.Serial;
 import java.util.List;
 
 /**
  *
  */
 public class EditTableRepeaterPage extends BorderPage {
+  @Serial private static final long serialVersionUID = -969289669171816620L;
 
-    private Form form = new Form("form");
+  private final Form form = new Form("form");
 
-    @Override
-    public void onInit() {
-        createMasterView();
-        createDetailView();
-    }
+  @Override
+  public void onInit() {
+    createMasterView();
+    createDetailView();
+  }
 
-    void createMasterView() {
+  void createMasterView() {
 
-        final HtmlTable table = new HtmlTable("table");
-        table.setAttribute("class", "gray");
-        table.setBorder(0);
+    final HtmlTable table = new HtmlTable("table");
+    table.setAttribute("class", "gray");
+    table.setBorder(0);
 
-        table.setHeader("Id", "Name", "Age", "Date Joined", "Holdings", "Action");
+    table.setHeader("Id", "Name", "Age", "Date Joined", "Holdings", "Action");
 
-        Repeater repeater = new Repeater() {
+    Repeater repeater = new Repeater() {
 
-            public void buildRow(final Object item, final RepeaterRow row, final int index) {
-                Customer customer = (Customer) item;
+      public void buildRow(final Object item, final RepeaterRow row, final int index) {
+        Customer customer = (Customer) item;
 
-                DataRow tableRow = new DataRow();
-                tableRow.add(customer, "id");
-                tableRow.add(customer, "name");
-                tableRow.add(customer, "age", new DataDecorator() {
-                    public void render(HtmlStringBuffer buffer, Object object,
-                        Context context) {
-                        Customer customer = (Customer) object;
-                        buffer.append(customer.getAge());
-                    }
-                });
-                tableRow.add(customer, "dateJoined", "{0,date,dd MMM yyyy}");
-                tableRow.add(customer, "holdings", "{0,number,currency}");
+        DataRow tableRow = new DataRow();
+        tableRow.add(customer, "id");
+        tableRow.add(customer, "name");
+        tableRow.add(customer, "age", (buffer, object, context)->{
+          Customer customer1 = (Customer) object;
+          buffer.append(customer1.getAge());
+        });
+        tableRow.add(customer, "dateJoined", "{0,date,dd MMM yyyy}");
+        tableRow.add(customer, "holdings", "{0,number,currency}");
 
-                Cell actions = new Cell();
-                tableRow.add(actions);
+        Cell actions = new Cell();
+        tableRow.add(actions);
 
-                ActionLink delete = new ActionLink("delete");
-                delete.setActionListener(new ActionListener() {
-                    public boolean onAction(Control source) {
-                        // Remove item from Repeater
-                        removeItem(item);
+        ActionLink delete = new ActionLink("delete");
+        delete.setActionListener((ActionListener) source->{
+          // Remove item from Repeater
+          removeItem(item);
 
-                        // Here we can delete customer from DB
+          // Here we can delete customer from DB
 
-                        // Perform redirect to guard against user hitting refresh
-                        // and setting the ActionLink value to the deleted recordId
-                        setRedirect(EditTableRepeaterPage.class);
-                        return false;
-                    }
-                });
-
-                actions.add(delete);
-
-                ActionLink edit = new ActionLink("edit");
-                edit.setActionListener(new ActionListener() {
-                    public boolean onAction(Control source) {
-                        // Copy the item to edit to the Form. This sets the Page
-                        // into edit mode.
-                        form.copyFrom(item);
-                        return true;
-                    }
-                });
-                actions.add(new Text(" | "));
-                actions.add(edit);
-
-                row.add(tableRow);
-            }
-        };
-
-        table.add(repeater);
-
-        repeater.setDataProvider(new DataProvider() {
-        	public List getData() {
-        		return getTopCustomers();
-        	}
+          // Perform redirect to guard against user hitting refresh
+          // and setting the ActionLink value to the deleted recordId
+          setRedirect(EditTableRepeaterPage.class);
+          return false;
         });
 
-        addControl(table);
-    }
+        actions.add(delete);
 
-    void createDetailView() {
-        // Setup customers form
-        FieldSet fieldSet = new FieldSet("customer");
-
-        final HiddenField idField = new HiddenField("id", Long.class);
-        fieldSet.add(idField);
-
-        fieldSet.add(new TextField("name"));
-        fieldSet.add(new DateField("dateJoined"));
-        fieldSet.add(new IntegerField("age"));
-        fieldSet.add(new DoubleField("holdings"));
-
-        form.add(fieldSet);
-
-        Submit submit = new Submit("save");
-        submit.setActionListener(new ActionListener() {
-            public boolean onAction(Control source) {
-                if (form.isValid()) {
-                    String id = idField.getValue();
-                    Customer customer = null;
-                    if (StringUtils.isBlank(id)) {
-                        // Create new customer. This call assigns a unique ID value
-                        customer = getCustomerService().createCustomer();
-
-                        // Update the idField value to the new customer ID value
-                        idField.setValueObject(customer.getId());
-
-                        getCustomerService().getCustomers().add(0, customer);
-                    } else {
-                        customer = getCustomerService().findCustomer(id);
-                    }
-                    form.copyTo(customer);
-
-                    // Here we can update customer in db
-
-                    // Perform redirect to ensure the form changes are reflected
-                    // by the Repeater
-                    setRedirect(EditTableRepeaterPage.class);
-                }
-                return true;
-            }
+        ActionLink edit = new ActionLink("edit");
+        edit.setActionListener((ActionListener) source->{
+          // Copy the item to edit to the Form. This sets the Page
+          // into edit mode.
+          form.copyFrom(item);
+          return true;
         });
-        form.add(submit);
+        actions.add(new Text(" | "));
+        actions.add(edit);
 
-        Submit cancel = new Submit("cancel");
-        cancel.setActionListener(new ActionListener(){
-            public boolean onAction(Control source) {
-                form.clearValues();
-                form.clearErrors();
-                return true;
-            }
-        });
-        form.add(cancel);
+        row.add(tableRow);
+      }
+    };
 
-        addControl(form);
-    }
+    table.add(repeater);
 
-    public List<Customer> getTopCustomers() {
-        List<Customer> customers = getCustomerService().getCustomers();
-        int size = Math.min(5, customers.size());
-        return customers.subList(0, size);
-    }
+    repeater.setDataProvider((DataProvider) ()->getTopCustomers());
+
+    addControl(table);
+  }
+
+  void createDetailView() {
+    // Setup customers form
+    FieldSet fieldSet = new FieldSet("customer");
+
+    final HiddenField idField = new HiddenField("id", Long.class);
+    fieldSet.add(idField);
+
+    fieldSet.add(new TextField("name"));
+    fieldSet.add(new DateField("dateJoined"));
+    fieldSet.add(new IntegerField("age"));
+    fieldSet.add(new DoubleField("holdings"));
+
+    form.add(fieldSet);
+
+    Submit submit = new Submit("save");
+    submit.setActionListener((ActionListener) source->{
+      if (form.isValid()) {
+        String id = idField.getValue();
+        Customer customer;
+        if (StringUtils.isBlank(id)) {
+          // Create new customer. This call assigns a unique ID value
+          customer = getCustomerService().createCustomer();
+
+          // Update the idField value to the new customer ID value
+          idField.setValueObject(customer.getId());
+
+          getCustomerService().getCustomers().add(0, customer);
+        } else {
+          customer = getCustomerService().findCustomer(id);
+        }
+        form.copyTo(customer);
+
+        // Here we can update customer in db
+
+        // Perform redirect to ensure the form changes are reflected
+        // by the Repeater
+        setRedirect(EditTableRepeaterPage.class);
+      }
+      return true;
+    });
+    form.add(submit);
+
+    Submit cancel = new Submit("cancel");
+    cancel.setActionListener((ActionListener) source->{
+      form.clearValues();
+      form.clearErrors();
+      return true;
+    });
+    form.add(cancel);
+
+    addControl(form);
+  }
+
+  public List<Customer> getTopCustomers() {
+    List<Customer> customers = getCustomerService().getCustomers();
+    int size = Math.min(5, customers.size());
+    return customers.subList(0, size);
+  }
 }

@@ -34,9 +34,9 @@ public class RepeatFieldPage extends AbstractRepeatPage {
 
     private static final String CATEGORY = "category";
 
-    private Form form = new Form("form");
+    private final Form form = new Form("form");
 
-    public void onInit() {
+    @Override public void onInit() {
         super.onInit();
         form.add(new TextField("name"));
         form.add(new TextField("author"));

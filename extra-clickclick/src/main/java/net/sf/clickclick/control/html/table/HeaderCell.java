@@ -77,7 +77,7 @@ public class HeaderCell extends Cell {
      *
      * @return this controls html tag
      */
-    public String getTag() {
+    @Override public String getTag(){
         return "th";
     }
 
@@ -88,7 +88,7 @@ public class HeaderCell extends Cell {
      *
      * @param buffer the buffer to render to
      */
-    public void render(HtmlStringBuffer buffer) {
+    @Override public void render(HtmlStringBuffer buffer) {
         // If no child controls have been added and name is not blank, create a
         // default child from the Cell name
         if (!hasControls() && StringUtils.isNotBlank(getName())) {

@@ -1,24 +1,5 @@
 package org.apache.velocity.tools.view;
 
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.ExtendedProperties;
 import org.apache.velocity.exception.ResourceNotFoundException;
@@ -54,211 +35,206 @@ import java.util.HashMap;
  * @version $Id$  */
 @Slf4j
 public class WebappResourceLoader extends ResourceLoader {
-    /** The root paths for templates (relative to webapp's root). */
-    protected String[] paths;
-    final HashMap<String,String> templatePaths = new HashMap<>();
-    protected ServletContext servletContext;
+  /** The root paths for templates (relative to webapp's root). */
+  protected String[] paths;
+  final HashMap<String,String> templatePaths = new HashMap<>();
+  protected ServletContext servletContext;
 
 
-    /**
-     *  This is abstract in the base class, so we need it.
-     *  <br>
-     *  NOTE: this expects that the ServletContext has already
-     *        been placed in the runtime's application attributes
-     *        under its full class name (i.e. "javax.servlet.ServletContext").
-     *
-     * @param configuration the {@link ExtendedProperties} associated with
-     *        this resource loader.
-     */
-    @Override
-    public void init(ExtendedProperties configuration) {
-        log.trace("WebappResourceLoader: initialization starting.");
+  /**
+   *  This is abstract in the base class, so we need it.
+   *  <br>
+   *  NOTE: this expects that the ServletContext has already
+   *        been placed in the runtime's application attributes
+   *        under its full class name (i.e. "javax.servlet.ServletContext").
+   *
+   * @param configuration the {@link ExtendedProperties} associated with
+   *        this resource loader.
+   */
+  @Override
+  public void init(ExtendedProperties configuration) {
+    log.trace("WebappResourceLoader: initialization starting.");
 
-        /* get configured paths */
-        paths = configuration.getStringArray("path");
-        if (paths == null || paths.length == 0)
+    /* get configured paths */
+    paths = configuration.getStringArray("path");
+    if (paths == null || paths.length == 0)
+    {
+      paths = new String[1];
+      paths[0] = "/";
+    }
+    else
+    {
+      /* make sure the paths end with a '/' */
+      for (int i=0; i < paths.length; i++)
+      {
+        if (!paths[i].endsWith("/"))
         {
-            paths = new String[1];
-            paths[0] = "/";
+          paths[i] += '/';
         }
-        else
-        {
-            /* make sure the paths end with a '/' */
-            for (int i=0; i < paths.length; i++)
-            {
-                if (!paths[i].endsWith("/"))
-                {
-                    paths[i] += '/';
-                }
-                log.info("WebappResourceLoader: added template path - '" + paths[i] + "'");
-            }
-        }
-
-        /* get the ServletContext */
-        Object obj = rsvc.getApplicationAttribute(ServletContext.class.getName());
-        if (obj instanceof ServletContext)
-        {
-            servletContext = (ServletContext)obj;
-        }
-        else
-        {
-            log.error("WebappResourceLoader: unable to retrieve ServletContext");
-        }
-
-        log.trace("WebappResourceLoader: initialization complete.");
+        log.info("WebappResourceLoader: added template path - '" + paths[i] + "'");
+      }
     }
 
-    /**
-     * Get an InputStream so that the Runtime can build a
-     * template with it.
-     *
-     * @param name name of template to get
-     * @return InputStream containing the template
-     * @throws ResourceNotFoundException if template not found
-     *         in  classpath.
-     */
-    @Override
-    public synchronized InputStream getResourceStream(String name)
-        throws ResourceNotFoundException
+    /* get the ServletContext */
+    Object obj = rsvc.getApplicationAttribute(ServletContext.class.getName());
+    if (obj instanceof ServletContext o){
+      servletContext = o;
+    }
+    else {
+      log.error("WebappResourceLoader: unable to retrieve ServletContext");
+    }
+
+    log.trace("WebappResourceLoader: initialization complete.");
+  }
+
+  /**
+   * Get an InputStream so that the Runtime can build a
+   * template with it.
+   *
+   * @param name name of template to get
+   * @return InputStream containing the template
+   * @throws ResourceNotFoundException if template not found in classpath.
+   */
+  @Override
+  public synchronized InputStream getResourceStream(String name)
+      throws ResourceNotFoundException
+  {
+    InputStream result = null;
+
+    if (name == null || name.length() == 0)
     {
-        InputStream result = null;
+      throw new ResourceNotFoundException("WebappResourceLoader: No template name provided");
+    }
 
-        if (name == null || name.length() == 0)
-        {
-            throw new ResourceNotFoundException("WebappResourceLoader: No template name provided");
+    /* since the paths always ends in '/',
+     * make sure the name never starts with one */
+    while (name.startsWith("/"))
+    {
+      name = name.substring(1);
+    }
+
+    Exception exception = null;
+    for (String rootPath : paths) {
+      String path = rootPath + name;
+      try {
+        result = servletContext.getResourceAsStream(path);
+
+        /* save the path and exit the loop if we found the template */
+        if (result != null) {
+          templatePaths.put(name, rootPath);
+          break;
         }
-
-        /* since the paths always ends in '/',
-         * make sure the name never starts with one */
-        while (name.startsWith("/"))
-        {
-            name = name.substring(1);
-        }
-
-      Exception exception = null;
-      for (String rootPath : paths) {
-        String path = rootPath + name;
-        try {
-          result = servletContext.getResourceAsStream(path);
-
-          /* save the path and exit the loop if we found the template */
-          if (result != null) {
-            templatePaths.put(name, rootPath);
-            break;
+      } catch (NullPointerException npe) {
+        /* no servletContext was set, whine about it! */
+        throw npe;
+      } catch (Exception e) {
+        /* only save the first one for later throwing */
+        if (exception == null) {
+          if (log.isDebugEnabled()) {
+            log.debug("WebappResourceLoader: Could not load " + path, e);
           }
-        } catch (NullPointerException npe) {
-          /* no servletContext was set, whine about it! */
-          throw npe;
-        } catch (Exception e) {
-          /* only save the first one for later throwing */
-          if (exception == null) {
-            if (log.isDebugEnabled()) {
-              log.debug("WebappResourceLoader: Could not load " + path, e);
-            }
-            exception = e;
-          }
+          exception = e;
         }
       }
-
-        /* if we never found the template */
-        if (result == null)
-        {
-            String msg = "WebappResourceLoader: Resource '" + name + "' not found.";
-
-            /* convert to a general Velocity ResourceNotFoundException */
-            if (exception == null)
-            {
-                throw new ResourceNotFoundException(msg);
-            }
-            else
-            {
-                msg += "  Due to: " + exception;
-                throw new ResourceNotFoundException(msg, exception);
-            }
-        }
-        return result;
     }
 
-    File getCachedFile(String rootPath, String fileName) {
-        // we do this when we cache a resource,
-        // so do it again to ensure a match
-        while (fileName.startsWith("/"))
-        {
-            fileName = fileName.substring(1);
-        }
+    /* if we never found the template */
+    if (result == null)
+    {
+      String msg = "WebappResourceLoader: Resource '" + name + "' not found.";
 
-        String savedPath = templatePaths.get(fileName);
-        return new File(rootPath + savedPath, fileName);
+      /* convert to a general Velocity ResourceNotFoundException */
+      if (exception == null)
+      {
+        throw new ResourceNotFoundException(msg);
+      }
+      else
+      {
+        msg += "  Due to: " + exception;
+        throw new ResourceNotFoundException(msg, exception);
+      }
+    }
+    return result;
+  }
+
+  File getCachedFile(String rootPath, String fileName) {
+    // we do this when we cache a resource, so do it again to ensure a match
+    while (fileName.startsWith("/")){
+      fileName = fileName.substring(1);
     }
 
+    String savedPath = templatePaths.get(fileName);
+    return new File(rootPath + savedPath, fileName);
+  }
 
-    /**
-     * Checks to see if a resource has been deleted, moved or modified.
-     *
-     * @param resource Resource  The resource to check for modification
-     * @return boolean  True if the resource has been modified
-     */
-    @Override
-    public boolean isSourceModified(Resource resource) {
-        String rootPath = servletContext.getRealPath("/");
-        if (rootPath == null) {
-            // rootPath is null if the servlet container cannot translate the
-            // virtual path to a real path for any reason (such as when the
-            // content is being made available from a .war archive)
-            return false;
-        }
 
-        // first, try getting the previously found file
-        String fileName = resource.getName();
-        File cachedFile = getCachedFile(rootPath, fileName);
-        if (!cachedFile.exists())
-        {
-            /* then the source has been moved and/or deleted */
-            return true;
-        }
-
-        /* check to see if the file can now be found elsewhere
-         * before it is found in the previously saved path */
-        File currentFile = null;
-        for (String path : paths) {
-            currentFile = new File(rootPath + path, fileName);
-            if (currentFile.canRead()) {
-                /* stop at the first resource found
-                 * (just like in getResourceStream()) */
-                break;
-            }
-        }
-
-        /* if the current is the cached and it is readable */
-        if (cachedFile.equals(currentFile) && cachedFile.canRead())
-        {
-            /* then (and only then) do we compare the last modified values */
-            return (cachedFile.lastModified() != resource.getLastModified());
-        }
-        else
-        {
-            /* we found a new file for the resource
-             * or the resource is no longer readable. */
-            return true;
-        }
+  /**
+   * Checks to see if a resource has been deleted, moved or modified.
+   *
+   * @param resource Resource  The resource to check for modification
+   * @return boolean  True if the resource has been modified
+   */
+  @Override
+  public boolean isSourceModified(Resource resource) {
+    String rootPath = servletContext.getRealPath("/");
+    if (rootPath == null) {
+      // rootPath is null if the servlet container cannot translate the
+      // virtual path to a real path for any reason (such as when the
+      // content is being made available from a .war archive)
+      return false;
     }
 
-    /**
-     * Checks to see when a resource was last modified
-     *
-     * @param resource Resource the resource to check
-     * @return long The time when the resource was last modified or 0 if the file can't be read
-     */
-    @Override
-    public long getLastModified(Resource resource) {
-        String rootPath = servletContext.getRealPath("/");
-        if (rootPath == null) {
-            // rootPath is null if the servlet container cannot translate the
-            // virtual path to a real path for any reason (such as when the
-            // content is being made available from a .war archive)
-            return 0;
-        }
-        File cachedFile = getCachedFile(rootPath, resource.getName());
-        return cachedFile.canRead() ? cachedFile.lastModified() : 0;
+    // first, try getting the previously found file
+    String fileName = resource.getName();
+    File cachedFile = getCachedFile(rootPath, fileName);
+    if (!cachedFile.exists())
+    {
+      /* then the source has been moved and/or deleted */
+      return true;
     }
+
+    /* check to see if the file can now be found elsewhere
+     * before it is found in the previously saved path */
+    File currentFile = null;
+    for (String path : paths) {
+      currentFile = new File(rootPath + path, fileName);
+      if (currentFile.canRead()) {
+        /* stop at the first resource found
+         * (just like in getResourceStream()) */
+        break;
+      }
+    }
+
+    /* if the current is the cached and it is readable */
+    if (cachedFile.equals(currentFile) && cachedFile.canRead())
+    {
+      /* then (and only then) do we compare the last modified values */
+      return (cachedFile.lastModified() != resource.getLastModified());
+    }
+    else
+    {
+      /* we found a new file for the resource
+       * or the resource is no longer readable. */
+      return true;
+    }
+  }
+
+  /**
+   * Checks to see when a resource was last modified
+   *
+   * @param resource Resource the resource to check
+   * @return long The time when the resource was last modified or 0 if the file can't be read
+   */
+  @Override
+  public long getLastModified(Resource resource) {
+    String rootPath = servletContext.getRealPath("/");
+    if (rootPath == null) {
+      // rootPath is null if the servlet container cannot translate the
+      // virtual path to a real path for any reason (such as when the
+      // content is being made available from a .war archive)
+      return 0;
+    }
+    File cachedFile = getCachedFile(rootPath, resource.getName());
+    return cachedFile.canRead() ? cachedFile.lastModified() : 0;
+  }
 }

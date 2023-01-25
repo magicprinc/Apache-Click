@@ -57,7 +57,8 @@ public class WebappResourceLoaderTest {
     assertTrue(msc.getWebappRoot().toURL().toString().endsWith("/click-velocity/src/test/resources/"));
     long lastModified = wrl.getLastModified(fileResource);
     // Sun Oct 23 03:45:39 MSK 2022 = 1666485939958
-    assertTrue(new Date(lastModified)+" = "+lastModified,lastModified>=1666485939958L);
+    assertTrue(new Date(lastModified)+" = "+lastModified+", instead of "+new Date(1666485938000L)+" = "+1666485938000L,
+        lastModified>=1666485938000L);
 
     assertTrue(wrl.isSourceModified(fileResource));
     when(fileResource.getLastModified()).thenReturn(lastModified);
