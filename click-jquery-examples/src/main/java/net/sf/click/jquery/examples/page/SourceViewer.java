@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Serial;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Provides a Java source code, HTML and XML examples rendering page.
@@ -132,7 +133,7 @@ public class SourceViewer extends BorderPage {
     isXml = name.endsWith(".xml");
     isHtml = name.endsWith(".htm") || name.endsWith(".html") || name.endsWith(".vm") || name.endsWith(".jsp");
 
-    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
 
     HtmlStringBuffer buffer = new HtmlStringBuffer();
 
