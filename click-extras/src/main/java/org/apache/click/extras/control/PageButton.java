@@ -22,6 +22,8 @@ import org.apache.click.Page;
 import org.apache.click.control.PageLink;
 import org.apache.click.util.HtmlStringBuffer;
 
+import java.io.Serial;
+
 /**
  * Provides a Page link Button control: &nbsp; &lt;input type='button'&gt;.
  *
@@ -61,7 +63,7 @@ import org.apache.click.util.HtmlStringBuffer;
  */
 public class PageButton extends PageLink {
 
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     // ----------------------------------------------------------- Constructors
 
@@ -127,7 +129,7 @@ public class PageButton extends PageLink {
      *
      * @return this controls html tag
      */
-    public String getTag() {
+    @Override public String getTag() {
         return "input";
     }
 
@@ -137,7 +139,7 @@ public class PageButton extends PageLink {
      *
      * @param buffer the specified buffer to render the control's output to
      */
-    public void render(HtmlStringBuffer buffer) {
+    @Override public void render(HtmlStringBuffer buffer) {
         buffer.elementStart(getTag());
 
         buffer.appendAttribute("type", "button");
@@ -169,7 +171,7 @@ public class PageButton extends PageLink {
      *
      * @return a HTML rendered Button string
      */
-    public String toString() {
+    @Override public String toString() {
         HtmlStringBuffer buffer = new HtmlStringBuffer(40);
         render(buffer);
         return buffer.toString();

@@ -19,7 +19,6 @@
 package org.apache.click.control;
 
 import junit.framework.TestCase;
-
 import org.apache.click.ActionListener;
 import org.apache.click.Control;
 import org.apache.click.MockContext;
@@ -35,20 +34,20 @@ public class ButtonTest extends TestCase {
     public void testOnProcess() {
         MockContext context = MockContext.initContext();
         MockRequest request = context.getMockRequest();
-        
+
         Button button = new Button("button");
         assertEquals("button", button.getName());
-        
+
         assertTrue(button.onProcess());
-        
+
         request.setParameter("button", "true");
         assertTrue(button.onProcess());
-        
+
         final boolean check[] = new boolean[1];
         button.setActionListener(new ActionListener() {
             private static final long serialVersionUID = 1L;
 
-            public boolean onAction(Control source) {
+            @Override public boolean onAction(Control source) {
                 check[0] = true;
                 return false;
             }
@@ -59,7 +58,7 @@ public class ButtonTest extends TestCase {
         assertTrue(button.onProcess());
         context.executeActionListeners();
         assertFalse(check[0]);
-        
+
         request.setParameter("button", "true");
 
         // Not an ajax request -> no action listener executed
@@ -80,55 +79,55 @@ public class ButtonTest extends TestCase {
         assertTrue(button.onProcess());
         context.executeActionListeners();
         assertTrue(check[0]);
-        
-       
+
+
         button.setDisabled(true);
         assertTrue(button.onProcess());
         assertTrue(button.isValid());
         assertFalse(button.isDisabled());
 
         request.removeParameter("button");
-        
+
         button.setDisabled(true);
         assertTrue(button.onProcess());
         assertTrue(button.isValid());
         assertTrue(button.isDisabled());
-        
+
         request.removeParameter("button");
         assertTrue(button.onProcess());
         assertTrue(button.isValid());
     }
-    
+
     /**
      * Coverage test of constructors.
      */
     public void testConstructors() {
         Button button = new Button();
         assertNull(button.getName());
-        
+
         button = new Button("button", "label");
         assertEquals("label", button.getLabel());
     }
-        
+
     /**
      * Coverage test of onClick.
      */
     public void testOnClick() {
         MockContext.initContext();
-        
+
         Button button = new Button("button");
         assertNull(button.getOnClick());
 
         button.setOnClick("javascript:return false;");
         assertEquals("javascript:return false;", button.getOnClick());
     }
-    
+
     /**
      * Coverage test of tab-index.
      */
     public void testTabIndex() {
         MockContext.initContext();
-        
+
         Button button = new Button("button");
         button.setTabIndex(5);
 
@@ -140,7 +139,7 @@ public class ButtonTest extends TestCase {
      */
     public void testDisabled() {
         MockContext.initContext();
-        
+
         Button button = new Button("button");
         button.setDisabled(true);
         System.out.println(button.toString());

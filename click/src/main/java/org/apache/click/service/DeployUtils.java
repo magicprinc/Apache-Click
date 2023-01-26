@@ -14,10 +14,11 @@
  */
 package org.apache.click.service;
 
+import org.apache.click.util.ClickUtils;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -29,7 +30,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
-import org.apache.click.util.ClickUtils;
 
 /**
  * <p>ResolverUtil is used to locate classes that are available in the/a class path and meet
@@ -68,37 +68,42 @@ import org.apache.click.util.ClickUtils;
  */
 class DeployUtils<T> {
 
-    // -------------------------------------------------------------- Constants
-
     /** The magic header that indicates a JAR (ZIP) file. */
     private static final byte[] JAR_MAGIC = { 'P', 'K', 3, 4 };
 
-    // -------------------------------------------------------------- Variables
 
     /** The set of matches being accumulated. */
-    private List<String> matches = new ArrayList<String>();
+    private final List<String> matches = new ArrayList<>();
 
     /** The log service to log output to. */
-    private LogService logService;
+    private final LogService logService;
 
     /**
      * The ClassLoader to use when looking for classes. If null then the ClassLoader
      * returned by Thread.currentThread().getContextClassLoader() will be used.
+     *
+     * an explicit ClassLoader that should be used when scanning for classes. If none
+     * is set then the context classloader will be used.
      */
-    private ClassLoader classloader;
+    private final ClassLoader classloader;
 
-    // ----------------------------------------------------------- Constructors
 
     /**
      * Create a new DeployUtils instance.
      *
      * @param logService the logService to log output to
      */
-    public DeployUtils(LogService logService) {
+    public DeployUtils (LogService logService){
         this.logService = logService;
-    }
+        classloader = null;
+    }//new
 
-    // --------------------------------------------------------- Public Methods
+
+    public DeployUtils (LogService logService, ClassLoader classloader){
+        this.logService = logService;
+        this.classloader = classloader;
+    }//new
+
 
     /**
      * Provides access to the resources discovered so far. If no calls have been
@@ -106,9 +111,7 @@ class DeployUtils<T> {
      *
      * @return the list of resources that have been discovered.
      */
-    public List<String> getResources() {
-        return matches;
-    }
+    public List<String> getResources (){ return matches;}
 
     /**
      * Returns the classloader that will be used for scanning for classes. If no explicit
@@ -116,19 +119,12 @@ class DeployUtils<T> {
      *
      * @return the ClassLoader that will be used to scan for classes
      */
-    public ClassLoader getClassLoader() {
-        return classloader == null ? Thread.currentThread().getContextClassLoader() : classloader;
+    public ClassLoader getClassLoader (){
+        if (classloader != null){ return classloader;}// explicit
+
+        return ClickUtils.getClassLoader();
     }
 
-    /**
-     * Sets an explicit ClassLoader that should be used when scanning for classes. If none
-     * is set then the context classloader will be used.
-     *
-     * @param classloader a ClassLoader to use when scanning for classes
-     */
-    public void setClassLoader(ClassLoader classloader) {
-        this.classloader = classloader;
-    }
 
     /**
      * Attempt to discover resources inside the given directory. Accumulated
@@ -269,11 +265,7 @@ class DeployUtils<T> {
                     if ("file".equals(url.getProtocol())) {
                         File file = new File(url.getFile());
                         if (file.isDirectory()) {
-                            children = Arrays.asList(file.list(new FilenameFilter() {
-                                public boolean accept(File dir, String name) {
-                                    return isRelevantResource(name);
-                                }
-                            }));
+                            children = Arrays.asList(file.list((dir, name)->isRelevantResource(name)));
                         }
                     } else {
                         // No idea where the exception came from so log it
@@ -293,7 +285,7 @@ class DeployUtils<T> {
                 // Iterate over each immediate child, adding classes and recursing into directories
                 for (String child : children) {
                     String resourcePath = path + "/" + child;
-                    if (child.indexOf(".") != -1) {
+                    if (child.contains(".")) {
                         if (logService.isTraceEnabled()) {
                             logService.trace("found deployable resource: " + resourcePath);
                         }

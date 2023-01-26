@@ -18,15 +18,16 @@
  */
 package org.apache.click.control;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.click.Control;
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.ContainerUtils;
 import org.apache.click.util.HtmlStringBuffer;
+
+import java.io.Serial;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Provides a default implementation of the {@link Container} interface
@@ -50,7 +51,7 @@ public abstract class AbstractContainer extends AbstractControl implements
 
     // Constants --------------------------------------------------------------
 
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     // Instance Variables -----------------------------------------------------
 
@@ -91,7 +92,7 @@ public abstract class AbstractContainer extends AbstractControl implements
      * @return the control that was added to the container
      * @throws IllegalArgumentException if the control is null
      */
-    public Control add(Control control) {
+    @Override public Control add(Control control) {
         return insert(control, getControls().size());
     }
 
@@ -120,7 +121,7 @@ public abstract class AbstractContainer extends AbstractControl implements
      * @throws IndexOutOfBoundsException if index is out of range
      * <tt>(index &lt; 0 || index &gt; getControls().size())</tt>
      */
-    public Control insert(Control control, int index) {
+    @Override public Control insert(Control control, int index) {
         // Check if panel already contains the control
         String controlName = control.getName();
         if (controlName != null) {
@@ -152,7 +153,7 @@ public abstract class AbstractContainer extends AbstractControl implements
      * @return true if the control was removed from the container
      * @throws IllegalArgumentException if the control is null
      */
-    public boolean remove(Control control) {
+    @Override public boolean remove(Control control) {
         return ContainerUtils.remove(this, control, getControlMap());
     }
 
@@ -174,6 +175,7 @@ public abstract class AbstractContainer extends AbstractControl implements
      * @throws IllegalStateException if the currentControl is not contained in
      * the container
      */
+    @Override @Deprecated
     public Control replace(Control currentControl, Control newControl) {
         int controlIndex = getControls().indexOf(currentControl);
         return ContainerUtils.replace(this, currentControl, newControl,
@@ -185,7 +187,7 @@ public abstract class AbstractContainer extends AbstractControl implements
      *
      * @return the sequential list of controls held by the container
      */
-    public List<Control> getControls() {
+    @Override public List<Control> getControls() {
         if (controls == null) {
             controls = new ArrayList<Control>();
         }
@@ -198,7 +200,7 @@ public abstract class AbstractContainer extends AbstractControl implements
      * @param controlName the name of the control to get from the container
      * @return the named control from the container if found or null otherwise
      */
-    public Control getControl(String controlName) {
+    @Override public Control getControl(String controlName) {
         if (hasControls()) {
             return getControlMap().get(controlName);
         }
@@ -211,7 +213,7 @@ public abstract class AbstractContainer extends AbstractControl implements
      * @param control the control whose presence in this container is to be tested
      * @return true if the container contains the specified control
      */
-    public boolean contains(Control control) {
+    @Override public boolean contains(Control control) {
         return getControls().contains(control);
     }
 
@@ -220,7 +222,7 @@ public abstract class AbstractContainer extends AbstractControl implements
      *
      * @return true if the container has existing controls, false otherwise.
      */
-    public boolean hasControls() {
+    @Override public boolean hasControls() {
         return (controls != null) && !controls.isEmpty();
     }
 

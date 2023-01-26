@@ -1,27 +1,9 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.click.control;
+
+import org.apache.click.util.HtmlStringBuffer;
 
 import java.io.Serializable;
 import java.util.List;
-
-import org.apache.click.util.HtmlStringBuffer;
 
 /**
  * Provides a select Option element: &nbsp; &lt;option&gt;&lt;/option&gt;.
@@ -98,132 +80,130 @@ import org.apache.click.util.HtmlStringBuffer;
  */
 public class Option implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+  /** The empty select empty option. */
+  public static final Option EMPTY_OPTION = new Option("", "");
 
-    /** The empty select empty option. */
-    public static final Option EMPTY_OPTION = new Option("", "");
 
-    // ----------------------------------------------------- Instance Variables
+  /** The Options display label. */
+  protected final String label;
 
-    /** The Options display label. */
-    protected final String label;
+  /** The Option value. */
+  protected final String value;
 
-    /** The Option value. */
-    protected final String value;
+  // ----------------------------------------------------------- Constructors
 
-    // ----------------------------------------------------------- Constructors
-
-    /**
-     * Create an Option with the given value and display label.
-     * <p/>
-     * <b>Note:</b> the specified value and label will be converted to a String.
-     *
-     * @param value the Option value
-     * @param label the Option display label
-     */
-    public Option(Object value, Object label) {
-        this.value = value.toString();
-        if (label == null) {
-            this.label = "";
-        } else {
-            this.label = label.toString();
-        }
+  /**
+   * Create an Option with the given value and display label.
+   * <p/>
+   * <b>Note:</b> the specified value and label will be converted to a String.
+   *
+   * @param value the Option value
+   * @param label the Option display label
+   */
+  public Option(Object value, Object label) {
+    this.value = value.toString();
+    if (label == null) {
+      this.label = "";
+    } else {
+      this.label = label.toString();
     }
+  }
 
-    /**
-     * Create an Option with the given value. The value will also be used
-     * for the display label.
-     * <p/>
-     * <b>Note:</b> the specified value will be converted to a String.
-     *
-     * @param value the Option value and display label
-     */
-    public Option(Object value) {
-        this(value, value);
-    }
+  /**
+   * Create an Option with the given value. The value will also be used
+   * for the display label.
+   * <p/>
+   * <b>Note:</b> the specified value will be converted to a String.
+   *
+   * @param value the Option value and display label
+   */
+  public Option(Object value) {
+    this(value, value);
+  }
 
-    // ------------------------------------------------------ Public Attributes
+  // ------------------------------------------------------ Public Attributes
 
-    /**
-     * Return the Option's html tag: <tt>option</tt>.
-     *
-     * @return the Option's html tag
-     */
-     public String getTag() {
-        return "option";
-     }
+  /**
+   * Return the Option's html tag: <tt>option</tt>.
+   *
+   * @return the Option's html tag
+   */
+  public String getTag() {
+    return "option";
+  }
 
-    /**
-     * Return the Option display label.
-     *
-     * @return the Option display label
-     */
-    public String getLabel() {
-        return label;
-    }
+  /**
+   * Return the Option display label.
+   *
+   * @return the Option display label
+   */
+  public String getLabel() {
+    return label;
+  }
 
-    /**
-     * Return the Option value.
-     *
-     * @return the Option value
-     */
-    public String getValue() {
-        return value;
-    }
+  /**
+   * Return the Option value.
+   *
+   * @return the Option value
+   */
+  public String getValue() {
+    return value;
+  }
 
-    // --------------------------------------------------------- Public Methods
+  // --------------------------------------------------------- Public Methods
 
-    /**
-     * Return a HTML rendered Option string.
-     *
-     * @param select the parent Select
-     * @param buffer the specified buffer to render to
-     */
-    public void render(Select select, HtmlStringBuffer buffer) {
-        buffer.elementStart(getTag());
+  /**
+   * Return a HTML rendered Option string.
+   *
+   * @param select the parent Select
+   * @param buffer the specified buffer to render to
+   */
+  public void render(Select select, HtmlStringBuffer buffer) {
+    buffer.elementStart(getTag());
 
-        if (select.isMultiple()) {
+    if (select.isMultiple()) {
 
-            if (!select.getSelectedValues().isEmpty()) {
+      if (!select.getSelectedValues().isEmpty()) {
 
-                // Search through selection list for matching value
-                List values = select.getSelectedValues();
-                for (int i = 0, size = values.size(); i < size; i++) {
-                    String value = values.get(i).toString();
-                    if (getValue().equals(value)) {
-                        buffer.appendAttribute("selected", "selected");
-                        break;
-                    }
-                }
-
-            }
-
-        } else {
-            if (getValue().equals(select.getValue())) {
-                buffer.appendAttribute("selected", "selected");
-            }
+        // Search through selection list for matching value
+        List values = select.getSelectedValues();
+        for (Object o : values){
+          String value = o.toString();
+          if (getValue().equals(value)){
+            buffer.appendAttribute("selected", "selected");
+            break;
+          }
         }
 
-        buffer.appendAttributeEscaped("value", getValue());
-        buffer.closeTag();
+      }
 
-        buffer.appendEscaped(getLabel());
-
-        buffer.elementEnd(getTag());
+    } else {
+      if (getValue().equals(select.getValue())) {
+        buffer.appendAttribute("selected", "selected");
+      }
     }
 
-    /**
-     * Return a HTML rendered Option string.
-     *
-     * @deprecated use {@link #render(org.apache.click.control.Select, org.apache.click.util.HtmlStringBuffer)}
-     * instead
-     *
-     * @param select the parent Select
-     * @return rendered HTML Option string
-     */
-    public String renderHTML(Select select) {
-        HtmlStringBuffer buffer = new HtmlStringBuffer(48);
-        render(select, buffer);
-        return buffer.toString();
-    }
+    buffer.appendAttributeEscaped("value", getValue());
+    buffer.closeTag();
+
+    buffer.appendEscaped(getLabel());
+
+    buffer.elementEnd(getTag());
+  }
+
+  /**
+   * Return a HTML rendered Option string.
+   *
+   * @deprecated use {@link #render(org.apache.click.control.Select, org.apache.click.util.HtmlStringBuffer)}
+   * instead
+   *
+   * @param select the parent Select
+   * @return rendered HTML Option string
+   */
+  @Deprecated
+  public String renderHTML(Select select) {
+    HtmlStringBuffer buffer = new HtmlStringBuffer(48);
+    render(select, buffer);
+    return buffer.toString();
+  }
 }

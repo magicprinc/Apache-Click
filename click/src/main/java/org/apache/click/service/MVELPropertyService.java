@@ -1,33 +1,17 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.click.service;
 
-import org.apache.click.util.ClickUtils;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import lombok.val;
 import org.apache.click.util.PropertyUtils;
 import org.mvel2.MVEL;
 
 import javax.servlet.ServletContext;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Provides an MVEL based property services.
@@ -35,67 +19,71 @@ import java.util.concurrent.ConcurrentMap;
  * TODO compare MVEL, OGNL and self-made reflection in {@link PropertyUtils}
  */
 public class MVELPropertyService implements PropertyService {
-    /** Expression cache with support for multiple classloader caching */
-    private static final ConcurrentMap<ClassLoader, ConcurrentMap<String,Serializable>>
-        EXPRESSION_CL_CACHE = new ConcurrentHashMap<>();
+  /** Expression cache with support for multiple classloader caching */
+  final Cache<String,Serializable> EXPRESSION_CACHE =
+      Caffeine.newBuilder().maximumSize(10_000).expireAfterAccess(1, TimeUnit.HOURS).build();
 
 
-    /**
-     * @see PropertyService#onInit(ServletContext)
-     *
-     * @param servletContext the application servlet context
-     * @throws IOException if an IO error occurs initializing the service
-     */
-    public void onInit (ServletContext servletContext) throws IOException {}
+  /**
+   * @see PropertyService#onInit(ServletContext)
+   *
+   * @param servletContext the application servlet context
+   * @throws IOException if an IO error occurs initializing the service
+   */
+  @Override public void onInit (ServletContext servletContext) throws IOException {}
 
-    /** @see PropertyService#onDestroy */
-    public void onDestroy() {}
+  /** @see PropertyService#onDestroy */
+  @Override public void onDestroy() {
+    EXPRESSION_CACHE.invalidateAll();
+  }
 
-    /**
-     * @see PropertyService#getValue(Object, String)
-     *
-     * @param source the source object
-     * @param name the name of the property
-     * @return the property value for the given source object and property name
-     */
-    public Object getValue (Object source, String name) {
-        return PropertyUtils.getValue(source, name);
-    }
+  /**
+   * @see PropertyService#getValue(Object, String)
+   *
+   * @param source the source object
+   * @param propertyName the name of the property
+   * @return the property value for the given source object and property name
+   */
+  @Override public Object getValue (Object source, String propertyName){
+    if (source == null){ return null;}
 
-    /**
-     * @see PropertyService#getValue(Object, String, Map)
-     *
-     * @param source the source object
-     * @param name the name of the property
-     * @param cache the cache of reflected property Method objects, do NOT modify
-     * this cache
-     * @return the property value for the given source object and property name
-     */
-    public Object getValue (Object source, String name, Map<?,?> cache) {
-        return PropertyUtils.getValue(source, name, cache);
-    }
+    // return PropertyUtils.getValue(source, name);
+    // "SomeObj.propertyName = value"
+    val name = "this.?" + propertyName.trim().replace(".", ".?");// null-safe property access
 
-    /**
-     * Set the named property value on the target object using the MVEL library.
-     *
-     * @see PropertyService#setValue(Object, String, Object)
-     *
-     * @param target the target object to set the property of
-     * @param name the name of the property to set
-     * @param value the property value to set
-     */
-    public void setValue (Object target, String name, Object value) {
-        ConcurrentMap<String,Serializable> cache = ClickUtils.classLoaderCacheGET(EXPRESSION_CL_CACHE);
-        // "SomeObj.propertyName = value"
-        String expression = target.getClass().getSimpleName() + "." + name + " = value";
+    Serializable compiledExpression = cacheOrParse(source, name);
 
-        Serializable compiledExpression = cache.computeIfAbsent(expression,
-            s->MVEL.compileExpression(expression));
+    return MVEL.executeExpression(compiledExpression, source);
+  }
 
-        final Map<String,Object> vars = Map.of(
-            target.getClass().getSimpleName(), target, // "SomeObj" = real someObj object
-            "value", value); // "value" = real value
 
-        MVEL.executeExpression(compiledExpression, vars);
-    }
+  protected Serializable cacheOrParse (Object root, String name){
+    return EXPRESSION_CACHE.asMap().computeIfAbsent(PropertyService.distinctClassName(root)+'#'+name,
+        s->MVEL.compileExpression(name));
+  }
+
+  /**
+   * Set the named property value on the target object using the MVEL library.
+   *
+   * @see PropertyService#setValue(Object, String, Object)
+   *
+   * @param target the target object to set the property of
+   * @param name the name of the property to set
+   * @param value the property value to set
+   */
+  @Override public void setValue (Object target, String name, Object value){
+    if (target == null){ return;}
+
+    // "SomeObj.propertyName = value"
+    val simpleName = target.getClass().getSimpleName();
+    val expression = simpleName +"."+ name.trim() +"=value";
+
+    Serializable compiledExpression = cacheOrParse(target, expression);
+
+    final Map<String,Object> vars = new HashMap<>();
+    vars.put(simpleName, target);// "SomeObj" → real someObj object
+    vars.put("value", value);    // "value"   → real value
+
+    MVEL.executeExpression(compiledExpression, vars);
+  }
 }

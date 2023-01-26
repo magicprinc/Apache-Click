@@ -19,11 +19,12 @@
 package org.apache.click.control;
 
 import junit.framework.TestCase;
-
 import org.apache.click.ActionListener;
 import org.apache.click.Control;
 import org.apache.click.MockContext;
 import org.apache.click.servlet.MockRequest;
+
+import java.io.Serial;
 
 /**
  * Test Radio behavior.
@@ -36,7 +37,7 @@ public class RadioTest extends TestCase {
      */
     public void testEscapeValue() {
         MockContext.initContext();
-        
+
         Form form = new Form("form");
         RadioGroup radioGroup = new RadioGroup("group");
         form.add(radioGroup);
@@ -48,39 +49,39 @@ public class RadioTest extends TestCase {
         String expectedValue = "value=\"&lt;script&gt;\"";
         radio.setValue(value);
         assertTrue(radio.toString().indexOf(expectedValue) > 1);
-        
+
         String expectedId = "form_group_&lt;script&gt;";
         String expectedIdAttr = "id=\"" + expectedId + "\"";
         radio.setValue(value);
         assertTrue(radio.toString().indexOf(expectedIdAttr) > 1);
-        
+
         String expectedLabelValue = ">&lt;script&gt;</label>";
         radio.setValue(value);
         assertTrue(radio.toString().indexOf(expectedLabelValue) > 1);
-        
+
         String expectedLabelForAttr = "for=\"" + expectedId + "\"";
         radio.setValue(value);
         assertTrue(radio.toString().indexOf(expectedLabelForAttr) > 1);
-        
+
         // Check that the value <script> is not rendered
         assertTrue(radio.toString().indexOf(value) < 0);
     }
-    
+
     /**
      * Radio Submit onProcess behavior.
      */
     public void testOnProcess() {
         MockContext context = MockContext.initContext();
         MockRequest request = context.getMockRequest();
-        
+
         Radio button = new Radio("value", "label", "button");
         assertEquals("button", button.getName());
-        
+
         assertTrue(button.onProcess());
-        
+
         request.setParameter("button", "true");
         assertTrue(button.onProcess());
-        
+
         Listener l = new Listener();
         button.setActionListener(l);
 
@@ -103,7 +104,7 @@ public class RadioTest extends TestCase {
         assertTrue(button.onProcess());
         assertTrue(button.isValid());
         assertFalse(button.isDisabled());
-        
+
         // Disabled button without request param
         request.removeParameter("button");
         button.setDisabled(true);
@@ -120,17 +121,17 @@ public class RadioTest extends TestCase {
         assertEquals("value", field.getValue());
         assertEquals("label", field.getLabel());
         assertEquals("field", field.getName());
-        
+
         field = new Radio("value", "label");
         assertEquals("value", field.getValue());
         assertEquals("label", field.getLabel());
-        
+
         field = new Radio();
         assertEquals("", field.getValue());
         assertEquals("", field.getLabel());
         assertNull(field.getName());
     }
-    
+
     /**
      * Coverage test of getId()
      */
@@ -144,7 +145,7 @@ public class RadioTest extends TestCase {
      */
     public void testTabIndex() {
         MockContext.initContext();
-        
+
         Radio field = new Radio("value");
         field.setTabIndex(5);
 
@@ -156,7 +157,7 @@ public class RadioTest extends TestCase {
      */
     public void testDisabled() {
         MockContext.initContext();
-        
+
         Radio field = new Radio("value");
         field.setDisabled(true);
         assertTrue(field.toString().contains("disabled=\"disabled\""));
@@ -167,12 +168,12 @@ public class RadioTest extends TestCase {
      */
     public void testReadonly() {
         MockContext.initContext();
-        
+
         Radio field = new Radio("value");
         field.setReadonly(true);
 
         assertTrue(field.toString().contains("disabled=\"disabled\""));
-        
+
         field = new Radio("value");
         field.setReadonly(true);
         field.setChecked(true);
@@ -187,7 +188,7 @@ public class RadioTest extends TestCase {
      */
     public void testHelp() {
         MockContext.initContext();
-        
+
         Radio field = new Radio("value");
         field.setHelp("help");
 
@@ -200,24 +201,24 @@ public class RadioTest extends TestCase {
      */
     public void testValidationJS() {
         MockContext.initContext();
-        
+
         Radio field = new Radio("value");
         assertNull(field.getValidationJavaScript());
     }
-    
+
     public void testValue() {
         MockContext.initContext();
-        
+
         Radio field = new Radio("value", "label", "field");
         assertFalse(field.isChecked());
-        
+
         field.setValue("value");
         assertTrue(field.isChecked());
         field.setValue("xxx");
         assertFalse(field.isChecked());
-        
+
         field.setChecked(false);
-        
+
         field.setValueObject("xxx");
         assertFalse(field.isChecked());
         field.setValueObject(null);
@@ -225,11 +226,11 @@ public class RadioTest extends TestCase {
     }
 
     static class Listener implements ActionListener {
-        private static final long serialVersionUID = 1L;
-        
+        @Serial private static final long serialVersionUID = 1L;
+
         public boolean fired;
 
-        public boolean onAction(Control source) {
+        @Override public boolean onAction(Control source) {
             fired = true;
             return true;
         }

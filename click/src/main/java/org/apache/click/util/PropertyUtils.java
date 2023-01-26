@@ -3,14 +3,21 @@ package org.apache.click.util;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.apache.click.Context;
 import org.apache.click.service.ConfigService;
 import org.apache.click.service.PropertyService;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.mvel2.MVEL;
 
 import javax.servlet.ServletContext;
+import java.io.IOException;
+import java.io.Serializable;
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -26,12 +33,15 @@ import static org.apache.click.util.ClickUtils.toPropertyName;
  * This class is provided for BACKWARD COMPATIBILITY.
  */
 @Slf4j
-public class PropertyUtils {
+public class PropertyUtils implements PropertyService {
   /**
    Provides a synchronized cache of get_value reflection methods, with support for multiple class loaders.
    */
-  private static final ConcurrentMap<ClassLoader, ConcurrentMap<CacheKey, Method>> GET_METHOD_CLASSLOADER_CACHE
-    = new ConcurrentHashMap<>();
+  private static final ConcurrentMap<CacheKey,AccessibleObject> GET_METHOD_CLASSLOADER_CACHE = new ConcurrentHashMap<>();
+
+
+  @Override public void onInit (ServletContext servletContext) throws IOException {}
+  @Override public void onDestroy (){}
 
 
   /**
@@ -48,8 +58,8 @@ public class PropertyUtils {
    * @param propertyName the name of the property
    * @return the property value for the given source object and property name
    */
-  public static Object getValue (Object source, String propertyName) {
-    return getValue(source, propertyName, ClickUtils.classLoaderCacheGET(GET_METHOD_CLASSLOADER_CACHE));
+  @Override public Object getValue (Object source, String propertyName, @NonNull Map<?,?> getMethodCache){
+    return getValue(source, propertyName);
   }
 
   /**
@@ -67,29 +77,30 @@ public class PropertyUtils {
    *
    * @param source the source object
    * @param propertyName the name of the property
-   * @param getMethodCache the cache of reflected property Method objects, do NOT modify this cache
    * @return the property value for the given source object and property name
    */
-  @Nullable public static Object getValue (Object source, String propertyName, @NonNull Map<?,?> getMethodCache) {
-    if (source instanceof Map<?,?> map) {
-      return map.get(propertyName);
+  @Override @Nullable public Object getValue (Object source, String propertyName){
+    String name = propertyName.trim();
+
+    if (source instanceof Map<?,?> map && map.containsKey(name)){
+      return map.get(name);
     }
 
-    String basePart = propertyName;
+    String basePart = name;
     String remainingPart = null;
-    int baseIndex = propertyName.indexOf('.');// foo.bar
-    if (baseIndex != -1) {
-      basePart = propertyName.substring(0, baseIndex);
-      remainingPart = propertyName.substring(baseIndex + 1);
-    }
+    int baseIndex = name.indexOf('.');// foo.bar
+    if (baseIndex >= 0){
+      basePart = name.substring(0, baseIndex).trim(); // foo
+      remainingPart = name.substring(baseIndex + 1).trim(); // bar
+    }//i found
 
-    Object value = getObjectPropertyValue(source, basePart, getMethodCache);
+    Object value = getObjectPropertyValue(source, basePart);
 
-    if (remainingPart == null || value == null) {
+    if (remainingPart == null || value == null){
       return value;
 
     } else {
-      return getValue(value, remainingPart, getMethodCache);
+      return getValue(value, remainingPart);
     }
   }
 
@@ -98,12 +109,25 @@ public class PropertyUtils {
    *
    * @param target the target object to set the property of
    * @param name the name of the property to set
-   * @param newValue the property value to set
+   * @param value the property value to set
    */
-  public static void setValue (Object target, String name, Object newValue) {
-    getPropertyService().setValue(target, name, newValue);
+  @Override public void setValue (Object target, String name, Object value) {
+    if (target == null){ return;}
+
+    // "SomeObj.propertyName = value"
+    val simpleName = target.getClass().getSimpleName();
+    val expression = simpleName +"."+ name.trim() +"=value";
+
+    Serializable compiledExpression = MCACHE.computeIfAbsent(expression, s->MVEL.compileExpression(expression));
+
+    final Map<String,Object> vars = new HashMap<>();
+    vars.put(simpleName, target);// "SomeObj" → real someObj object
+    vars.put("value", value);    // "value"   → real value
+
+    MVEL.executeExpression(compiledExpression, vars);
   }
 
+  final ConcurrentHashMap<String,Serializable> MCACHE = new ConcurrentHashMap<>();
 
 
   /**
@@ -112,34 +136,48 @@ public class PropertyUtils {
    *
    * @param source the source object
    * @param name the name of the property
-   * @param cache the cache of reflected property Method objects
    * @return the property value for the given source object and property name
    */
-  @Nullable private static Object getObjectPropertyValue (Object source, String name, Map<?,?> cache) {
-    final CacheKey methodNameKey = new CacheKey(source, name);
-    final Map<CacheKey, Method> getMethodCache = ClickUtils.castUnsafe(cache);
+  @Nullable private static Object getObjectPropertyValue (Object source, String name){
+    if (source instanceof Map<?,?> map && map.containsKey(name)){
+      return map.get(name);
+    }
 
-    Method method = getMethodCache.get(methodNameKey);
-    if (method != null) {
+    final CacheKey methodNameKey = new CacheKey(source, name);
+
+    val ao = GET_METHOD_CLASSLOADER_CACHE.get(methodNameKey);
+    if (ao instanceof Method method) {
       try {// eventually everything is in the cache
         return method.invoke(source);
-      } catch (Exception e) {
+      } catch (Exception e){
         log.warn("getObjectPropertyValue: cached method {}={} failed @ ({}) {}", name, method,
             methodNameKey.getSourceClass().getName(), source,  e);
       }
+    } else if (ao instanceof Field f){
+      try {// eventually everything is in the cache
+        return f.get(source);
+      } catch (Exception e){
+        log.warn("getObjectPropertyValue: cached field {}={} failed @ ({}) {}", name, f,
+            methodNameKey.getSourceClass().getName(), source,  e);
+      }
     }
+
     try {
-      return methodNameKey.invoke(toPropertyName(GET_GETTER, name), source, getMethodCache);
-    } catch (Exception ignore) {// NoSuchMethodException, InvocationTargetException, IllegalAccessException
-    }
+      return methodNameKey.invoke(toPropertyName(GET_GETTER, name), source);
+    } catch (Exception ignore){}// NoSuchMethodException, InvocationTargetException, IllegalAccessException
+
     try {
-      return methodNameKey.invoke(toPropertyName(IS_GETTER, name), source, getMethodCache);
-    } catch (Exception ignore) {// NoSuchMethodException, InvocationTargetException, IllegalAccessException
-    }
+      return methodNameKey.invoke(toPropertyName(IS_GETTER, name), source);
+    } catch (Exception ignore){}// NoSuchMethodException, InvocationTargetException, IllegalAccessException
+
+    try {
+      return methodNameKey.get(name, source);
+    } catch (Exception ignore){}// NoSuchMethodException, InvocationTargetException, IllegalAccessException
+
     // final one - the reporting one
     try {
-      return methodNameKey.invoke(name, source, getMethodCache);// as is ~ fooBar
-    } catch (NoSuchMethodException e) {
+      return methodNameKey.invoke(name, source);// as is ~ fooBar
+    } catch (NoSuchMethodException e){
       throw new IllegalArgumentException("getObjectPropertyValue: No matching getter method found for property '"
           + name + "' on (" + methodNameKey.getSourceClass().getName()+") "+source,  e);
     } catch (Exception e) {
@@ -210,10 +248,17 @@ public class PropertyUtils {
       return sourceClass.hashCode()*31 + property.hashCode();
     }
 
-    public Object invoke (String methodName, Object source, Map<CacheKey, Method> getMethodCache) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public Object invoke (String methodName, Object source) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
       Method method = sourceClass.getMethod(methodName);// NoSuchMethodException
       Object returnValue = method.invoke(source);// InvocationTargetException, IllegalAccessException
-      getMethodCache.put(this, method);// only if ^^ ok
+      GET_METHOD_CLASSLOADER_CACHE.put(this, method);// only if ^^ ok
+      return returnValue;
+    }
+
+    public Object get (String fieldName, Object source) throws IllegalAccessException, NoSuchFieldException, IllegalArgumentException {
+      Field field = sourceClass.getField(fieldName);// NoSuchMethodException
+      Object returnValue = field.get(source);// IllegalAccessException, IllegalArgumentException
+      GET_METHOD_CLASSLOADER_CACHE.put(this, field);// only if ^^ ok
       return returnValue;
     }
   }//CacheKey

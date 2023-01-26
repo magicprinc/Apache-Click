@@ -1,31 +1,15 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.click.control;
 
+import lombok.NonNull;
+import org.apache.click.util.ClickUtils;
+import org.apache.click.util.HtmlStringBuffer;
+
 import java.io.IOException;
+import java.io.Serial;
 import java.io.Serializable;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Date;
-
-import org.apache.click.util.ClickUtils;
-import org.apache.click.util.HtmlStringBuffer;
 
 /**
  * Provides a Hidden Field control: &nbsp; &lt;input type='hidden'&gt;.
@@ -85,297 +69,265 @@ import org.apache.click.util.HtmlStringBuffer;
  *    href="http://www.w3.org/TR/html401/interact/forms.html#h-17.4">INPUT</a>
  */
 public class HiddenField extends Field {
+  @Serial private static final long serialVersionUID = -11951594609124299L;
 
-    private static final long serialVersionUID = 1L;
+  /** The field value Object. */
+  protected Object valueObject;
 
-    // ----------------------------------------------------- Instance Variables
+  /** The field value Class. */
+  protected Class<?> valueClass;
 
-    /** The field value Object. */
-    protected Object valueObject;
+  // ----------------------------------------------------------- Constructors
 
-    /** The field value Class. */
-    protected Class<?> valueClass;
+  /**
+   * Construct a HiddenField with the given name and Class.
+   *
+   * @param name the name of the hidden field
+   * @param valueClass the Class of the value Object
+   */
+  public HiddenField (@NonNull String name, @NonNull Class<?> valueClass) {
+    this.name = name;
+    this.valueClass = valueClass;
+  }
 
-    // ----------------------------------------------------------- Constructors
+  /**
+   * Construct a HiddenField with the given name and value object.
+   *
+   * @param name the name of the hidden field
+   * @param value the value object
+   */
+  public HiddenField (@NonNull String name, @NonNull Object value) {
+    this.name = name;
+    this.valueClass = value.getClass();
+    setValueObject(value);
+  }
 
-    /**
-     * Construct a HiddenField with the given name and Class.
-     *
-     * @param name the name of the hidden field
-     * @param valueClass the Class of the value Object
-     */
-    public HiddenField(String name, Class<?> valueClass) {
-        if (name == null) {
-            throw new IllegalArgumentException("Null name parameter");
+  /**
+   * Create an HiddenField with no name or Class defined. <b>Please note</b>
+   * the HiddenField's name and value Class must be defined before it is
+   * valid.
+   */
+  public HiddenField() {
+    super();
+  }
+
+  // ------------------------------------------------------ Public Attributes
+
+  /**
+   * Return the hiddenfield's html tag: <tt>input</tt>.
+   *
+   * @see AbstractControl#getTag()
+   *
+   * @return this controls html tag
+   */
+  @Override public String getTag (){ return "input";}
+
+  /**
+   * Returns true.
+   *
+   * @see Field#isHidden()
+   *
+   * @return true
+   */
+  @Override public boolean isHidden(){ return true;}
+
+  /**
+   * Return the input type: 'hidden'.
+   *
+   * @return the input type: 'hidden'
+   */
+  public String getType() { return "hidden";}
+
+  /**
+   * @see Field#getValue()
+   *
+   * @return the Field value
+   */
+  @Override
+  public String getValue() {
+    return getValueObject() != null ? getValueObject().toString() : "";
+  }
+
+  /**
+   * @see Field#setValue(String)
+   *
+   * @param value the Field value
+   */
+  @Override
+  public void setValue(String value) {
+    setValueObject(value);
+  }
+
+  /**
+   * Return the registered Class for the Hidden Field value Object.
+   *
+   * @return the registered Class for the Hidden Field value Object
+   */
+  public Class<?> getValueClass() {
+    return valueClass;
+  }
+
+  /**
+   * Set the registered Class for the Hidden Field value Object.
+   *
+   * @param valueClass the registered Class for the Hidden Field value Object
+   */
+  public void setValueClass(Class<?> valueClass) {
+    this.valueClass = valueClass;
+  }
+
+  /**
+   * Return the value Object of the hidden field.
+   *
+   * @see Field#getValueObject()
+   *
+   * @return the object representation of the Field value
+   */
+  @Override
+  public Object getValueObject() {
+    return valueObject;
+  }
+
+  /**
+   * @see Field#setValueObject(Object)
+   *
+   * @param value the object value to set
+   */
+  @Override
+  public void setValueObject(Object value) {
+    if ((value != null) && (value.getClass() != valueClass)) {
+      throw new IllegalArgumentException("The value.getClass(): '" + value.getClass().getName()
+          + "' must be the same as the HiddenField valueClass: '"
+          + ( valueClass != null ? valueClass.getName() : "null") + "'");
+    }
+
+    this.valueObject = value;
+  }
+
+  /**
+   * Returns null to ensure no client side JavaScript validation is performed.
+   *
+   * @return null to ensure no client side JavaScript validation is performed
+   */
+  @Override
+  public String getValidationJavaScript() {
+    return null;
+  }
+
+  // --------------------------------------------------------- Public Methods
+
+  /**
+   * This method binds the submitted request value to the Field's value.
+   */
+  @Override
+  public void bindRequestValue() {
+
+    String aValue = getRequestValue();
+    Class<?> valueClass = getValueClass();
+
+    if (valueClass == null) {
+      throw new IllegalStateException("The value class is not defined."
+          + " Please use setValueClass(Class valueClass) to specify"
+          + " the HiddenField value type.");
+    }
+
+    if (valueClass == String.class) {
+      setValue(aValue);
+
+    } else if (aValue != null && aValue.length() > 0) {
+
+      if (valueClass == Integer.class) {
+        setValueObject(Integer.valueOf(aValue));
+
+      } else if (valueClass == Boolean.class) {
+        setValueObject(Boolean.valueOf(aValue));
+
+      } else if (valueClass == Double.class) {
+        setValueObject(Double.valueOf(aValue));
+
+      } else if (valueClass == Float.class) {
+        setValueObject(Float.valueOf(aValue));
+
+      } else if (valueClass == Long.class) {
+        setValueObject(Long.valueOf(aValue));
+
+      } else if (valueClass == Short.class) {
+        setValueObject(Short.valueOf(aValue));
+
+      } else if (valueClass == Timestamp.class) {
+        long time = Long.parseLong(aValue);
+        setValueObject(new Timestamp(time));
+
+      } else if (valueClass == java.sql.Date.class) {
+        long time = Long.parseLong(aValue);
+        setValueObject(new java.sql.Date(time));
+
+      } else if (valueClass == Time.class) {
+        long time = Long.parseLong(aValue);
+        setValueObject(new Time(time));
+
+      } else if (Date.class.isAssignableFrom(valueClass)) {
+        long time = Long.parseLong(aValue);
+        setValueObject(new Date(time));
+
+      } else if (Serializable.class.isAssignableFrom(valueClass)) {
+        try {
+          setValueObject(ClickUtils.decode(aValue));
+        } catch (ClassNotFoundException | IOException cnfe){
+          throw new RuntimeException("could not decode value for hidden field: " + aValue, cnfe);
         }
-        if (valueClass == null) {
-            throw new IllegalArgumentException("Null valueClass parameter");
-        }
-        this.name = name;
-        this.valueClass = valueClass;
+      } else {
+        setValue(aValue);
+      }
+    } else {
+      setValue(null);
+    }
+  }
+
+  /**
+   * Render the HTML representation of the HiddenField.
+   *
+   * @see org.apache.click.Control#render(org.apache.click.util.HtmlStringBuffer)
+   *
+   * @param buffer the specified buffer to render the control's output to
+   */
+  @Override
+  public void render(HtmlStringBuffer buffer) {
+
+    buffer.elementStart(getTag());
+    buffer.appendAttribute("type", getType());
+    buffer.appendAttribute("name", getName());
+    buffer.appendAttribute("id", getId());
+
+    Class<?> valueCls = getValueClass();
+
+    if (valueCls == String.class
+        || valueCls == Integer.class
+        || valueCls == Boolean.class
+        || valueCls == Double.class
+        || valueCls == Float.class
+        || valueCls == Long.class
+        || valueCls == Short.class) {
+
+      buffer.appendAttributeEscaped("value", String.valueOf(getValue()));
+
+    } else if (getValueObject() instanceof Date) {
+      String dateStr = String.valueOf(((Date) getValueObject()).getTime());
+      buffer.appendAttributeEscaped("value", dateStr);
+
+    } else if (getValueObject() instanceof Serializable) {
+      try {
+        buffer.appendAttribute("value", ClickUtils.encode(getValueObject()));
+      } catch (IOException ioe) {
+        String msg =
+            "could not encode value for hidden field: "
+                + getValueObject();
+        throw new RuntimeException(msg, ioe);
+      }
+    } else {
+      buffer.appendAttributeEscaped("value", getValue());
     }
 
-    /**
-     * Construct a HiddenField with the given name and value object.
-     *
-     * @param name the name of the hidden field
-     * @param value the value object
-     */
-    public HiddenField(String name, Object value) {
-        if (name == null) {
-            throw new IllegalArgumentException("Null name parameter");
-        }
-        if (value == null) {
-            throw new IllegalArgumentException("Null value parameter");
-        }
-        this.name = name;
-        this.valueClass = value.getClass();
-        setValueObject(value);
-    }
-
-    /**
-     * Create an HiddenField with no name or Class defined. <b>Please note</b>
-     * the HiddenField's name and value Class must be defined before it is
-     * valid.
-     */
-    public HiddenField() {
-        super();
-    }
-
-    // ------------------------------------------------------ Public Attributes
-
-    /**
-     * Return the hiddenfield's html tag: <tt>input</tt>.
-     *
-     * @see AbstractControl#getTag()
-     *
-     * @return this controls html tag
-     */
-    @Override
-    public String getTag() {
-        return "input";
-    }
-
-    /**
-     * Returns true.
-     *
-     * @see Field#isHidden()
-     *
-     * @return true
-     */
-    @Override
-    public boolean isHidden() {
-        return true;
-    }
-
-    /**
-     * Return the input type: 'hidden'.
-     *
-     * @return the input type: 'hidden'
-     */
-    public String getType() {
-        return "hidden";
-    }
-
-    /**
-     * @see Field#getValue()
-     *
-     * @return the Field value
-     */
-    @Override
-    public String getValue() {
-        return (getValueObject() != null) ? getValueObject().toString() : "";
-    }
-
-    /**
-     * @see Field#setValue(String)
-     *
-     * @param value the Field value
-     */
-    @Override
-    public void setValue(String value) {
-        setValueObject(value);
-    }
-
-    /**
-     * Return the registered Class for the Hidden Field value Object.
-     *
-     * @return the registered Class for the Hidden Field value Object
-     */
-    public Class<?> getValueClass() {
-        return valueClass;
-    }
-
-    /**
-     * Set the registered Class for the Hidden Field value Object.
-     *
-     * @param valueClass the registered Class for the Hidden Field value Object
-     */
-    public void setValueClass(Class<?> valueClass) {
-        this.valueClass = valueClass;
-    }
-
-    /**
-     * Return the value Object of the hidden field.
-     *
-     * @see Field#getValueObject()
-     *
-     * @return the object representation of the Field value
-     */
-    @Override
-    public Object getValueObject() {
-        return valueObject;
-    }
-
-    /**
-     * @see Field#setValueObject(Object)
-     *
-     * @param value the object value to set
-     */
-    @Override
-    public void setValueObject(Object value) {
-        if ((value != null) && (value.getClass() != valueClass)) {
-            String msg =
-                "The value.getClass(): '" + value.getClass().getName()
-                + "' must be the same as the HiddenField valueClass: '"
-                + ((valueClass != null) ? valueClass.getName() : "null") + "'";
-
-            throw new IllegalArgumentException(msg);
-        }
-
-        this.valueObject = value;
-    }
-
-    /**
-     * Returns null to ensure no client side JavaScript validation is performed.
-     *
-     * @return null to ensure no client side JavaScript validation is performed
-     */
-    @Override
-    public String getValidationJavaScript() {
-        return null;
-    }
-
-    // --------------------------------------------------------- Public Methods
-
-    /**
-     * This method binds the submitted request value to the Field's value.
-     */
-    @Override
-    public void bindRequestValue() {
-
-        String aValue = getRequestValue();
-        Class<?> valueClass = getValueClass();
-
-        if (valueClass == null) {
-            throw new IllegalStateException("The value class is not defined."
-                + " Please use setValueClass(Class valueClass) to specify"
-                + " the HiddenField value type.");
-        }
-
-        if (valueClass == String.class) {
-            setValue(aValue);
-
-        } else if (aValue != null && aValue.length() > 0) {
-
-             if (valueClass == Integer.class) {
-                setValueObject(Integer.valueOf(aValue));
-
-            } else if (valueClass == Boolean.class) {
-                setValueObject(Boolean.valueOf(aValue));
-
-            } else if (valueClass == Double.class) {
-                setValueObject(Double.valueOf(aValue));
-
-            } else if (valueClass == Float.class) {
-                setValueObject(Float.valueOf(aValue));
-
-            } else if (valueClass == Long.class) {
-                setValueObject(Long.valueOf(aValue));
-
-            } else if (valueClass == Short.class) {
-                setValueObject(Short.valueOf(aValue));
-
-            } else if (valueClass == Timestamp.class) {
-                long time = Long.parseLong(aValue);
-                setValueObject(new Timestamp(time));
-
-            } else if (valueClass == java.sql.Date.class) {
-                long time = Long.parseLong(aValue);
-                setValueObject(new java.sql.Date(time));
-
-            } else if (valueClass == Time.class) {
-                long time = Long.parseLong(aValue);
-                setValueObject(new Time(time));
-
-            } else if (Date.class.isAssignableFrom(valueClass)) {
-                long time = Long.parseLong(aValue);
-                setValueObject(new Date(time));
-
-            } else if (Serializable.class.isAssignableFrom(valueClass)) {
-                try {
-                    setValueObject(ClickUtils.decode(aValue));
-                } catch (ClassNotFoundException cnfe) {
-                    String msg =
-                        "could not decode value for hidden field: " + aValue;
-                    throw new RuntimeException(msg, cnfe);
-                } catch (IOException ioe) {
-                    String msg =
-                        "could not decode value for hidden field: " + aValue;
-                    throw new RuntimeException(msg, ioe);
-                }
-            } else {
-                setValue(aValue);
-            }
-        } else {
-            setValue(null);
-        }
-    }
-
-    /**
-     * Render the HTML representation of the HiddenField.
-     *
-     * @see org.apache.click.Control#render(org.apache.click.util.HtmlStringBuffer)
-     *
-     * @param buffer the specified buffer to render the control's output to
-     */
-    @Override
-    public void render(HtmlStringBuffer buffer) {
-
-        buffer.elementStart(getTag());
-        buffer.appendAttribute("type", getType());
-        buffer.appendAttribute("name", getName());
-        buffer.appendAttribute("id", getId());
-
-        Class<?> valueCls = getValueClass();
-
-        if (valueCls == String.class
-            || valueCls == Integer.class
-            || valueCls == Boolean.class
-            || valueCls == Double.class
-            || valueCls == Float.class
-            || valueCls == Long.class
-            || valueCls == Short.class) {
-
-            buffer.appendAttributeEscaped("value", String.valueOf(getValue()));
-
-        } else if (getValueObject() instanceof Date) {
-            String dateStr = String.valueOf(((Date) getValueObject()).getTime());
-            buffer.appendAttributeEscaped("value", dateStr);
-
-        } else if (getValueObject() instanceof Serializable) {
-            try {
-                buffer.appendAttribute("value", ClickUtils.encode(getValueObject()));
-            } catch (IOException ioe) {
-                String msg =
-                    "could not encode value for hidden field: "
-                    + getValueObject();
-                throw new RuntimeException(msg, ioe);
-            }
-        } else {
-            buffer.appendAttributeEscaped("value", getValue());
-        }
-
-        buffer.elementEnd();
-    }
+    buffer.elementEnd();
+  }
 }

@@ -1,33 +1,14 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.click.service;
-
-import java.lang.reflect.Field;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
-import javax.servlet.ServletContext;
 
 import org.apache.click.Page;
 import org.apache.click.PageInterceptor;
 import org.apache.click.util.Format;
+
+import javax.servlet.ServletContext;
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * Provides a Click application configuration service interface.
@@ -97,274 +78,272 @@ import org.apache.click.util.Format;
  */
 public interface ConfigService {
 
-    /** The trace application mode. */
-    public static final String MODE_TRACE = "trace";
+  /** The error page file path: &nbsp; "<tt>/click/error.htm</tt>". */
+  String ERROR_PATH = "/click/error.htm";
 
-    /** The debug application mode. */
-    public static final String MODE_DEBUG = "debug";
+  /** The page not found file path: &nbsp; "<tt>/click/not-found.htm</tt>". */
+  String NOT_FOUND_PATH = "/click/not-found.htm";
+
+  /** The page auto binding mode. */
+  enum AutoBinding { DEFAULT, ANNOTATION, NONE }
+
+  /**
+   * The servlet context attribute name. The ClickServlet stores the
+   * application ConfigService instance in the ServletContext using this
+   * context attribute name. The value of this constant is {@value}.
+   */
+  String CONTEXT_NAME = "org.apache.click.service.ConfigService";
+
+  /**
+   * Initialize the ConfigurationService with the given application servlet context.
+   * <p/>
+   * This method is invoked after the ConfigurationService has been constructed.
+   *
+   * @param servletContext the application servlet context
+   * @throws Exception if an error occurs initializing the ConfigurationService
+   */
+  void onInit (ServletContext servletContext) throws Exception;
+
+  /**
+   * Destroy the ConfigurationService. This method will also invoke the
+   * <tt>onDestroy()</tt> methods on the <tt>FileUploadService</tt>,
+   * <tt>TemplateService</tt>, <tt>ResourceService</tt> and the
+   * <tt>LogService</tt> in that order.
+   */
+  void onDestroy ();
+
+  /**
+   * Return the application file upload service, which is used to parse
+   * multi-part file upload post requests.
+   *
+   * @return the application file upload service
+   */
+  FileUploadService getFileUploadService();
+
+  /**
+   * Return the application log service.
+   *
+   * @return the application log service.
+   */
+  LogService getLogService();
+
+  /**
+   * Return the application property service.
+   *
+   * @return the application property service
+   */
+  PropertyService getPropertyService();
+
+  /**
+   * Return the application resource service.
+   *
+   * @return the application resource service.
+   */
+  ResourceService getResourceService();
+
+  /**
+   * Return the application templating service.
+   *
+   * @return the application templating service
+   */
+  TemplateService getTemplateService();
+
+  /**
+   * Return the application messages map service.
+   *
+   * @return the application messages Map service
+   */
+  MessagesMapService getMessagesMapService();
+
+  enum Mode {
+    /** The production application mode. */
+    PRODUCTION,
+
+    /** The profile application mode. */
+    PROFILE,
 
     /** The development application mode. */
-    public static final String MODE_DEVELOPMENT = "development";
+    DEVELOPMENT,
 
-    /** The profile application mode. */
-    public static final String MODE_PROFILE = "profile";
+    /** The debug application mode. */
+    DEBUG
+  }
 
-    /** The profile application mode. */
-    public static final String MODE_PRODUCTION = "production";
+  /**
+   * Return the Click application mode value: &nbsp;
+   * <tt>["production", "profile", "development", "debug", "trace"]</tt>.
+   *
+   * @return the application mode value
+   */
+  Mode getApplicationMode();
 
-    /** The error page file path: &nbsp; "<tt>/click/error.htm</tt>". */
-    static final String ERROR_PATH = "/click/error.htm";
+  /**
+   * Return the Click application charset or null if not defined.
+   *
+   * @return the application charset value
+   */
+  String getCharset();
 
-    /** The page not found file path: &nbsp; "<tt>/click/not-found.htm</tt>". */
-    public static final String NOT_FOUND_PATH = "/click/not-found.htm";
+  /**
+   * Return the error handling page <tt>Page</tt> <tt>Class</tt>.
+   *
+   * @return the error handling page <tt>Page</tt> <tt>Class</tt>
+   */
+  Class<? extends Page> getErrorPageClass();
 
-    /** The page auto binding mode. */
-    public enum AutoBinding { DEFAULT, ANNOTATION, NONE }
+  /**
+   * Create and return a new format object instance.
+   *
+   * @return a new format object instance
+   */
+  Format createFormat();
 
-    /**
-     * The servlet context attribute name. The ClickServlet stores the
-     * application ConfigService instance in the ServletContext using this
-     * context attribute name. The value of this constant is {@value}.
-     */
-    public static final String CONTEXT_NAME = "org.apache.click.service.ConfigService";
+  /**
+   * Return true if JSP exists for the given ".htm" path.
+   *
+   * @param path the Page ".htm" path
+   * @return true if JSP exists for the given ".htm" path
+   */
+  boolean isJspPage(String path);
 
-    /**
-     * Initialize the ConfigurationService with the given application servlet context.
-     * <p/>
-     * This method is invoked after the ConfigurationService has been constructed.
-     *
-     * @param servletContext the application servlet context
-     * @throws Exception if an error occurs initializing the ConfigurationService
-     */
-    public void onInit(ServletContext servletContext) throws Exception;
+  /**
+   * Return true if the given resource is a Page class template, false
+   * otherwise.
+   * <p/>
+   * Below is an example showing how to map <tt>.htm</tt> and <tt>.jsp</tt>
+   * files as Page class templates.
+   *
+   * <pre class="prettyprint">
+   * public class XmlConfigService implements ConfigService {
+   *
+   *     ...
+   *
+   *     public boolean isTemplate(String path) {
+   *         if (path.endsWith(".htm") || path.endsWith(".jsp")) {
+   *             return true;
+   *         }
+   *         return false;
+   *     }
+   *
+   *     ...
+   * } </pre>
+   *
+   * @param path the path to check if it is a Page class template or not
+   * @return true if the resource is a Page class template, false otherwise
+   */
+  boolean isTemplate(String path);
 
-    /**
-     * Destroy the ConfigurationService. This method will also invoke the
-     * <tt>onDestroy()</tt> methods on the <tt>FileUploadService</tt>,
-     * <tt>TemplateService</tt>, <tt>ResourceService</tt> and the
-     * <tt>LogService</tt> in that order.
-     */
-    public void onDestroy();
+  /**
+   * Return the page auto binding mode. If the mode is "PUBLIC" any public
+   * Page fields will be auto bound, if the mode is "ANNOTATION" any Page field
+   * with the "Bindable" annotation will be auto bound and if the mode is
+   * "NONE" no Page fields will be auto bound.
+   *
+   * @return the Page field auto binding mode { PUBLIC, ANNOTATION, NONE }
+   */
+  AutoBinding getAutoBindingMode();
 
-    /**
-     * Return the application file upload service, which is used to parse
-     * multi-part file upload post requests.
-     *
-     * @return the application file upload service
-     */
-    public FileUploadService getFileUploadService();
+  /**
+   * Return true if the application is in "production" mode.
+   *
+   * @return true if the application is in "production" mode
+   */
+  boolean isProductionMode();
 
-    /**
-     * Return the application log service.
-     *
-     * @return the application log service.
-     */
-    public LogService getLogService();
+  /**
+   * Return true if the application is in "profile" mode.
+   *
+   * @return true if the application is in "profile" mode
+   */
+  boolean isProfileMode();
 
-    /**
-     * Return the application property service.
-     *
-     * @return the application property service
-     */
-    public PropertyService getPropertyService();
+  /**
+   * Return the Click application locale or null if not defined.
+   *
+   * @return the application locale value
+   */
+  Locale getLocale();
 
-    /**
-     * Return the application resource service.
-     *
-     * @return the application resource service.
-     */
-    public ResourceService getResourceService();
+  /**
+   * Return the path for the given page Class.
+   *
+   * @param pageClass the class of the Page to lookup the path for
+   * @return the path for the given page Class
+   * @throws IllegalArgumentException if the Page Class is not configured
+   * with a unique path
+   */
+  String getPagePath(Class<? extends Page> pageClass);
 
-    /**
-     * Return the application templating service.
-     *
-     * @return the application templating service
-     */
-    public TemplateService getTemplateService();
+  /**
+   * Return the page <tt>Class</tt> for the given path. The path must start
+   * with a <tt>"/"</tt>.
+   *
+   * @param path the page path
+   * @return the page class for the given path
+   * @throws IllegalArgumentException if the Page Class for the path is not
+   * found
+   */
+  Class<? extends Page> getPageClass(String path);
 
-    /**
-     * Return the application messages map service.
-     *
-     * @return the application messages Map service
-     */
-    public MessagesMapService getMessagesMapService();
+  /**
+   * Return the list of configured page classes.
+   *
+   * @return the list of configured page classes
+   */
+  List<Class<? extends Page>> getPageClassList();
 
-    /**
-     * Return the Click application mode value: &nbsp;
-     * <tt>["production", "profile", "development", "debug", "trace"]</tt>.
-     *
-     * @return the application mode value
-     */
-    public String getApplicationMode();
+  /**
+   * Return Map of bindable fields for the given page class.
+   *
+   * @param pageClass the page class
+   * @return a Map of bindable fields for the given page class
+   */
+  Map<String, Field> getPageFields(Class<? extends Page> pageClass);
 
-    /**
-     * Return the Click application charset or null if not defined.
-     *
-     * @return the application charset value
-     */
-    public String getCharset();
+  /**
+   * Return the bindable field of the given name for the pageClass,
+   * or null if not defined.
+   *
+   * @param pageClass the page class
+   * @param fieldName the name of the field
+   * @return the bindable field of the pageClass with the given name or null
+   */
+  Field getPageField(Class<? extends Page> pageClass, String fieldName);
 
-    /**
-     * Return the error handling page <tt>Page</tt> <tt>Class</tt>.
-     *
-     * @return the error handling page <tt>Page</tt> <tt>Class</tt>
-     */
-    public Class<? extends Page> getErrorPageClass();
+  /**
+   * Return the headers of the page for the given path.
+   *
+   * @param path the path of the page
+   * @return a Map of headers for the given page path
+   */
+  Map<String, Object> getPageHeaders(String path);
 
-    /**
-     * Create and return a new format object instance.
-     *
-     * @return a new format object instance
-     */
-    public Format createFormat();
+  /**
+   * Return an array bindable for the given page class.
+   *
+   * @param pageClass the page class
+   * @return an array bindable fields for the given page class
+   */
+  Field[] getPageFieldArray(Class<? extends Page> pageClass);
 
-    /**
-     * Return true if JSP exists for the given ".htm" path.
-     *
-     * @param path the Page ".htm" path
-     * @return true if JSP exists for the given ".htm" path
-     */
-    public boolean isJspPage(String path);
+  /**
+   * Return the list of configured PageInterceptors instances.
+   *
+   * @return the list of configured PageInterceptors instances
+   */
+  List<PageInterceptor> getPageInterceptors();
 
-    /**
-     * Return true if the given resource is a Page class template, false
-     * otherwise.
-     * <p/>
-     * Below is an example showing how to map <tt>.htm</tt> and <tt>.jsp</tt>
-     * files as Page class templates.
-     *
-     * <pre class="prettyprint">
-     * public class XmlConfigService implements ConfigService {
-     *
-     *     ...
-     *
-     *     public boolean isTemplate(String path) {
-     *         if (path.endsWith(".htm") || path.endsWith(".jsp")) {
-     *             return true;
-     *         }
-     *         return false;
-     *     }
-     *
-     *     ...
-     * } </pre>
-     *
-     * @param path the path to check if it is a Page class template or not
-     * @return true if the resource is a Page class template, false otherwise
-     */
-    public boolean isTemplate(String path);
+  /**
+   * Return the page not found <tt>Page</tt> <tt>Class</tt>.
+   *
+   * @return the page not found <tt>Page</tt> <tt>Class</tt>
+   */
+  Class<? extends Page> getNotFoundPageClass();
 
-    /**
-     * Return the page auto binding mode. If the mode is "PUBLIC" any public
-     * Page fields will be auto bound, if the mode is "ANNOTATION" any Page field
-     * with the "Bindable" annotation will be auto bound and if the mode is
-     * "NONE" no Page fields will be auto bound.
-     *
-     * @return the Page field auto binding mode { PUBLIC, ANNOTATION, NONE }
-     */
-    public AutoBinding getAutoBindingMode();
-
-    /**
-     * Return true if the application is in "production" mode.
-     *
-     * @return true if the application is in "production" mode
-     */
-    public boolean isProductionMode();
-
-    /**
-     * Return true if the application is in "profile" mode.
-     *
-     * @return true if the application is in "profile" mode
-     */
-    public boolean isProfileMode();
-
-    /**
-     * Return the Click application locale or null if not defined.
-     *
-     * @return the application locale value
-     */
-    public Locale getLocale();
-
-    /**
-     * Return the path for the given page Class.
-     *
-     * @param pageClass the class of the Page to lookup the path for
-     * @return the path for the given page Class
-     * @throws IllegalArgumentException if the Page Class is not configured
-     * with a unique path
-     */
-    public String getPagePath(Class<? extends Page> pageClass);
-
-    /**
-     * Return the page <tt>Class</tt> for the given path. The path must start
-     * with a <tt>"/"</tt>.
-     *
-     * @param path the page path
-     * @return the page class for the given path
-     * @throws IllegalArgumentException if the Page Class for the path is not
-     * found
-     */
-    public Class<? extends Page> getPageClass(String path);
-
-    /**
-     * Return the list of configured page classes.
-     *
-     * @return the list of configured page classes
-     */
-    public List<Class<? extends Page>> getPageClassList();
-
-    /**
-     * Return Map of bindable fields for the given page class.
-     *
-     * @param pageClass the page class
-     * @return a Map of bindable fields for the given page class
-     */
-    public Map<String, Field> getPageFields(Class<? extends Page> pageClass);
-
-    /**
-     * Return the bindable field of the given name for the pageClass,
-     * or null if not defined.
-     *
-     * @param pageClass the page class
-     * @param fieldName the name of the field
-     * @return the bindable field of the pageClass with the given name or null
-     */
-    public Field getPageField(Class<? extends Page> pageClass, String fieldName);
-
-    /**
-     * Return the headers of the page for the given path.
-     *
-     * @param path the path of the page
-     * @return a Map of headers for the given page path
-     */
-    public Map<String, Object> getPageHeaders(String path);
-
-    /**
-     * Return an array bindable for the given page class.
-     *
-     * @param pageClass the page class
-     * @return an array bindable fields for the given page class
-     */
-    public Field[] getPageFieldArray(Class<? extends Page> pageClass);
-
-    /**
-     * Return the list of configured PageInterceptors instances.
-     *
-     * @return the list of configured PageInterceptors instances
-     */
-    public List<PageInterceptor> getPageInterceptors();
-
-    /**
-     * Return the page not found <tt>Page</tt> <tt>Class</tt>.
-     *
-     * @return the page not found <tt>Page</tt> <tt>Class</tt>
-     */
-    public Class<? extends Page> getNotFoundPageClass();
-
-    /**
-     * Return the application servlet context.
-     *
-     * @return the application servlet context
-     */
-    public ServletContext getServletContext();
-
+  /**
+   * Return the application servlet context.
+   *
+   * @return the application servlet context
+   */
+  ServletContext getServletContext();
 }

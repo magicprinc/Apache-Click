@@ -1,26 +1,7 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.click.extras.spring;
 
 import org.apache.click.Page;
 import org.apache.click.util.ClickUtils;
-
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.ScopeMetadata;
@@ -80,37 +61,37 @@ import org.springframework.context.annotation.ScopeMetadataResolver;
  */
 public class PageScopeResolver implements ScopeMetadataResolver {
 
-    /**
-     * Return the scope meta data for the given bean definition. This scope meta
-     * data resolver will resolve "prototype" scope for any Click Page bean
-     * and will resolve "singleton" scope for other beans.
-     *
-     * @see ScopeMetadataResolver#resolveScopeMetadata(BeanDefinition)
-     *
-     * @param beanDef the component bean definition to resolve
-     * @return the scope meta data for the given bean definition.
-     */
-    public ScopeMetadata resolveScopeMetadata(BeanDefinition beanDef) {
-        ScopeMetadata sm = new ScopeMetadata();
+  /**
+   * Return the scope meta data for the given bean definition. This scope meta
+   * data resolver will resolve "prototype" scope for any Click Page bean
+   * and will resolve "singleton" scope for other beans.
+   *
+   * @see ScopeMetadataResolver#resolveScopeMetadata(BeanDefinition)
+   *
+   * @param beanDef the component bean definition to resolve
+   * @return the scope meta data for the given bean definition.
+   */
+  @Override public ScopeMetadata resolveScopeMetadata(BeanDefinition beanDef) {
+    ScopeMetadata sm = new ScopeMetadata();
 
-        try {
-            Class<?> beanClass = ClickUtils.classForName(beanDef.getBeanClassName());
+    try {
+      Class<?> beanClass = ClickUtils.classForName(beanDef.getBeanClassName());
 
-            if (Page.class.isAssignableFrom(beanClass)) {
-                sm.setScopeName(ConfigurableBeanFactory.SCOPE_PROTOTYPE);
+      if (Page.class.isAssignableFrom(beanClass)) {
+        sm.setScopeName(ConfigurableBeanFactory.SCOPE_PROTOTYPE);
 
-            } else {
-                // TODO: see whether we can determine the default scope definition
-                // from the beanDef and return this instead.
-                sm.setScopeName(ConfigurableBeanFactory.SCOPE_SINGLETON);
-            }
+      } else {
+        // TODO: see whether we can determine the default scope definition
+        // from the beanDef and return this instead.
+        sm.setScopeName(ConfigurableBeanFactory.SCOPE_SINGLETON);
+      }
 
-            return sm;
+      return sm;
 
-        } catch (Exception e) {
-            String msg = "Could not load class for beanDef: " + beanDef;
-            throw new RuntimeException(msg, e);
-        }
+    } catch (Exception e) {
+      String msg = "Could not load class for beanDef: " + beanDef;
+      throw new RuntimeException(msg, e);
     }
+  }
 
 }

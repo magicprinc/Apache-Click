@@ -19,11 +19,12 @@
 package org.apache.click.control;
 
 import junit.framework.TestCase;
-
 import org.apache.click.ActionListener;
 import org.apache.click.Control;
 import org.apache.click.MockContext;
 import org.apache.click.servlet.MockRequest;
+
+import java.io.Serial;
 
 /**
  * Test Button behavior.
@@ -35,20 +36,20 @@ public class SubmitTest extends TestCase {
     public void testOnProcess() {
         MockContext context = MockContext.initContext();
         MockRequest request = context.getMockRequest();
-        
+
         Submit button = new Submit("button");
         assertEquals("button", button.getName());
-        
+
         assertTrue(button.onProcess());
-        
+
         request.setParameter("button", "true");
         assertTrue(button.onProcess());
-        
+
         final boolean check[] = new boolean[1];
         button.setActionListener(new ActionListener() {
-            private static final long serialVersionUID = 1L;
+            @Serial private static final long serialVersionUID = 1L;
 
-            public boolean onAction(Control source) {
+            @Override public boolean onAction(Control source) {
                 check[0] = true;
                 return false;
             }
@@ -74,18 +75,18 @@ public class SubmitTest extends TestCase {
         assertTrue(button.isValid());
         assertTrue(button.isDisabled());
     }
-    
+
     /**
      * Coverage test of constructors.
      */
     public void testConstructors() {
         Submit button = new Submit();
         assertNull(button.getName());
-        
+
         button = new Submit("button", "label");
         assertEquals("button", button.getName());
         assertEquals("label", button.getLabel());
-        
+
         Listener l = new Listener();
         assertEquals("button", button.getName());
         button = new Submit("button", l, "onAction");
@@ -129,25 +130,25 @@ public class SubmitTest extends TestCase {
      */
     public void testCancelJavaScriptValidation() {
         MockContext.initContext();
-        
+
         Submit button = new Submit("button");
         assertFalse(button.getCancelJavaScriptValidation());
 
         button = new Submit("button");
         button.setCancelJavaScriptValidation(false);
         assertFalse(button.getCancelJavaScriptValidation());
-        
+
         button.setCancelJavaScriptValidation(true);
         assertTrue(button.getCancelJavaScriptValidation());
         assertNotNull(button.getAttribute("onclick"));
     }
-    
+
     /**
      * Coverage test of tab-index.
      */
     public void testTabIndex() {
         MockContext.initContext();
-        
+
         Submit button = new Submit("button");
         button.setTabIndex(5);
 
@@ -159,7 +160,7 @@ public class SubmitTest extends TestCase {
      */
     public void testDisabled() {
         MockContext.initContext();
-        
+
         Submit button = new Submit("button");
         button.setDisabled(true);
 

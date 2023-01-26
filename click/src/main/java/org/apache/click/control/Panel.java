@@ -1,31 +1,7 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.click.control;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.click.Context;
 import org.apache.click.Control;
 import org.apache.click.Page;
@@ -34,6 +10,13 @@ import org.apache.click.util.ContainerUtils;
 import org.apache.click.util.Format;
 import org.apache.click.util.HtmlStringBuffer;
 import org.apache.click.util.SessionMap;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Provides a Panel container that has its own {@link #template} and
@@ -238,587 +221,566 @@ import org.apache.click.util.SessionMap;
  */
 public class Panel extends AbstractContainer {
 
-    private static final long serialVersionUID = 1L;
+  /** The panel disabled value. */
+  protected boolean disabled;
 
-    // Instance Variables -----------------------------------------------------
+  /** The "identifier" for this panel (CSS id for rendering). */
+  protected String id;
 
-    /** The panel disabled value. */
-    protected boolean disabled;
+  /** The (localized) label of this panel. */
+  protected String label;
 
-    /** The "identifier" for this panel (CSS id for rendering). */
-    protected String id;
+  /** A temporary storage for model objects until the Page is set. */
+  protected Map<String, Object> model;
 
-    /** The (localized) label of this panel. */
-    protected String label;
+  /** The list of sub panels. */
+  protected List<Panel> panels;
 
-    /** A temporary storage for model objects until the Page is set. */
-    protected Map<String, Object> model;
+  /** The path of the template to render. */
+  @Getter @Setter protected String template;
 
-    /** The list of sub panels. */
-    protected List<Panel> panels;
+  /** The panel active value, <tt>"true"</tt> by default. */
+  protected boolean active = true;
 
-    /** The path of the template to render. */
-    protected String template;
+  // Constructors -----------------------------------------------------------
 
-    /** The panel active value, <tt>"true"</tt> by default. */
-    protected boolean active = true;
+  /**
+   * Create a Panel with the given name.
+   *
+   * @param name the name of the panel
+   */
+  public Panel(String name) {
+    setName(name);
+  }
 
-    // Constructors -----------------------------------------------------------
+  /**
+   * Create a Panel with the given name and template path.
+   *
+   * @param name the name of the panel
+   * @param template the template path
+   */
+  public Panel(String name, String template) {
+    setName(name);
+    setTemplate(template);
+  }
 
-    /**
-     * Create a Panel with the given name.
-     *
-     * @param name the name of the panel
-     */
-    public Panel(String name) {
-        setName(name);
-    }
+  /**
+   * Create a Panel with the given name, id attribute and template path.
+   *
+   * @param name the name of the panel
+   * @param id the id HTML attribute value
+   * @param template the template path
+   */
+  public Panel(String name, String id, String template) {
+    setName(name);
+    setId(id);
+    setTemplate(template);
+  }
 
-    /**
-     * Create a Panel with the given name and template path.
-     *
-     * @param name the name of the panel
-     * @param template the template path
-     */
-    public Panel(String name, String template) {
-        setName(name);
-        setTemplate(template);
-    }
+  /**
+   * Create a Panel with no name or template defined.
+   * <p/>
+   * <b>Please note</b> the control's name must be defined before it is valid.
+   */
+  public Panel() {
+  }
 
-    /**
-     * Create a Panel with the given name, id attribute and template path.
-     *
-     * @param name the name of the panel
-     * @param id the id HTML attribute value
-     * @param template the template path
-     */
-    public Panel(String name, String id, String template) {
-        setName(name);
-        setId(id);
-        setTemplate(template);
-    }
+  // Properties -------------------------------------------------------------
 
-    /**
-     * Create a Panel with no name or template defined.
-     * <p/>
-     * <b>Please note</b> the control's name must be defined before it is valid.
-     */
-    public Panel() {
-    }
+  /**
+   * @see #add(org.apache.click.Control)
+   *
+   * @deprecated use {@link #add(org.apache.click.Control)} instead
+   *
+   * @param control the control to add to the container
+   * @return the control that was added to the container
+   * @throws IllegalArgumentException if the control is null or if the name
+   *     of the control is not defined
+   */
+  @Deprecated
+  public Control addControl(Control control) {
+    return add(control);
+  }
 
-    // Properties -------------------------------------------------------------
+  /**
+   * Add the control to the panel and return the specified control.
+   * <p/>
+   * <b>Please note</b>: if the Panel contains a control with the same name as
+   * the given control, that control will be
+   * {@link #replace(org.apache.click.Control, org.apache.click.Control) replaced}
+   * by the given control. If a control has no name defined it cannot be replaced.
+   * <p/>
+   * In addition to the requirements specified by
+   * {@link Container#add(org.apache.click.Control)}, note the following:
+   * <ul>
+   *  <li>
+   *   If the control name is defined, it will be added to the Panel
+   *   {@link #getModel() model} using the control name as the key. The control
+   *   can be referenced via it's name from the Panel template.
+   *  </li>
+   *  <li>
+   *   If the specified control is an <tt>instanceof</tt> a Panel, it will
+   *   be added to the list of panels and can be accessed through
+   *   {@link #getPanels()}.
+   *  </li>
+   * </ul>
+   * @see org.apache.click.control.Container#add(org.apache.click.Control)
+   *
+   * @param control the control to add to the container
+   * @return the control that was added to the container
+   * @throws IllegalArgumentException if the control is null
+   */
+  @Override
+  public Control insert(Control control, int index) {
+    // Check if panel already contains the control
+    String controlName = control.getName();
+    if (controlName != null) {
+      // Check if container already contains the control
+      Control currentControl = getControlMap().get(controlName);
 
-    /**
-     * @see #add(org.apache.click.Control)
-     *
-     * @deprecated use {@link #add(org.apache.click.Control)} instead
-     *
-     * @param control the control to add to the container
-     * @return the control that was added to the container
-     * @throws IllegalArgumentException if the control is null or if the name
-     *     of the control is not defined
-     */
-    public Control addControl(Control control) {
-        return add(control);
-    }
+      // If container already contains the control do a replace
+      if (currentControl != null) {
 
-    /**
-     * Add the control to the panel and return the specified control.
-     * <p/>
-     * <b>Please note</b>: if the Panel contains a control with the same name as
-     * the given control, that control will be
-     * {@link #replace(org.apache.click.Control, org.apache.click.Control) replaced}
-     * by the given control. If a control has no name defined it cannot be replaced.
-     * <p/>
-     * In addition to the requirements specified by
-     * {@link Container#add(org.apache.click.Control)}, note the following:
-     * <ul>
-     *  <li>
-     *   If the control name is defined, it will be added to the Panel
-     *   {@link #getModel() model} using the control name as the key. The control
-     *   can be referenced via it's name from the Panel template.
-     *  </li>
-     *  <li>
-     *   If the specified control is an <tt>instanceof</tt> a Panel, it will
-     *   be added to the list of panels and can be accessed through
-     *   {@link #getPanels()}.
-     *  </li>
-     * </ul>
-     * @see org.apache.click.control.Container#add(org.apache.click.Control)
-     *
-     * @param control the control to add to the container
-     * @return the control that was added to the container
-     * @throws IllegalArgumentException if the control is null
-     */
-    @Override
-    public Control insert(Control control, int index) {
-        // Check if panel already contains the control
-        String controlName = control.getName();
-        if (controlName != null) {
-            // Check if container already contains the control
-            Control currentControl = getControlMap().get(controlName);
-
-            // If container already contains the control do a replace
-            if (currentControl != null) {
-
-                // Current control and new control are referencing the same object
-                // so we exit early
-                if (currentControl == control) {
-                    return control;
-                }
-
-                // If the two controls are different objects, we remove the current
-                // control and add the given control
-                return replace(currentControl, control);
-            }
+        // Current control and new control are referencing the same object
+        // so we exit early
+        if (currentControl == control) {
+          return control;
         }
 
-        ContainerUtils.insert(this, control, index, getControlMap());
-
-        if (controlName != null) {
-            // If controls name is set, add control to the model
-            addModel(controlName, control);
-        }
-
-        if (control instanceof Panel) {
-            getPanels().add((Panel) control);
-        }
-
-        return control;
+        // If the two controls are different objects, we remove the current
+        // control and add the given control
+        return replace(currentControl, control);
+      }
     }
 
-    /**
-     * Replace the current control with the new control.
-     *
-     * @param currentControl the current control container in the panel
-     * @param newControl the control to replace the current control
-     * @return the new control that replaced the current control
-     *
-     * @deprecated this method was used for stateful pages, which have been deprecated
-     *
-     * @throws IllegalArgumentException if the currentControl or newControl is
-     * null
-     * @throws IllegalStateException if the currentControl is not contained in
-     * the panel
-     */
-    @Override
-    public Control replace(Control currentControl, Control newControl) {
-        // Current and new control is the same instance - exit early
-        if (currentControl == newControl) {
-            return newControl;
-        }
+    ContainerUtils.insert(this, control, index, getControlMap());
 
-        int controlIndex = getControls().indexOf(currentControl);
-        Control result = ContainerUtils.replace(this, currentControl, newControl,
-            controlIndex, getControlMap());
-
-        String controlName = newControl.getName();
-        if (controlName != null) {
-            // If controls name is set, add control to the model
-            addModel(controlName, newControl);
-        }
-
-        if (newControl instanceof Panel) {
-            int panelIndex = getPanels().indexOf(currentControl);
-            getPanels().set(panelIndex, (Panel) newControl);
-        }
-
-        return result;
+    if (controlName != null) {
+      // If controls name is set, add control to the model
+      addModel(controlName, control);
     }
 
-    /**
-     * @see #remove(org.apache.click.Control)
-     *
-     * @deprecated use {@link #remove(org.apache.click.Control)} instead
-     *
-     * @param control the control to remove from the container
-     * @return true if the control was removed from the container
-     * @throws IllegalArgumentException if the control is null or if the name of
-     *     the control is not defined
-     */
-    public boolean removeControl(Control control) {
-        return remove(control);
+    if (control instanceof Panel) {
+      getPanels().add((Panel) control);
     }
 
-    /**
-     * Remove the control from the panel and returning true if the control was
-     * found in the container and removed, or false if the control was not
-     * found.
-     * <p/>
-     * In addition to the requirements specified by
-     * {@link Container#remove(org.apache.click.Control)}, the controls name
-     * must also be set.
-     *
-     * @see org.apache.click.control.Container#remove(org.apache.click.Control)
-     *
-     * @param control the control to remove from the container
-     * @return true if the control was removed from the container
-     * @throws IllegalArgumentException if the control is null
-     */
-    @Override
-    public boolean remove(Control control) {
-        boolean contains = super.remove(control);
+    return control;
+  }
 
-        String controlName = control.getName();
-        if (controlName != null) {
-            // If control has name, remove it from the model
-            getModel().remove(controlName);
-        }
-
-        if (control instanceof Panel) {
-            getPanels().remove(control);
-        }
-
-        return contains;
+  /**
+   * Replace the current control with the new control.
+   *
+   * @param currentControl the current control container in the panel
+   * @param newControl the control to replace the current control
+   * @return the new control that replaced the current control
+   *
+   * @deprecated this method was used for stateful pages, which have been deprecated
+   *
+   * @throws IllegalArgumentException if the currentControl or newControl is
+   * null
+   * @throws IllegalStateException if the currentControl is not contained in
+   * the panel
+   */
+  @Override @Deprecated
+  public Control replace(Control currentControl, Control newControl) {
+    // Current and new control is the same instance - exit early
+    if (currentControl == newControl) {
+      return newControl;
     }
 
-    /**
-     * Return true if the panel is disabled.
-     *
-     * @return true if the panel is disabled
-     */
-    public boolean isDisabled() {
-        return disabled;
+    int controlIndex = getControls().indexOf(currentControl);
+    Control result = ContainerUtils.replace(this, currentControl, newControl,
+        controlIndex, getControlMap());
+
+    String controlName = newControl.getName();
+    if (controlName != null) {
+      // If controls name is set, add control to the model
+      addModel(controlName, newControl);
     }
 
-    /**
-     * Set the panel disabled flag. Disabled panels are not processed nor
-     * is their action event fired.
-     *
-     * @param disabled the disabled flag
-     */
-    public void setDisabled(boolean disabled) {
-        this.disabled = disabled;
+    if (newControl instanceof Panel) {
+      int panelIndex = getPanels().indexOf(currentControl);
+      getPanels().set(panelIndex, (Panel) newControl);
     }
 
-    /**
-     * Return true if the panel is active.
-     *
-     * @return true if the panel is active
-     */
-    public boolean isActive() {
-        return active;
+    return result;
+  }
+
+  /**
+   * @see #remove(org.apache.click.Control)
+   *
+   * @deprecated use {@link #remove(org.apache.click.Control)} instead
+   *
+   * @param control the control to remove from the container
+   * @return true if the control was removed from the container
+   * @throws IllegalArgumentException if the control is null or if the name of
+   *     the control is not defined
+   */
+  @Deprecated
+  public boolean removeControl(Control control) {
+    return remove(control);
+  }
+
+  /**
+   * Remove the control from the panel and returning true if the control was
+   * found in the container and removed, or false if the control was not
+   * found.
+   * <p/>
+   * In addition to the requirements specified by
+   * {@link Container#remove(org.apache.click.Control)}, the controls name
+   * must also be set.
+   *
+   * @see org.apache.click.control.Container#remove(org.apache.click.Control)
+   *
+   * @param control the control to remove from the container
+   * @return true if the control was removed from the container
+   * @throws IllegalArgumentException if the control is null
+   */
+  @Override
+  public boolean remove(Control control) {
+    boolean contains = super.remove(control);
+
+    String controlName = control.getName();
+    if (controlName != null) {
+      // If control has name, remove it from the model
+      getModel().remove(controlName);
     }
 
-    /**
-     * Set the panel active flag. The active property is normally managed and
-     * set by Panel containers.
-     *
-     * <b>Please note</b>: inactive panels do not have their events
-     * ({@link #onInit()}, {@link #onProcess()}, {@link #onRender()}) processed.
-     *
-     * @param active the active flag
-     */
-    public void setActive(boolean active) {
-        this.active = active;
+    if (control instanceof Panel) {
+      getPanels().remove(control);
     }
 
-    /**
-     * Return the panel id value. If no id attribute is defined then this method
-     * will return the panel name. If no name is defined this method will return
-     * <tt>null</tt>.
-     *
-     * @see #setActive(boolean)
-     * @see org.apache.click.Control#getId()
-     *
-     * @return the panel HTML id attribute value
-     */
-    @Override
-    public String getId() {
-        if (id != null) {
-            return id;
+    return contains;
+  }
 
-        } else {
-            String id = getName();
+  /**
+   * Return true if the panel is disabled.
+   *
+   * @return true if the panel is disabled
+   */
+  public boolean isDisabled() {
+    return disabled;
+  }
 
-            if (id == null) {
-                // If panel name is null, return null
-                return null;
-            }
+  /**
+   * Set the panel disabled flag. Disabled panels are not processed nor
+   * is their action event fired.
+   *
+   * @param disabled the disabled flag
+   */
+  public void setDisabled(boolean disabled) {
+    this.disabled = disabled;
+  }
 
-            if (id.indexOf('/') != -1) {
-                id = id.replace('/', '_');
-            }
-            if (id.indexOf(' ') != -1) {
-                id = id.replace(' ', '_');
-            }
-            if (id.indexOf('<') != -1) {
-                id = id.replace('<', '_');
-            }
-            if (id.indexOf('>') != -1) {
-                id = id.replace('>', '_');
-            }
-            if (id.indexOf('.') != -1) {
-                id = id.replace('.', '_');
-            }
+  /**
+   * Return true if the panel is active.
+   *
+   * @return true if the panel is active
+   */
+  public boolean isActive() {
+    return active;
+  }
 
-            return id;
-        }
+  /**
+   * Set the panel active flag. The active property is normally managed and
+   * set by Panel containers.
+   *
+   * <b>Please note</b>: inactive panels do not have their events
+   * ({@link #onInit()}, {@link #onProcess()}, {@link #onRender()}) processed.
+   *
+   * @param active the active flag
+   */
+  public void setActive(boolean active) {
+    this.active = active;
+  }
+
+  /**
+   * Return the panel id value. If no id attribute is defined then this method
+   * will return the panel name. If no name is defined this method will return
+   * <tt>null</tt>.
+   *
+   * @see #setActive(boolean)
+   * @see org.apache.click.Control#getId()
+   *
+   * @return the panel HTML id attribute value
+   */
+  @Override
+  public String getId() {
+    if (id != null) {
+      return id;
+
+    } else {
+      String id = getName();
+
+      if (id == null) {
+        // If panel name is null, return null
+        return null;
+      }
+
+      if (id.indexOf('/') != -1) {
+        id = id.replace('/', '_');
+      }
+      if (id.indexOf(' ') != -1) {
+        id = id.replace(' ', '_');
+      }
+      if (id.indexOf('<') != -1) {
+        id = id.replace('<', '_');
+      }
+      if (id.indexOf('>') != -1) {
+        id = id.replace('>', '_');
+      }
+      if (id.indexOf('.') != -1) {
+        id = id.replace('.', '_');
+      }
+
+      return id;
+    }
+  }
+
+  /**
+   * Set the id for this panel.  This is the identifier that will be assigned
+   * to the 'id' tag for this panel's model.
+   *
+   * @param id the id attribute for this panel
+   */
+  @Override
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  /**
+   * Return the panel display label.
+   * <p/>
+   * If the label value is null, this method will attempt to find a
+   * localized label message in the parent messages using the key:
+   * <blockquote>
+   * <tt>getName() + ".label"</tt>
+   * </blockquote>
+   * If not found then the message will be looked up in the
+   * <tt>/click-control.properties</tt> file using the same key.
+   * If a value still cannot be found then the Panel name will be converted
+   * into a label using the method: {@link ClickUtils#toLabel(String)}
+   * <p/>
+   * Typically the label property is used as a header for a particular panel.
+   * For example:
+   *
+   * <pre class="codeHtml">
+   *  &lt;div id="$panel.id"&gt;
+   *      &lt;h1&gt;$panel.label&lt;/h1&gt;
+   *      ## content here
+   *  &lt;/div&gt; </pre>
+   *
+   * @return the internationalized label associated with this control
+   */
+  public String getLabel() {
+    if (label == null) {
+      label = getMessage(getName() + ".label");
+    }
+    if (label == null) {
+      label = ClickUtils.toLabel(getName());
+    }
+    return label;
+  }
+
+  /**
+   * Set the Panel display caption.
+   *
+   * @param label the display label of the Panel
+   */
+  public void setLabel(String label) {
+    this.label = label;
+  }
+
+  /**
+   * Add the named object value to the Panels model map.
+   * <p/>
+   * <b>Please note</b>: if the Panel contains an object with a matching name,
+   * that object will be replaced by the given value.
+   *
+   * @param name the key name of the object to add
+   * @param value the object to add
+   * @throws IllegalArgumentException if the name or value parameters are
+   * null
+   */
+  public void addModel(String name, Object value) {
+    if (name == null) {
+      String msg = "Cannot add null parameter name to "
+          + getClass().getName() + " model";
+      throw new IllegalArgumentException(msg);
+    }
+    if (value == null) {
+      String msg = "Cannot add null " + name + " parameter "
+          + "to " + getClass().getName() + " model";
+      throw new IllegalArgumentException(msg);
+    }
+    getModel().put(name, value);
+  }
+
+  /**
+   * Return the panels model map. The model is used populate the
+   * Template Context with is merged with the panel template before rendering.
+   *
+   * @return the Page's model map
+   */
+  public Map<String, Object> getModel() {
+    if (model == null) {
+      model = new HashMap<>();
+    }
+    return model;
+  }
+
+  /**
+   * Return the list of sub panels associated with this panel. Do not
+   * add sub panels using this method, use {@link #add(Control)} instead.
+   *
+   * @return the list of sub-panels, if any
+   */
+  public List<Panel> getPanels() {
+    if (panels == null) {
+      panels = new ArrayList<>();
+    }
+    return panels;
+  }
+
+
+
+  /**
+   * Initialize the panel.
+   * <p/>
+   * <b>Please note</b>: {@link #isActive() inactive} panels are not
+   * initialized.
+   *
+   * @see org.apache.click.Control#onInit()
+   */
+  @Override
+  public void onInit() {
+    if (isActive()) {
+      super.onInit();
+    }
+  }
+
+  /**
+   * This method processes the Panel request returning true to continue
+   * processing or false otherwise.
+   * <p/>
+   * <b>Please note</b>: {@link #isDisabled() Disabled} and
+   * {@link #isActive() inactive} panels are not processed.
+   *
+   * @see org.apache.click.Control#onProcess().
+   *
+   * @return true to continue Panel event processing, false otherwise
+   */
+  @Override
+  public boolean onProcess() {
+    if (isDisabled()) {
+      return true;
     }
 
-    /**
-     * Set the id for this panel.  This is the identifier that will be assigned
-     * to the 'id' tag for this panel's model.
-     *
-     * @param id the id attribute for this panel
-     */
-    @Override
-    public void setId(String id) {
-        this.id = id;
+    if (!isActive()) {
+      return true;
     }
 
-    /**
-     * Return the panel display label.
-     * <p/>
-     * If the label value is null, this method will attempt to find a
-     * localized label message in the parent messages using the key:
-     * <blockquote>
-     * <tt>getName() + ".label"</tt>
-     * </blockquote>
-     * If not found then the message will be looked up in the
-     * <tt>/click-control.properties</tt> file using the same key.
-     * If a value still cannot be found then the Panel name will be converted
-     * into a label using the method: {@link ClickUtils#toLabel(String)}
-     * <p/>
-     * Typically the label property is used as a header for a particular panel.
-     * For example:
-     *
-     * <pre class="codeHtml">
-     *  &lt;div id="$panel.id"&gt;
-     *      &lt;h1&gt;$panel.label&lt;/h1&gt;
-     *      ## content here
-     *  &lt;/div&gt; </pre>
-     *
-     * @return the internationalized label associated with this control
-     */
-    public String getLabel() {
-        if (label == null) {
-            label = getMessage(getName() + ".label");
-        }
-        if (label == null) {
-            label = ClickUtils.toLabel(getName());
-        }
-        return label;
+    return super.onProcess();
+  }
+
+  /**
+   * Perform any pre rendering logic and invoke the <tt>onRender()</tt> method
+   * of any child controls.
+   * <p/>
+   * <b>Please note</b>: {@link #isActive() inactive} panels are not rendered.
+   *
+   * @see org.apache.click.Control#onRender()
+   */
+  @Override
+  public void onRender() {
+    if (isActive()) {
+      super.onRender();
+    }
+  }
+
+  /**
+   * Render the HTML string representation of the Panel. The panel will be
+   * rendered by merging the {@link #template} with the template
+   * model. The template model is created using {@link #createTemplateModel()}.
+   * <p/>
+   * If a Panel template is not defined, a template based on the classes
+   * name will be loaded. For more details please see {@link Context#renderTemplate(Class, Map)}.
+   *
+   * @see #toString()
+   *
+   * @param buffer the specified buffer to render the control's output to
+   */
+  @Override
+  public void render(HtmlStringBuffer buffer) {
+    Context context = Context.getThreadLocalContext();
+
+    if (getTemplate() != null) {
+      buffer.append(context.renderTemplate(getTemplate(), createTemplateModel()));
+
+    } else {
+      buffer.append(context.renderTemplate(getClass(), createTemplateModel()));
+    }
+  }
+
+  // Protected Methods ------------------------------------------------------
+
+  /**
+   * Create a model to merge with the template. The model will
+   * include the pages model values, plus any Panel defined model values, and
+   * a number of automatically added model values. Note panel model values
+   * will override any page defined model values.
+   * <p/>
+   * The following values automatically added to the Model:
+   * <ul>
+   * <li>attributes - the panel HTML attributes map</li>
+   * <li>context - the Servlet context path, e.g. /mycorp</li>
+   * <li>format - the page {@link Format} object for formatting the display of objects</li>
+   * <li>this - a reference to this panel</li>
+   * <li>messages - the panel messages bundle</li>
+   * <li>request - the servlet request</li>
+   * <li>response - the servlet request</li>
+   * <li>session - the {@link SessionMap} adaptor for the users HttpSession</li>
+   * </ul>
+   *
+   * @return a new model to merge with the template.
+   */
+  protected Map<String, Object> createTemplateModel() {
+
+    Context context = Context.getThreadLocalContext();
+
+    final HttpServletRequest request = context.getRequest();
+
+    final Page page = ClickUtils.getParentPage(this);
+
+    final Map<String, Object> renderModel = new HashMap<>(page.getModel());
+
+    renderModel.putAll(getModel());
+
+    if (hasAttributes()) {
+      renderModel.put("attributes", getAttributes());
+    } else {
+      renderModel.put("attributes", Collections.EMPTY_MAP);
     }
 
-    /**
-     * Set the Panel display caption.
-     *
-     * @param label the display label of the Panel
-     */
-    public void setLabel(String label) {
-        this.label = label;
+    renderModel.put("this", this);
+
+    renderModel.put("context", request.getContextPath());
+
+    Format format = page.getFormat();
+    if (format != null) {
+      renderModel.put("format", format);
     }
 
-    /**
-     * Add the named object value to the Panels model map.
-     * <p/>
-     * <b>Please note</b>: if the Panel contains an object with a matching name,
-     * that object will be replaced by the given value.
-     *
-     * @param name the key name of the object to add
-     * @param value the object to add
-     * @throws IllegalArgumentException if the name or value parameters are
-     * null
-     */
-    public void addModel(String name, Object value) {
-        if (name == null) {
-            String msg = "Cannot add null parameter name to "
-                         + getClass().getName() + " model";
-            throw new IllegalArgumentException(msg);
-        }
-        if (value == null) {
-            String msg = "Cannot add null " + name + " parameter "
-                         + "to " + getClass().getName() + " model";
-            throw new IllegalArgumentException(msg);
-        }
-        getModel().put(name, value);
-    }
+    Map<String, String> templateMessages = new HashMap<>(getMessages());
+    templateMessages.putAll(page.getMessages());
+    renderModel.put("messages", templateMessages);
 
-    /**
-     * Return the panels model map. The model is used populate the
-     * Template Context with is merged with the panel template before rendering.
-     *
-     * @return the Page's model map
-     */
-    public Map<String, Object> getModel() {
-        if (model == null) {
-             model = new HashMap<String, Object>();
-        }
-        return model;
-    }
+    renderModel.put("request", request);
 
-    /**
-     * Return the list of sub panels associated with this panel. Do not
-     * add sub panels using this method, use {@link #add(Control)} instead.
-     *
-     * @return the list of sub-panels, if any
-     */
-    public List<Panel> getPanels() {
-        if (panels == null) {
-            panels = new ArrayList<Panel>();
-        }
-        return panels;
-    }
+    renderModel.put("response", context.getResponse());
 
-    /**
-     * Return the path of the template to render.
-     *
-     * @return the path of the template to render
-     */
-    public String getTemplate() {
-        return template;
-    }
+    renderModel.put("session", new SessionMap(request.getSession(false)));
 
-    /**
-     * Set the path of the template to render.
-     *
-     * @param template the path of the template to render
-     */
-    public void setTemplate(String template) {
-        this.template = template;
-    }
-
-    // Public Methods ---------------------------------------------------------
-
-    /**
-     * Initialize the panel.
-     * <p/>
-     * <b>Please note</b>: {@link #isActive() inactive} panels are not
-     * initialized.
-     *
-     * @see org.apache.click.Control#onInit()
-     */
-    @Override
-    public void onInit() {
-        if (isActive()) {
-            super.onInit();
-        }
-    }
-
-    /**
-     * This method processes the Panel request returning true to continue
-     * processing or false otherwise.
-     * <p/>
-     * <b>Please note</b>: {@link #isDisabled() Disabled} and
-     * {@link #isActive() inactive} panels are not processed.
-     *
-     * @see org.apache.click.Control#onProcess().
-     *
-     * @return true to continue Panel event processing, false otherwise
-     */
-    @Override
-    public boolean onProcess() {
-        if (isDisabled()) {
-            return true;
-        }
-
-        if (!isActive()) {
-            return true;
-        }
-
-        return super.onProcess();
-    }
-
-    /**
-     * Perform any pre rendering logic and invoke the <tt>onRender()</tt> method
-     * of any child controls.
-     * <p/>
-     * <b>Please note</b>: {@link #isActive() inactive} panels are not rendered.
-     *
-     * @see org.apache.click.Control#onRender()
-     */
-    @Override
-    public void onRender() {
-        if (isActive()) {
-            super.onRender();
-        }
-    }
-
-    /**
-     * Render the HTML string representation of the Panel. The panel will be
-     * rendered by merging the {@link #template} with the template
-     * model. The template model is created using {@link #createTemplateModel()}.
-     * <p/>
-     * If a Panel template is not defined, a template based on the classes
-     * name will be loaded. For more details please see {@link Context#renderTemplate(Class, Map)}.
-     *
-     * @see #toString()
-     *
-     * @param buffer the specified buffer to render the control's output to
-     */
-    @Override
-    public void render(HtmlStringBuffer buffer) {
-        Context context = getContext();
-
-        if (getTemplate() != null) {
-            buffer.append(context.renderTemplate(getTemplate(), createTemplateModel()));
-
-        } else {
-            buffer.append(context.renderTemplate(getClass(), createTemplateModel()));
-        }
-    }
-
-    // Protected Methods ------------------------------------------------------
-
-    /**
-     * Create a model to merge with the template. The model will
-     * include the pages model values, plus any Panel defined model values, and
-     * a number of automatically added model values. Note panel model values
-     * will override any page defined model values.
-     * <p/>
-     * The following values automatically added to the Model:
-     * <ul>
-     * <li>attributes - the panel HTML attributes map</li>
-     * <li>context - the Servlet context path, e.g. /mycorp</li>
-     * <li>format - the page {@link Format} object for formatting the display of objects</li>
-     * <li>this - a reference to this panel</li>
-     * <li>messages - the panel messages bundle</li>
-     * <li>request - the servlet request</li>
-     * <li>response - the servlet request</li>
-     * <li>session - the {@link SessionMap} adaptor for the users HttpSession</li>
-     * </ul>
-     *
-     * @return a new model to merge with the template.
-     */
-    protected Map<String, Object> createTemplateModel() {
-
-        Context context = getContext();
-
-        final HttpServletRequest request = context.getRequest();
-
-        final Page page = ClickUtils.getParentPage(this);
-
-        final Map<String, Object> renderModel = new HashMap<String, Object>(page.getModel());
-
-        renderModel.putAll(getModel());
-
-        if (hasAttributes()) {
-            renderModel.put("attributes", getAttributes());
-        } else {
-            renderModel.put("attributes", Collections.EMPTY_MAP);
-        }
-
-        renderModel.put("this", this);
-
-        renderModel.put("context", request.getContextPath());
-
-        Format format = page.getFormat();
-        if (format != null) {
-            renderModel.put("format", format);
-        }
-
-        Map<String, String> templateMessages = new HashMap<String, String>(getMessages());
-        templateMessages.putAll(page.getMessages());
-        renderModel.put("messages", templateMessages);
-
-        renderModel.put("request", request);
-
-        renderModel.put("response", context.getResponse());
-
-        renderModel.put("session", new SessionMap(request.getSession(false)));
-
-        return renderModel;
-    }
-
+    return renderModel;
+  }
 }

@@ -1,29 +1,4 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.click.service;
-
-import java.io.File;
-import java.security.AccessControlException;
-import java.util.List;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.click.util.ClickUtils;
 import org.apache.commons.fileupload.FileItem;
@@ -34,6 +9,12 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.servlet.ServletRequestContext;
 import org.apache.commons.lang.Validate;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.security.AccessControlException;
+import java.util.List;
 
 /**
  * Provides an Apache Commons FileUploadService class.
@@ -79,7 +60,7 @@ public class CommonsFileUploadService implements FileUploadService {
      * @param servletContext the application servlet context
      * @throws Exception if an error occurs initializing the FileUploadService
      */
-    public void onInit(ServletContext servletContext) throws Exception {
+    @Override public void onInit(ServletContext servletContext) throws Exception {
         ConfigService configService = ClickUtils.getConfigService(servletContext);
         LogService logService = configService.getLogService();
 
@@ -135,7 +116,7 @@ public class CommonsFileUploadService implements FileUploadService {
     /**
      * @see FileUploadService#onDestroy()
      */
-    public void onDestroy() {
+    @Override public void onDestroy() {
     }
 
     /**
@@ -145,7 +126,7 @@ public class CommonsFileUploadService implements FileUploadService {
      * @return the list of FileItem instances parsed from the request
      * @throws FileUploadException if request cannot be parsed
      */
-    @SuppressWarnings("unchecked")
+    @Override @SuppressWarnings("unchecked")
     public List<FileItem> parseRequest(HttpServletRequest request)
             throws FileUploadException {
 

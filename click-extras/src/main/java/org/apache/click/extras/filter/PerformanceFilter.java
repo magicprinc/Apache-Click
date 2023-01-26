@@ -1,28 +1,8 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.click.extras.filter;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
+import org.apache.click.service.ConfigService;
+import org.apache.click.util.ClickUtils;
+import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -33,11 +13,11 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.click.service.ConfigService;
-import org.apache.click.util.ClickUtils;
-
-import org.apache.commons.lang.StringUtils;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 
 /**
  * Provides a filter for improving the performance of web applications by
@@ -259,522 +239,508 @@ import org.apache.commons.lang.StringUtils;
  */
 public class PerformanceFilter implements Filter {
 
-    // ---------------------------------------------- Protected Constants
+  // ---------------------------------------------- Protected Constants
 
-    /** Default cache max-age in seconds (1 year): 31536000. */
-    protected static final int DEFAULT_CACHE_MAX_AGE = 31536000;
+  /** Default cache max-age in seconds (1 year): 31536000. */
+  protected static final int DEFAULT_CACHE_MAX_AGE = 31536000;
 
-    /** Forever cache max-age in seconds (5 years). */
-    protected static final int FOREVER_CACHE_MAX_AGE = DEFAULT_CACHE_MAX_AGE * 5;
+  /** Forever cache max-age in seconds (5 years). */
+  protected static final int FOREVER_CACHE_MAX_AGE = DEFAULT_CACHE_MAX_AGE * 5;
 
-    /** Minimum compress threshold: 384 bytes. */
-    protected static final int MIN_COMPRESSION_THRESHOLD = 384;
+  /** Minimum compress threshold: 384 bytes. */
+  protected static final int MIN_COMPRESSION_THRESHOLD = 384;
 
-    // ----------------------------------------------------- Instance Variables
+  // ----------------------------------------------------- Instance Variables
 
-    /** The configured cache max age in seconds, default value is 1 year. */
-    protected long cacheMaxAge = DEFAULT_CACHE_MAX_AGE;
+  /** The configured cache max age in seconds, default value is 1 year. */
+  protected long cacheMaxAge = DEFAULT_CACHE_MAX_AGE;
 
-    /** The threshold number to compress, default value is 384 bytes. */
-    protected int compressionThreshold = MIN_COMPRESSION_THRESHOLD;
+  /** The threshold number to compress, default value is 384 bytes. */
+  protected int compressionThreshold = MIN_COMPRESSION_THRESHOLD;
 
-    /** Indicates if compression is enabled or not, default value is true. */
-    protected boolean compressionEnabled = true;
+  /** Indicates if compression is enabled or not, default value is true. */
+  protected boolean compressionEnabled = true;
 
-    /** The filter has been configured flag. */
-    protected boolean configured;
+  /** The filter has been configured flag. */
+  protected boolean configured;
 
-    /** The application configuration service. */
-    protected ConfigService configService;
+  /** The application configuration service. */
+  protected ConfigService configService;
 
-    /**
-     * The filter configuration object we are associated with.  If this value
-     * is null, this filter instance is not currently configured.
-     */
-    protected FilterConfig filterConfig = null;
+  /**
+   * The filter configuration object we are associated with.  If this value
+   * is null, this filter instance is not currently configured.
+   */
+  protected FilterConfig filterConfig = null;
 
-    /** The cacheable-path include directories. */
-    protected List<String> includeDirs = new ArrayList<String>();
+  /** The cacheable-path include directories. */
+  protected List<String> includeDirs = new ArrayList<>();
 
-    /** The cacheable-path include files. */
-    protected List<String> includeFiles = new ArrayList<String>();
+  /** The cacheable-path include files. */
+  protected List<String> includeFiles = new ArrayList<>();
 
-    /** The cacheable-path exclude directories. */
-    protected List<String> excludeDirs = new ArrayList<String>();
+  /** The cacheable-path exclude directories. */
+  protected List<String> excludeDirs = new ArrayList<>();
 
-    /** The cacheable-path exclude files. */
-    protected List<String> excludeFiles = new ArrayList<String>();
+  /** The cacheable-path exclude files. */
+  protected List<String> excludeFiles = new ArrayList<>();
 
-    /** The application resource version indicator. */
-    protected String applicationVersionIndicator = "";
+  /** The application resource version indicator. */
+  protected String applicationVersionIndicator = "";
 
-    // --------------------------------------------------------- Public Methods
+  // --------------------------------------------------------- Public Methods
 
-    /**
-     * Initialize the filter.
-     *
-     * @see Filter#init(FilterConfig)
-     *
-     * @param filterConfig The filter configuration object
-     */
-    public void init(FilterConfig filterConfig) {
-        this.filterConfig = filterConfig;
+  /**
+   * Initialize the filter.
+   *
+   * @see Filter#init(FilterConfig)
+   *
+   * @param filterConfig The filter configuration object
+   */
+  @Override public void init(FilterConfig filterConfig) {
+    this.filterConfig = filterConfig;
+  }
+
+  /**
+   * Take this filter out of service.
+   *
+   * @see Filter#destroy()
+   */
+  @Override public void destroy() {
+    this.filterConfig = null;
+  }
+
+  /**
+   * Perform the filter operation applying any necessary Expire headers and
+   * compressing the response content.
+   *
+   * @see Filter#doFilter(ServletRequest, ServletResponse, FilterChain)
+   *
+   * @param servletRequest the servlet request
+   * @param servletResponse the servlet response
+   * @param chain the filter chain
+   * @throws IOException if an I/O error occurs
+   * @throws ServletException if a servlet error occurs
+   */
+  @Override public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain) throws IOException, ServletException {
+
+    if (!configured) {
+      loadConfiguration();
     }
 
-    /**
-     * Take this filter out of service.
-     *
-     * @see Filter#destroy()
-     */
-    public void destroy() {
-        this.filterConfig = null;
+    if (!getConfigService().isProductionMode()
+        && !getConfigService().isProfileMode()) {
+      chain.doFilter(servletRequest, servletResponse);
+      return;
     }
 
-    /**
-     * Perform the filter operation applying any necessary Expire headers and
-     * compressing the response content.
-     *
-     * @see Filter#doFilter(ServletRequest, ServletResponse, FilterChain)
-     *
-     * @param servletRequest the servlet request
-     * @param servletResponse the servlet response
-     * @param chain the filter chain
-     * @throws IOException if an I/O error occurs
-     * @throws ServletException if a servlet error occurs
-     */
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse,
-            FilterChain chain) throws IOException, ServletException {
+    final HttpServletRequest request = (HttpServletRequest) servletRequest;
+    final HttpServletResponse response = (HttpServletResponse) servletResponse;
 
-        if (!configured) {
-            loadConfiguration();
-        }
+    final String path = ClickUtils.getResourcePath(request);
 
-        if (!getConfigService().isProductionMode()
-            && !getConfigService().isProfileMode()) {
-            chain.doFilter(servletRequest, servletResponse);
-            return;
-        }
+    if (isExcludePath(path)) {
+      chain.doFilter(servletRequest, servletResponse);
+      return;
+    }
 
-        final HttpServletRequest request = (HttpServletRequest) servletRequest;
-        final HttpServletResponse response = (HttpServletResponse) servletResponse;
+    // Enable resource versioning in Click
+    request.setAttribute(ClickUtils.ENABLE_RESOURCE_VERSION, "true");
 
-        final String path = ClickUtils.getResourcePath(request);
+    if (useForeverCacheHeader(path)) {
+      setHeaderExpiresCache(response, FOREVER_CACHE_MAX_AGE);
 
-        if (isExcludePath(path)) {
-            chain.doFilter(servletRequest, servletResponse);
-            return;
-        }
+    } else if (useConfiguredCacheHeader(path)) {
+      setHeaderExpiresCache(response, cacheMaxAge);
+    }
 
-        // Enable resource versioning in Click
-        request.setAttribute(ClickUtils.ENABLE_RESOURCE_VERSION, "true");
+    // Set the character set
+    String charset = getConfigService().getCharset();
+    if (charset != null) {
+      try {
+        request.setCharacterEncoding(charset);
 
-        if (useForeverCacheHeader(path)) {
-            setHeaderExpiresCache(response, FOREVER_CACHE_MAX_AGE);
+      } catch (UnsupportedEncodingException ex) {
+        String msg =
+            "The character encoding " + charset + " is invalid.";
+        getConfigService().getLogService().warn(msg, ex);
+      }
+    }
 
-        } else if (useConfiguredCacheHeader(path)) {
-            setHeaderExpiresCache(response, cacheMaxAge);
-        }
+    final String realPath = stripResourceVersionIndicator(path);
+    final boolean isVersionedResourcePath = (realPath.length() != path.length());
 
-        // Set the character set
-        String charset = getConfigService().getCharset();
-        if (charset != null) {
-            try {
-                request.setCharacterEncoding(charset);
+    // Apply response compression
+    if (useGzipCompression(request, response, path)) {
 
-            } catch (UnsupportedEncodingException ex) {
-                String msg =
-                    "The character encoding " + charset + " is invalid.";
-                getConfigService().getLogService().warn(msg, ex);
-            }
-        }
+      CompressionServletResponseWrapper wrappedResponse =
+          new CompressionServletResponseWrapper(response, request);
 
-        final String realPath = stripResourceVersionIndicator(path);
-        final boolean isVersionedResourcePath = (realPath.length() != path.length());
+      wrappedResponse.setCompressionThreshold(compressionThreshold);
 
-        // Apply response compression
-        if (useGzipCompression(request, response, path)) {
+      try {
+        // If a versioned resource path, forward request to real resource path
+        if (isVersionedResourcePath) {
+          request.getRequestDispatcher(realPath).forward(request, wrappedResponse);
 
-            CompressionServletResponseWrapper wrappedResponse =
-                new CompressionServletResponseWrapper(response, request);
-
-            wrappedResponse.setCompressionThreshold(compressionThreshold);
-
-            try {
-                // If a versioned resource path, forward request to real resource path
-                if (isVersionedResourcePath) {
-                    request.getRequestDispatcher(realPath).forward(request, wrappedResponse);
-
-                // Else chain filter
-                } else {
-                    chain.doFilter(request, wrappedResponse);
-                }
-
-            } finally {
-                wrappedResponse.finishResponse();
-            }
-
+          // Else chain filter
         } else {
-            // If a versioned resource path, forward request to real resource path
-            if (isVersionedResourcePath) {
-                request.getRequestDispatcher(realPath).forward(request, response);
-
-            // Else chain filter
-            } else {
-                chain.doFilter(request, response);
-            }
+          chain.doFilter(request, wrappedResponse);
         }
+
+      } finally {
+        wrappedResponse.finishResponse();
+      }
+
+    } else {
+      // If a versioned resource path, forward request to real resource path
+      if (isVersionedResourcePath) {
+        request.getRequestDispatcher(realPath).forward(request, response);
+
+        // Else chain filter
+      } else {
+        chain.doFilter(request, response);
+      }
+    }
+  }
+
+  /**
+   * Set filter configuration. This function is equivalent to init and is
+   * required by Weblogic 6.1.
+   *
+   * @param filterConfig the filter configuration object
+   */
+  public void setFilterConfig(FilterConfig filterConfig) {
+    init(filterConfig);
+  }
+
+  /**
+   * Return filter config. This is required by Weblogic 6.1
+   *
+   * @return the filter configuration
+   */
+  public FilterConfig getFilterConfig() {
+    return filterConfig;
+  }
+
+  // ------------------------------------------------------ Protected Methods
+
+  /**
+   * Return the application configuration service.
+   *
+   * @return the application configuration service
+   */
+  protected ConfigService getConfigService() {
+    return configService;
+  }
+
+  /**
+   * Load the filters configuration and set the configured flat to true.
+   */
+  protected void loadConfiguration() {
+
+    ServletContext servletContext = getFilterConfig().getServletContext();
+    configService = ClickUtils.getConfigService(servletContext);
+
+    // Get gzip enabled parameter
+    String param = filterConfig.getInitParameter("compression-enabled");
+    if (StringUtils.isNotBlank(param)) {
+      compressionEnabled = Boolean.parseBoolean(param);
     }
 
-    /**
-     * Set filter configuration. This function is equivalent to init and is
-     * required by Weblogic 6.1.
-     *
-     * @param filterConfig the filter configuration object
-     */
-    public void setFilterConfig(FilterConfig filterConfig) {
-        init(filterConfig);
+    // Get compression threshold
+    param = filterConfig.getInitParameter("compression-threshold");
+    if (param != null) {
+      compressionThreshold = Integer.parseInt(param);
+      if (compressionThreshold != 0
+          && compressionThreshold < MIN_COMPRESSION_THRESHOLD) {
+
+        compressionThreshold = MIN_COMPRESSION_THRESHOLD;
+      }
     }
 
-    /**
-     * Return filter config. This is required by Weblogic 6.1
-     *
-     * @return the filter configuration
-     */
-    public FilterConfig getFilterConfig() {
-        return filterConfig;
+    param = filterConfig.getInitParameter("application-version");
+    if (StringUtils.isNotBlank(param)) {
+      applicationVersionIndicator = ClickUtils.VERSION_INDICATOR_SEP
+          + param;
+      ClickUtils.setApplicationVersion(param);
     }
 
-    // ------------------------------------------------------ Protected Methods
+    param = filterConfig.getInitParameter("cacheable-paths");
+    if (param != null) {
+      String[] paths = StringUtils.split(param, ',');
 
-    /**
-     * Return the application configuration service.
-     *
-     * @return the application configuration service
-     */
-    protected ConfigService getConfigService() {
-        return configService;
-    }
+      for (String s : paths){
+        String path = s.trim();
 
-    /**
-     * Load the filters configuration and set the configured flat to true.
-     */
-    protected void loadConfiguration() {
-
-        ServletContext servletContext = getFilterConfig().getServletContext();
-        configService = ClickUtils.getConfigService(servletContext);
-
-        // Get gzip enabled parameter
-        String param = filterConfig.getInitParameter("compression-enabled");
-        if (StringUtils.isNotBlank(param)) {
-            compressionEnabled = Boolean.parseBoolean(param);
-        }
-
-        // Get compression threshold
-        param = filterConfig.getInitParameter("compression-threshold");
-        if (param != null) {
-            compressionThreshold = Integer.parseInt(param);
-            if (compressionThreshold != 0
-                    && compressionThreshold < MIN_COMPRESSION_THRESHOLD) {
-
-                compressionThreshold = MIN_COMPRESSION_THRESHOLD;
-            }
-        }
-
-        param = filterConfig.getInitParameter("application-version");
-        if (StringUtils.isNotBlank(param)) {
-            applicationVersionIndicator = ClickUtils.VERSION_INDICATOR_SEP
-                + param;
-            ClickUtils.setApplicationVersion(param);
-        }
-
-        param = filterConfig.getInitParameter("cacheable-paths");
-        if (param != null) {
-            String[] paths = StringUtils.split(param, ',');
-
-            for (int i = 0; i  < paths.length; i++) {
-                String path = paths[i].trim();
-
-                if (path.endsWith("*")) {
-                    String value = path.substring(0, path.length() - 1);
-                    if (!includeDirs.contains(value)) {
-                        includeDirs.add(value);
-                    }
-
-                } else if (path.startsWith("*")) {
-                    String value = path.substring(1);
-                    if (!includeFiles.contains(value)) {
-                        includeFiles.add(value);
-                    }
-
-                } else {
-                    String message = "cacheable-path '" + path + "' ignored, "
-                        + "path must start or end with a wildcard character: *";
-                    getConfigService().getLogService().warn(message);
-                }
-            }
-        }
-
-        // Fixed misspelling. Use cacheable-paths instead.
-        param = filterConfig.getInitParameter("cachable-paths");
-         if (param != null) {
-            String[] paths = StringUtils.split(param, ',');
-
-            for (int i = 0; i  < paths.length; i++) {
-                String path = paths[i].trim();
-
-                if (path.endsWith("*")) {
-                    String value = path.substring(0, path.length() - 1);
-                    if (!includeDirs.contains(value)) {
-                        includeDirs.add(value);
-                    }
-
-                } else if (path.startsWith("*")) {
-                    String value = path.substring(1);
-                    if (!includeFiles.contains(value)) {
-                        includeFiles.add(value);
-                    }
-
-                } else {
-                    String message = "cachable-path '" + path + "' ignored, "
-                        + "path must start or end with a wildcard character: *";
-                    getConfigService().getLogService().warn(message);
-                }
-            }
-        }
-
-        param = filterConfig.getInitParameter("exclude-paths");
-        if (param != null) {
-            String[] paths = StringUtils.split(param, ',');
-
-            for (int i = 0; i  < paths.length; i++) {
-                String path = paths[i].trim();
-
-                if (path.endsWith("*")) {
-                    excludeDirs.add(path.substring(0, path.length() - 1));
-
-                } else if (path.startsWith("*")) {
-                    excludeFiles.add(path.substring(1));
-
-                } else {
-                    String message = "exclude-path '" + path + "' ignored, "
-                    + "path must start or end with a wildcard character: *";
-                    getConfigService().getLogService().warn(message);
-                }
-            }
-        }
-
-        // Get the cache max-age in seconds
-        param = filterConfig.getInitParameter("cacheable-max-age");
-        if (param != null) {
-            cacheMaxAge = Long.parseLong(param);
-
+        if (path.endsWith("*")){
+          String value = path.substring(0, path.length() - 1);
+          if (!includeDirs.contains(value)){
+            includeDirs.add(value);
+          }
+        } else if (path.startsWith("*")){
+          String value = path.substring(1);
+          if (!includeFiles.contains(value)){
+            includeFiles.add(value);
+          }
         } else {
-            // Fixed misspelling. Use cacheable-max-age instead.
-            param = filterConfig.getInitParameter("cachable-max-age");
-            if (param != null) {
-                cacheMaxAge = Long.parseLong(param);
-            }
+          String message = "cacheable-path '" + path + "' ignored, "
+              + "path must start or end with a wildcard character: *";
+          getConfigService().getLogService().warn(message);
         }
+      }
+    }
 
-        String message =
-            "PerformanceFilter initialized with: cacheable-paths="
+    // Fixed misspelling. Use cacheable-paths instead.
+    param = filterConfig.getInitParameter("cachable-paths");
+    if (param != null) {
+      String[] paths = StringUtils.split(param, ',');
+
+      for (String s : paths){
+        String path = s.trim();
+
+        if (path.endsWith("*")){
+          String value = path.substring(0, path.length() - 1);
+          if (!includeDirs.contains(value)){
+            includeDirs.add(value);
+          }
+        } else if (path.startsWith("*")){
+          String value = path.substring(1);
+          if (!includeFiles.contains(value)){
+            includeFiles.add(value);
+          }
+        } else {
+          String message = "cachable-path '" + path + "' ignored, "
+              + "path must start or end with a wildcard character: *";
+          getConfigService().getLogService().warn(message);
+        }
+      }
+    }
+
+    param = filterConfig.getInitParameter("exclude-paths");
+    if (param != null) {
+      String[] paths = StringUtils.split(param, ',');
+
+      for (String s : paths){
+        String path = s.trim();
+
+        if (path.endsWith("*")){
+          excludeDirs.add(path.substring(0, path.length() - 1));
+        } else if (path.startsWith("*")){
+          excludeFiles.add(path.substring(1));
+        } else {
+          String message = "exclude-path '" + path + "' ignored, "
+              + "path must start or end with a wildcard character: *";
+          getConfigService().getLogService().warn(message);
+        }
+      }
+    }
+
+    // Get the cache max-age in seconds
+    param = filterConfig.getInitParameter("cacheable-max-age");
+    if (param != null) {
+      cacheMaxAge = Long.parseLong(param);
+
+    } else {
+      // Fixed misspelling. Use cacheable-max-age instead.
+      param = filterConfig.getInitParameter("cachable-max-age");
+      if (param != null) {
+        cacheMaxAge = Long.parseLong(param);
+      }
+    }
+
+    String message =
+        "PerformanceFilter initialized with: cacheable-paths="
             + filterConfig.getInitParameter("cacheable-paths")
             + " and cacheable-max-age=" + cacheMaxAge;
 
-        getConfigService().getLogService().info(message);
+    getConfigService().getLogService().info(message);
 
-        configured = true;
+    configured = true;
+  }
+
+  /**
+   * Return true if a path should be excluded from the performance filter.
+   *
+   * @param path the request path to test
+   * @return true if the response should be excluded from the performance filter
+   */
+  protected boolean isExcludePath(String path) {
+    if (!excludeFiles.isEmpty()) {
+      for (String file : excludeFiles){
+        if (path.endsWith(file)){
+          return true;
+        }
+      }
     }
 
-    /**
-     * Return true if a path should be excluded from the performance filter.
-     *
-     * @param path the request path to test
-     * @return true if the response should be excluded from the performance filter
-     */
-    protected boolean isExcludePath(String path) {
-        if (!excludeFiles.isEmpty()) {
-            for (int i = 0; i < excludeFiles.size(); i++) {
-                String file = excludeFiles.get(i);
-                if (path.endsWith(file)) {
-                    return true;
-                }
-            }
+    if (!excludeDirs.isEmpty()) {
+      for (String dir : excludeDirs){
+        if (path.startsWith(dir)){
+          return true;
         }
+      }
+    }
 
-        if (!excludeDirs.isEmpty()) {
-            for (int i = 0; i < excludeDirs.size(); i++) {
-                String dir = excludeDirs.get(i);
-                if (path.startsWith(dir)) {
-                    return true;
-                }
-            }
+    return false;
+  }
+
+  /**
+   * Return the <tt>version indicator</tt> for the specified path.
+   *
+   * @param path the resource path
+   * @return a version indicator for web resources
+   */
+  protected String getResourceVersionIndicator(String path) {
+    return ClickUtils.RESOURCE_VERSION_INDICATOR;
+  }
+
+  /**
+   * Return the application <tt>version indicator</tt> for the specified path.
+   *
+   * @param path the resource path
+   * @return an application version indicator for web resources
+   */
+  protected String getApplicationResourceVersionIndicator(String path) {
+    String indicator = ClickUtils.getApplicationResourceVersionIndicator();
+
+    if (StringUtils.isBlank(indicator)) {
+      // NOTE: getApplicationResourceVersionIndicator will return an empty
+      // string on the first request to this filter because the Context is
+      // not available. Thus we default to the application version
+      // indicator that may have been set on the filter.
+      indicator = applicationVersionIndicator;
+    }
+    return indicator;
+  }
+
+  /**
+   * Removes the version indicator from the specified path.
+   * <p/>
+   * For example, given the path <tt>'/example/control_1.4.js'</tt>, where
+   * <tt>'_1.4'</tt> is the <tt>version indicator</tt>, this method will
+   * return <tt>'/example/control.js'</tt>.
+   *
+   * @see #getResourceVersionIndicator(String)
+   * @see #getApplicationResourceVersionIndicator(java.lang.String)
+   *
+   * @param path the resource path
+   * @return path without the version indicator
+   */
+  protected String stripResourceVersionIndicator(String path) {
+    String realPath = path;
+
+    realPath = StringUtils.replace(realPath,
+        getApplicationResourceVersionIndicator(path), "");
+
+    realPath = StringUtils.replace(realPath,
+        getResourceVersionIndicator(path), "");
+
+    return realPath;
+  }
+
+  /**
+   * Set the response "Expires" and "Cache-Control" headers with the given
+   * maximum cache duration age in seconds.
+   *
+   * @param response the response to set the headers in
+   * @param maxAgeSeconds the maximum cache duration in seconds
+   */
+  protected void setHeaderExpiresCache(HttpServletResponse response, long maxAgeSeconds) {
+    long expiresMs = System.currentTimeMillis() + (maxAgeSeconds * 1000);
+    response.setDateHeader("Expires", expiresMs);
+    response.setHeader("Cache-Control", "max-age=" + maxAgeSeconds);
+  }
+
+  /**
+   * Return true if a path is a static versioned resource and should be
+   * cached forever.
+   *
+   * @see #getResourceVersionIndicator(java.lang.String)
+   * @see #getApplicationResourceVersionIndicator(java.lang.String)
+   *
+   * @param path the request path to test
+   * @return true if the response should be cached forever
+   */
+  protected boolean useForeverCacheHeader(String path) {
+    String versionIndicator = getResourceVersionIndicator(path);
+    if (path.startsWith("/click/") && path.contains(versionIndicator)) {
+      return true;
+    }
+    versionIndicator = getApplicationResourceVersionIndicator(path);
+
+    // Only apply application version if one is defined
+    if (StringUtils.isNotBlank(versionIndicator)) {
+      return path.contains(versionIndicator);
+    }
+    return false;
+  }
+
+  /**
+   * Return true if the response should be cached using the configured cache
+   * max-age.
+   *
+   * @param path the request path to test
+   * @return true if the response should be cached with the configured max-age
+   */
+  protected boolean useConfiguredCacheHeader(String path) {
+    if (!includeFiles.isEmpty()) {
+      for (String file : includeFiles){
+        if (path.endsWith(file)){
+          return true;
         }
+      }
+    }
 
+    if (!includeDirs.isEmpty()) {
+      for (String dir : includeDirs){
+        if (path.startsWith(dir)){
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Return true if the response should be GZIP compressed.
+   *
+   * @param request the request to test
+   * @param response the response to test
+   * @param path the request path to test
+   * @return true if the response should be GZIP compressed
+   */
+  protected boolean useGzipCompression(HttpServletRequest request,
+      HttpServletResponse response, String path) {
+
+    if (!compressionEnabled) {
+      return false;
+    }
+
+    // If Content-Encoding header is already set on response, skip compression
+    if (response.containsHeader("Content-Encoding")) {
+      return false;
+    }
+
+    if (compressionThreshold > 0) {
+      path = path.toLowerCase();
+
+      if (path.endsWith(".gif") || path.endsWith(".png") || path.endsWith(".jpg")) {
         return false;
+      }
+
+      Enumeration<?> e = request.getHeaders("Accept-Encoding");
+
+      while (e.hasMoreElements()) {
+        String name = (String) e.nextElement();
+        if (name.contains("gzip")) {
+          return true;
+        }
+      }
     }
 
-    /**
-     * Return the <tt>version indicator</tt> for the specified path.
-     *
-     * @param path the resource path
-     * @return a version indicator for web resources
-     */
-    protected String getResourceVersionIndicator(String path) {
-        return ClickUtils.RESOURCE_VERSION_INDICATOR;
-    }
-
-    /**
-     * Return the application <tt>version indicator</tt> for the specified path.
-     *
-     * @param path the resource path
-     * @return an application version indicator for web resources
-     */
-    protected String getApplicationResourceVersionIndicator(String path) {
-        String indicator = ClickUtils.getApplicationResourceVersionIndicator();
-
-        if (StringUtils.isBlank(indicator)) {
-            // NOTE: getApplicationResourceVersionIndicator will return an empty
-            // string on the first request to this filter because the Context is
-            // not available. Thus we default to the application version
-            // indicator that may have been set on the filter.
-            indicator = applicationVersionIndicator;
-        }
-        return indicator;
-    }
-
-    /**
-     * Removes the version indicator from the specified path.
-     * <p/>
-     * For example, given the path <tt>'/example/control_1.4.js'</tt>, where
-     * <tt>'_1.4'</tt> is the <tt>version indicator</tt>, this method will
-     * return <tt>'/example/control.js'</tt>.
-     *
-     * @see #getResourceVersionIndicator(String)
-     * @see #getApplicationResourceVersionIndicator(java.lang.String)
-     *
-     * @param path the resource path
-     * @return path without the version indicator
-     */
-    protected String stripResourceVersionIndicator(String path) {
-        String realPath = path;
-
-        realPath = StringUtils.replace(realPath,
-            getApplicationResourceVersionIndicator(path), "");
-
-        realPath = StringUtils.replace(realPath,
-            getResourceVersionIndicator(path), "");
-
-        return realPath;
-    }
-
-    /**
-     * Set the response "Expires" and "Cache-Control" headers with the given
-     * maximum cache duration age in seconds.
-     *
-     * @param response the response to set the headers in
-     * @param maxAgeSeconds the maximum cache duration in seconds
-     */
-    protected void setHeaderExpiresCache(HttpServletResponse response, long maxAgeSeconds) {
-        long expiresMs = System.currentTimeMillis() + (maxAgeSeconds * 1000);
-        response.setDateHeader("Expires", expiresMs);
-        response.setHeader("Cache-Control", "max-age=" + maxAgeSeconds);
-    }
-
-    /**
-     * Return true if a path is a static versioned resource and should be
-     * cached forever.
-     *
-     * @see #getResourceVersionIndicator(java.lang.String)
-     * @see #getApplicationResourceVersionIndicator(java.lang.String)
-     *
-     * @param path the request path to test
-     * @return true if the response should be cached forever
-     */
-    protected boolean useForeverCacheHeader(String path) {
-        String versionIndicator = getResourceVersionIndicator(path);
-        if (path.startsWith("/click/") && path.contains(versionIndicator)) {
-            return true;
-        }
-        versionIndicator = getApplicationResourceVersionIndicator(path);
-
-        // Only apply application version if one is defined
-        if (StringUtils.isNotBlank(versionIndicator)) {
-            if (path.contains(versionIndicator)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Return true if the response should be cached using the configured cache
-     * max-age.
-     *
-     * @param path the request path to test
-     * @return true if the response should be cached with the configured max-age
-     */
-    protected boolean useConfiguredCacheHeader(String path) {
-        if (!includeFiles.isEmpty()) {
-            for (int i = 0; i < includeFiles.size(); i++) {
-                String file = includeFiles.get(i);
-                if (path.endsWith(file)) {
-                    return true;
-                }
-            }
-        }
-
-        if (!includeDirs.isEmpty()) {
-            for (int i = 0; i < includeDirs.size(); i++) {
-                String dir = includeDirs.get(i);
-                if (path.startsWith(dir)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Return true if the response should be GZIP compressed.
-     *
-     * @param request the request to test
-     * @param response the response to test
-     * @param path the request path to test
-     * @return true if the response should be GZIP compressed
-     */
-    protected boolean useGzipCompression(HttpServletRequest request,
-        HttpServletResponse response, String path) {
-
-        if (!compressionEnabled) {
-            return false;
-        }
-
-        // If Content-Encoding header is already set on response, skip compression
-        if (response.containsHeader("Content-Encoding")) {
-            return false;
-        }
-
-        if (compressionThreshold > 0) {
-            path = path.toLowerCase();
-
-            if (path.endsWith(".gif") || path.endsWith(".png") || path.endsWith(".jpg")) {
-                return false;
-            }
-
-            Enumeration<?> e = request.getHeaders("Accept-Encoding");
-
-            while (e.hasMoreElements()) {
-                String name = (String) e.nextElement();
-                if (name.contains("gzip")) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
+    return false;
+  }
 
 }
-

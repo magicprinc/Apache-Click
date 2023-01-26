@@ -20,6 +20,8 @@ package org.apache.click.extras.control;
 
 import org.apache.click.control.TextField;
 
+import java.io.Serial;
+
 /**
  * Provides a Telephone Field control: &nbsp; &lt;input type='text'&gt;.
  *
@@ -58,152 +60,150 @@ import org.apache.click.control.TextField;
  */
 public class TelephoneField extends TextField {
 
-    private static final long serialVersionUID = 1L;
+  @Serial private static final long serialVersionUID = 1L;
 
-    // ----------------------------------------------------------- Constructors
 
-    /**
-     * Construct the TelephoneField with the given name. The default text field
-     * size is 20 characters and the minimum valid length is 10 characters.
-     *
-     * @param name the name of the field
-     */
-    public TelephoneField(String name) {
-        super(name);
-        setAttribute("onkeypress", "javascript:return noLetterFilter(event);");
-        setMinLength(10);
-    }
+  /**
+   * Construct the TelephoneField with the given name. The default text field
+   * size is 20 characters and the minimum valid length is 10 characters.
+   *
+   * @param name the name of the field
+   */
+  public TelephoneField(String name) {
+    super(name);
+    setAttribute("onkeypress", "javascript:return noLetterFilter(event);");
+    setMinLength(10);
+  }
 
-    /**
-     * Construct the TelephoneField with the given name and required status.
-     * The default text field size is 20 characters and the minimum valid length
-     * is 10 characters.
-     *
-     * @param name the name of the field
-     * @param required the field required status
-     */
-    public TelephoneField(String name, boolean required) {
-        this(name);
-        setRequired(required);
-    }
+  /**
+   * Construct the TelephoneField with the given name and required status.
+   * The default text field size is 20 characters and the minimum valid length
+   * is 10 characters.
+   *
+   * @param name the name of the field
+   * @param required the field required status
+   */
+  public TelephoneField(String name, boolean required) {
+    this(name);
+    setRequired(required);
+  }
 
-    /**
-     * Construct the TelephoneField with the given name and label. The default
-     * text field size is 20 characters and the minimum valid length is 10
-     * characters.
-     *
-     * @param name the name of the field
-     * @param label the label of the field
-     */
-    public TelephoneField(String name, String label) {
-        super(name, label);
-        setAttribute("onkeypress", "javascript:return noLetterFilter(event);");
-        setMinLength(10);
-    }
+  /**
+   * Construct the TelephoneField with the given name and label. The default
+   * text field size is 20 characters and the minimum valid length is 10
+   * characters.
+   *
+   * @param name the name of the field
+   * @param label the label of the field
+   */
+  public TelephoneField(String name, String label) {
+    super(name, label);
+    setAttribute("onkeypress", "javascript:return noLetterFilter(event);");
+    setMinLength(10);
+  }
 
-    /**
-     * Construct the TelephoneField with the given name, label and required
-     * status. The default text field size is 20 characters and the minimum valid
-     * length is 10 characters.
-     *
-     * @param name the name of the field
-     * @param label the label of the field
-     * @param required the field required status
-     */
-    public TelephoneField(String name, String label, boolean required) {
-        this(name, label);
-        setRequired(required);
-    }
+  /**
+   * Construct the TelephoneField with the given name, label and required
+   * status. The default text field size is 20 characters and the minimum valid
+   * length is 10 characters.
+   *
+   * @param name the name of the field
+   * @param label the label of the field
+   * @param required the field required status
+   */
+  public TelephoneField(String name, String label, boolean required) {
+    this(name, label);
+    setRequired(required);
+  }
 
-    /**
-     * Construct the TelephoneField with the given name, label and size.
-     * The default the minimum valid length is 10 characters.
-     *
-     * @param name the name of the field
-     * @param label the label of the field
-     * @param size the size of the field
-     */
-    public TelephoneField(String name, String label, int size) {
-        this(name, label);
-        setSize(size);
-    }
+  /**
+   * Construct the TelephoneField with the given name, label and size.
+   * The default the minimum valid length is 10 characters.
+   *
+   * @param name the name of the field
+   * @param label the label of the field
+   * @param size the size of the field
+   */
+  public TelephoneField(String name, String label, int size) {
+    this(name, label);
+    setSize(size);
+  }
 
-    /**
-     * Construct the TelephoneField with the given name, label, size and
-     * required status.
-     *
-     * @param name the name of the field
-     * @param label the label of the field
-     * @param size the size of the field
-     * @param required the field required status
-     */
-    public TelephoneField(String name, String label, int size, boolean required) {
-        this(name, label, required);
-        setSize(size);
-    }
+  /**
+   * Construct the TelephoneField with the given name, label, size and
+   * required status.
+   *
+   * @param name the name of the field
+   * @param label the label of the field
+   * @param size the size of the field
+   * @param required the field required status
+   */
+  public TelephoneField(String name, String label, int size, boolean required) {
+    this(name, label, required);
+    setSize(size);
+  }
 
-    /**
-     * Create a TelephoneField with no name defined. The default the minimum
-     * valid length is 10 characters.
-     * <p/>
-     * <b>Please note</b> the control's name must be defined before it is valid.
-     */
-    public TelephoneField() {
-        setAttribute("onkeypress", "javascript:return noLetterFilter(event);");
-        setMinLength(10);
-    }
+  /**
+   * Create a TelephoneField with no name defined. The default the minimum
+   * valid length is 10 characters.
+   * <p/>
+   * <b>Please note</b> the control's name must be defined before it is valid.
+   */
+  public TelephoneField() {
+    setAttribute("onkeypress", "javascript:return noLetterFilter(event);");
+    setMinLength(10);
+  }
 
-    // --------------------------------------------------------- Public Methods
+  // --------------------------------------------------------- Public Methods
 
-    /**
-     * Validate the TelephoneField request submission.
-     * <p/>
-     * A field error message is displayed if a validation error occurs.
-     * These messages are defined in the resource bundle:
-     * <blockquote>
-     * <ul>
-     *   <li>/click-control.properties
-     *     <ul>
-     *       <li>field-maxlength-error</li>
-     *       <li>field-minlength-error</li>
-     *       <li>field-required-error</li>
-     *     </ul>
-     *   </li>
-     *   <li>/org/apache/click/extras/control/TelephoneField.properties
-     *     <ul>
-     *       <li>telephone-format-error</li>
-     *     </ul>
-     *   </li>
-     * </ul>
-     * </blockquote>
-     */
-    public void validate() {
-        setError(null);
+  /**
+   * Validate the TelephoneField request submission.
+   * <p/>
+   * A field error message is displayed if a validation error occurs.
+   * These messages are defined in the resource bundle:
+   * <blockquote>
+   * <ul>
+   *   <li>/click-control.properties
+   *     <ul>
+   *       <li>field-maxlength-error</li>
+   *       <li>field-minlength-error</li>
+   *       <li>field-required-error</li>
+   *     </ul>
+   *   </li>
+   *   <li>/org/apache/click/extras/control/TelephoneField.properties
+   *     <ul>
+   *       <li>telephone-format-error</li>
+   *     </ul>
+   *   </li>
+   * </ul>
+   * </blockquote>
+   */
+  @Override public void validate() {
+    setError(null);
 
-        super.validate();
+    super.validate();
 
-        if (isValid()) {
-            int digitCount = 0;
-            String value = getValue();
-            for (int i = 0; i < value.length(); i++) {
-                char aChar = value.charAt(i);
-                if (Character.isLetter(aChar)) {
-                    setErrorMessage("telephone-format-error");
-                    return;
-                }
-                if (Character.isDigit(aChar)) {
-                    digitCount++;
-                }
-            }
-
-            if (digitCount > 0
-                && getMinLength() > 0
-                && digitCount < getMinLength()) {
-
-                setErrorMessage("field-minlength-error", getMinLength());
-                return;
-            }
+    if (isValid()) {
+      int digitCount = 0;
+      String value = getValue();
+      for (int i = 0; i < value.length(); i++) {
+        char aChar = value.charAt(i);
+        if (Character.isLetter(aChar)) {
+          setErrorMessage("telephone-format-error");
+          return;
         }
+        if (Character.isDigit(aChar)) {
+          digitCount++;
+        }
+      }
+
+      if (digitCount > 0
+          && getMinLength() > 0
+          && digitCount < getMinLength()) {
+
+        setErrorMessage("field-minlength-error", getMinLength());
+      }
     }
+  }
 
 }

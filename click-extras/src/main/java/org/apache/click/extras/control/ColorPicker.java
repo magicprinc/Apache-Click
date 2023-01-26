@@ -1,30 +1,7 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.click.extras.control;
 
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.click.Context;
 import org.apache.click.control.Field;
 import org.apache.click.element.CssImport;
@@ -32,6 +9,14 @@ import org.apache.click.element.Element;
 import org.apache.click.element.JsImport;
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
+
+import java.io.Serial;
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Provides a ColorPicker control: &nbsp; &lt;input type='text'&gt;&lt;img&gt;.
@@ -93,325 +78,284 @@ import org.apache.click.util.HtmlStringBuffer;
  * <a target="_blank" href="http://www.dhtmlgoodies.com/index.html?whichScript=submitted-color-picker">www.dhtmlgoodies.com</a>.
  */
 public class ColorPicker extends Field {
+  @Serial private static final long serialVersionUID = -4211759105079211998L;
 
-    // Constants --------------------------------------------------------------
+  /** The color validation hexadecimal pattern. */
+  static final Pattern HEX_PATTERN = Pattern.compile("#[a-fA-F0-9]{3}([a-fA-F0-9]{3})?");
 
-    private static final long serialVersionUID = 1L;
+  /**
+   * The field validation JavaScript function template.
+   * The function template arguments are: <ul>
+   * <li>0 - is the field id</li>
+   * <li>1 - is the Field required status</li>
+   * <li>2 - is the localized error message for required validation</li>
+   * <li>3 - is the localized error message for pattern validation</li>
+   * </ul>
+   */
+  final static String VALIDATE_COLORPICKER_FUNCTION =
+      "function validate_{0}() '{'\n"
+          + "   var msg = validateColorPicker(\n"
+          + "         ''{0}'',{1}, [''{2}'',''{3}'']);\n"
+          + "   if (msg) '{'\n"
+          + "      return msg + ''|{0}'';\n"
+          + "   '}' else '{'\n"
+          + "      return null;\n"
+          + "   '}'\n"
+          + "'}'\n";
 
-    /** The color validation hexadecimal pattern. */
-    static final Pattern HEX_PATTERN =
-        Pattern.compile("#[a-fA-F0-9]{3}([a-fA-F0-9]{3})?");
 
-    /**
-     * The field validation JavaScript function template.
-     * The function template arguments are: <ul>
-     * <li>0 - is the field id</li>
-     * <li>1 - is the Field required status</li>
-     * <li>2 - is the localized error message for required validation</li>
-     * <li>3 - is the localized error message for pattern validation</li>
-     * </ul>
-     */
-    final static String VALIDATE_COLORPICKER_FUNCTION =
-        "function validate_{0}() '{'\n"
-        + "   var msg = validateColorPicker(\n"
-        + "         ''{0}'',{1}, [''{2}'',''{3}'']);\n"
-        + "   if (msg) '{'\n"
-        + "      return msg + ''|{0}'';\n"
-        + "   '}' else '{'\n"
-        + "      return null;\n"
-        + "   '}'\n"
-        + "'}'\n";
+  /**
+   * The show text field option for entering a color hex value.
+   * Whether the TextField to enter the color hex number should be shown or not. !Default is true!
+   */
+  @Setter protected boolean showTextField = true;
 
-    // Instance Variables -----------------------------------------------------
+  /** The text field size attribute. The default size is 7.
+   the field size. By default, is 7. Only used when {@link #getShowTextField()} true.*/
+  @Getter @Setter protected int size = 7;
 
-    /**
-     * The show text field option for entering a color hex value. The default
-     * value is true.
-     */
-    protected boolean showTextField = true;
+  // Constructors -----------------------------------------------------------
 
-    /** The text field size attribute. The default size is 7. */
-    protected int size = 7;
+  /**
+   * Construct a ColorPicker with the given name. The color picker will show
+   * the text input field.
+   *
+   * @param name the name of the field
+   */
+  public ColorPicker(String name) {
+    super(name);
+  }
 
-    // Constructors -----------------------------------------------------------
+  /**
+   * Construct the ColorPicker with the given name and label.
+   *
+   * @param name the name of the field
+   * @param label the label of the field
+   */
+  public ColorPicker(String name, String label) {
+    super(name, label);
+  }
 
-    /**
-     * Construct a ColorPicker with the given name. The color picker will show
-     * the text input field.
-     *
-     * @param name the name of the field
-     */
-    public ColorPicker(String name) {
-        super(name);
+  /**
+   * Construct a ColorPicker with the given name and required status.
+   *
+   * @param name the name of the field
+   * @param required the field required status
+   */
+  public ColorPicker(String name, boolean required) {
+    super(name);
+    setRequired(required);
+  }
+
+  /**
+   * Constructs a ColorPicker with the given name, required status and
+   * display text field option.
+   *
+   * @param name the name of field
+   * @param required the field required status
+   * @param showTextField flag to show the text input field
+   */
+  public ColorPicker(String name, boolean required, boolean showTextField) {
+    this(name, required);
+    this.showTextField = showTextField;
+  }
+
+  /**
+   * Create a ColorPicker with no name defined.
+   * <p/>
+   * <b>Please note</b> the control's name must be defined before it is valid.
+   */
+  public ColorPicker() {
+    super();
+  }
+
+
+  /** @see #showTextField */
+  public boolean getShowTextField (){ return showTextField;}
+
+
+  /**
+   * Return the ColorPicker HTML HEAD elements for the following
+   * resources:
+   * <p/>
+   * <ul>
+   * <li><tt>click/colorpicker/colorpicker.css</tt></li>
+   * <li><tt>click/prototype/prototype.js</tt></li>
+   * <li><tt>click/colorpicker/colorpicker.js</tt></li>
+   * </ul>
+   *
+   * @see org.apache.click.Control#getHeadElements()
+   *
+   * @return the HTML HEAD elements for the control
+   */
+  @Override
+  public List<Element> getHeadElements() {
+    if (headElements == null) {
+      headElements = super.getHeadElements();
+
+      Context context = Context.getThreadLocalContext();
+      String versionIndicator = ClickUtils.getResourceVersionIndicator(context);
+
+      headElements.add(new CssImport("/click/colorpicker/colorpicker.css", versionIndicator));
+      headElements.add(new JsImport("/click/prototype/prototype.js", versionIndicator));
+      headElements.add(new JsImport("/click/colorpicker/colorpicker.js", versionIndicator));
     }
+    return headElements;
+  }
 
-    /**
-     * Construct the ColorPicker with the given name and label.
-     *
-     * @param name the name of the field
-     * @param label the label of the field
-     */
-    public ColorPicker(String name, String label) {
-        super(name, label);
+  /**
+   * Return the field JavaScript client side validation function.
+   * <p/>
+   * The function name must follow the format <tt>validate_[id]</tt>, where
+   * the id is the DOM element id of the fields focusable HTML element, to
+   * ensure the function has a unique name.
+   *
+   * @return the field JavaScript client side validation function
+   */
+  @Override
+  public String getValidationJavaScript() {
+    Object[] args = new Object[9];
+    args[0] = getId();
+    args[1] = String.valueOf(isRequired());
+    args[2] = getMessage("field-required-error", getErrorLabel());
+    args[3] = getMessage("no-color-value", getErrorLabel());
+    return MessageFormat.format(VALIDATE_COLORPICKER_FUNCTION, args);
+  }
+
+  // Public Methods ---------------------------------------------------------
+
+  /**
+   * @see org.apache.click.control.AbstractControl#getControlSizeEst()
+   *
+   * @return the estimated rendered control size in characters
+   */
+  @Override
+  public int getControlSizeEst() {
+    return 96;
+  }
+
+  /**
+   * Render the HTML representation of the ColorPicker.
+   *
+   * @see #toString()
+   *
+   * @param buffer the specified buffer to render the control's output to
+   */
+  @Override
+  public void render(HtmlStringBuffer buffer) {
+    Context context = Context.getThreadLocalContext();
+    Map<String, Object> values = new HashMap<>();
+
+    values.put("id", getId());
+    values.put("field", this);
+    values.put("path", context.getRequest().getContextPath());
+
+    if (isColor(getValue())) {
+      values.put("back_color", getValue());
+    } else {
+      values.put("back_color", "#FFFFFF");
     }
+    values.put("value", getValue());
 
-    /**
-     * Construct a ColorPicker with the given name and required status.
-     *
-     * @param name the name of the field
-     * @param required the field required status
-     */
-    public ColorPicker(String name, boolean required) {
-        super(name);
-        setRequired(required);
-    }
+    HtmlStringBuffer textFieldAttributes = new HtmlStringBuffer(96);
+    if (getShowTextField()) {
+      textFieldAttributes.appendAttribute("size", getSize());
+      textFieldAttributes.appendAttribute("title", getTitle());
+      if (isReadonly()) {
+        textFieldAttributes.appendAttributeReadonly();
+      }
+      textFieldAttributes.appendAttribute("maxlength", 7);
 
-    /**
-     * Constructs a ColorPicker with the given name, required status and
-     * display text field option.
-     *
-     * @param name the name of field
-     * @param required the field required status
-     * @param showTextField flag to show the text input field
-     */
-    public ColorPicker(String name, boolean required, boolean showTextField) {
-        this(name, required);
-        this.showTextField = showTextField;
-    }
-
-    /**
-     * Create a ColorPicker with no name defined.
-     * <p/>
-     * <b>Please note</b> the control's name must be defined before it is valid.
-     */
-    public ColorPicker() {
-        super();
-    }
-
-    // Public Attributes ------------------------------------------------------
-
-    /**
-     * Return the ColorPicker HTML HEAD elements for the following
-     * resources:
-     * <p/>
-     * <ul>
-     * <li><tt>click/colorpicker/colorpicker.css</tt></li>
-     * <li><tt>click/prototype/prototype.js</tt></li>
-     * <li><tt>click/colorpicker/colorpicker.js</tt></li>
-     * </ul>
-     *
-     * @see org.apache.click.Control#getHeadElements()
-     *
-     * @return the HTML HEAD elements for the control
-     */
-    @Override
-    public List<Element> getHeadElements() {
-        if (headElements == null) {
-            headElements = super.getHeadElements();
-
-            Context context = getContext();
-            String versionIndicator = ClickUtils.getResourceVersionIndicator(context);
-
-            headElements.add(new CssImport("/click/colorpicker/colorpicker.css", versionIndicator));
-            headElements.add(new JsImport("/click/prototype/prototype.js", versionIndicator));
-            headElements.add(new JsImport("/click/colorpicker/colorpicker.js", versionIndicator));
-        }
-        return headElements;
-    }
-
-    /**
-     * Whether the TextField to enter the color hex number should be shown or
-     * not. Default is true
-     *
-     * @return Returns the showTextField.
-     */
-    public boolean getShowTextField() {
-        return showTextField;
-    }
-
-    /**
-     * Whether the TextField to enter the color hex number should be shown or
-     * not. Default is true.
-     *
-     * @param showTextField the showTextField to set
-     */
-    public void setShowTextField(boolean showTextField) {
-        this.showTextField = showTextField;
-    }
-
-    /**
-     * Return the field size. By default is 7. Only used when
-     * {@link #getShowTextField()} true.
-     *
-     * @return the field size
-     */
-    public int getSize() {
-        return size;
-    }
-
-    /**
-     * Set the field size.
-     *
-     * @param size the field size
-     */
-    public void setSize(int size) {
-        this.size = size;
-    }
-
-    /**
-     * Return the field JavaScript client side validation function.
-     * <p/>
-     * The function name must follow the format <tt>validate_[id]</tt>, where
-     * the id is the DOM element id of the fields focusable HTML element, to
-     * ensure the function has a unique name.
-     *
-     * @return the field JavaScript client side validation function
-     */
-    @Override
-    public String getValidationJavaScript() {
-        Object[] args = new Object[9];
-        args[0] = getId();
-        args[1] = String.valueOf(isRequired());
-        args[2] = getMessage("field-required-error", getErrorLabel());
-        args[3] = getMessage("no-color-value", getErrorLabel());
-        return MessageFormat.format(VALIDATE_COLORPICKER_FUNCTION, args);
-    }
-
-    // Public Methods ---------------------------------------------------------
-
-    /**
-     * @see org.apache.click.control.AbstractControl#getControlSizeEst()
-     *
-     * @return the estimated rendered control size in characters
-     */
-    @Override
-    public int getControlSizeEst() {
-        return 96;
-    }
-
-    /**
-     * Render the HTML representation of the ColorPicker.
-     *
-     * @see #toString()
-     *
-     * @param buffer the specified buffer to render the control's output to
-     */
-    @Override
-    public void render(HtmlStringBuffer buffer) {
-        Context context = getContext();
-        Map<String, Object> values = new HashMap<String, Object>();
-
-        values.put("id", getId());
-        values.put("field", this);
-        values.put("path", context.getRequest().getContextPath());
-
-        if (isColor(getValue())) {
-            values.put("back_color", getValue());
-        } else {
-            values.put("back_color", "#FFFFFF");
-        }
-        values.put("value", getValue());
-
-        HtmlStringBuffer textFieldAttributes = new HtmlStringBuffer(96);
-        if (getShowTextField()) {
-            textFieldAttributes.appendAttribute("size", getSize());
-            textFieldAttributes.appendAttribute("title", getTitle());
-            if (isReadonly()) {
-                textFieldAttributes.appendAttributeReadonly();
-            }
-            textFieldAttributes.appendAttribute("maxlength", 7);
-
-            if (isValid()) {
-                removeStyleClass("error");
-                if (isDisabled()) {
-                    addStyleClass("disabled");
-                } else {
-                    removeStyleClass("disabled");
-                }
-            } else {
-                addStyleClass("error");
-            }
-        }
-
-        appendAttributes(textFieldAttributes);
-
+      if (isValid()) {
+        removeStyleClass("error");
         if (isDisabled()) {
-            textFieldAttributes.appendAttributeDisabled();
-        }
-        values.put("attributes", textFieldAttributes.toString());
-
-        // The image messages
-        values.put("chooseColorMsg", getMessage("choose-color"));
-        values.put("noColorMsg", getMessage("no-color"));
-        values.put("closeMsg", getMessage("close"));
-
-        renderTemplate(buffer, values);
-    }
-
-    /**
-     * Returns the HTML for the color-picker. This is the content of the
-     * ColorPicker.htm template.
-     *
-     * @return a HTML rendered ColorPicker string
-     */
-    @Override
-    public String toString() {
-        HtmlStringBuffer buffer = new HtmlStringBuffer(getControlSizeEst());
-        render(buffer);
-        return buffer.toString();
-    }
-
-    /**
-     * Validates the input to check whether is required or not and that the
-     * input contains a valid color hex value.
-     *
-     * @see org.apache.click.control.TextField#validate()
-     */
-    @Override
-    public void validate() {
-        setError(null);
-
-        String value = getValue();
-
-        int length = value.length();
-        if (length > 0) {
-            Matcher matcher = HEX_PATTERN.matcher(value);
-            if (!matcher.matches()) {
-                setErrorMessage("no-color-value");
-            }
+          addStyleClass("disabled");
         } else {
-            if (isRequired()) {
-                setErrorMessage("field-required-error");
-            }
+          removeStyleClass("disabled");
         }
+      } else {
+        addStyleClass("error");
+      }
     }
 
-    // Protected Methods ------------------------------------------------------
+    appendAttributes(textFieldAttributes);
 
-    /**
-     * Render a Velocity template for the given data model.
-     *
-     * @param buffer the specified buffer to render the template output to
-     * @param model the model data to merge with the template
-     */
-    protected void renderTemplate(HtmlStringBuffer buffer, Map<String, ?> model) {
-        buffer.append(getContext().renderTemplate(ColorPicker.class, model));
+    if (isDisabled()) {
+      textFieldAttributes.appendAttributeDisabled();
+    }
+    values.put("attributes", textFieldAttributes.toString());
+
+    // The image messages
+    values.put("chooseColorMsg", getMessage("choose-color"));
+    values.put("noColorMsg", getMessage("no-color"));
+    values.put("closeMsg", getMessage("close"));
+
+    renderTemplate(buffer, values);
+  }
+
+  /**
+   * Returns the HTML for the color-picker. This is the content of the
+   * ColorPicker.htm template.
+   *
+   * @return a HTML rendered ColorPicker string
+   */
+  @Override
+  public String toString() {
+    HtmlStringBuffer buffer = new HtmlStringBuffer(getControlSizeEst());
+    render(buffer);
+    return buffer.toString();
+  }
+
+  /**
+   * Validates the input to check whether is required or not and that the
+   * input contains a valid color hex value.
+   *
+   * @see org.apache.click.control.TextField#validate()
+   */
+  @Override
+  public void validate() {
+    setError(null);
+
+    String value = getValue();
+
+    int length = value.length();
+    if (length > 0) {
+      Matcher matcher = HEX_PATTERN.matcher(value);
+      if (!matcher.matches()) {
+        setErrorMessage("no-color-value");
+      }
+    } else {
+      if (isRequired()) {
+        setErrorMessage("field-required-error");
+      }
+    }
+  }
+
+  // Protected Methods ------------------------------------------------------
+
+  /**
+   * Render a Velocity template for the given data model.
+   *
+   * @param buffer the specified buffer to render the template output to
+   * @param model the model data to merge with the template
+   */
+  protected void renderTemplate(HtmlStringBuffer buffer, Map<String, ?> model) {
+    buffer.append(Context.getThreadLocalContext().renderTemplate(ColorPicker.class, model));
+  }
+
+
+  private boolean isColor(String value) {
+    if (value == null) {
+      return false;
+    }
+    int length = value.length();
+    if (length > 0) {
+      Matcher matcher = HEX_PATTERN.matcher(value);
+      return matcher.matches();
+    } else {
+      return false;
     }
 
-    // Private Methods --------------------------------------------------------
-
-    private boolean isColor(String value) {
-        if (value == null) {
-            return false;
-        }
-        int length = value.length();
-        if (length > 0) {
-            Matcher matcher = HEX_PATTERN.matcher(value);
-            return matcher.matches();
-        } else {
-            return false;
-        }
-
-    }
+  }
 
 }

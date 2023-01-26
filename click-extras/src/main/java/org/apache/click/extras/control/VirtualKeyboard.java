@@ -1,24 +1,5 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.click.extras.control;
 
-import java.util.List;
 import org.apache.click.Context;
 import org.apache.click.control.TextField;
 import org.apache.click.element.CssImport;
@@ -27,6 +8,9 @@ import org.apache.click.element.JsImport;
 import org.apache.click.element.JsScript;
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
+
+import java.io.Serial;
+import java.util.List;
 
 /**
  * Provides a graphical Virtual Keyboard interface text field control: &nbsp; &lt;input type='text'&gt;.
@@ -75,86 +59,83 @@ import org.apache.click.util.HtmlStringBuffer;
  * This control based on the <a href="http://www.greywyvern.com/code/js/keyboard.html">Greywyvern</a> JavaScript library.
  */
 public class VirtualKeyboard extends TextField {
+  @Serial private static final long serialVersionUID = 6482610166429175955L;
 
-    private static final long serialVersionUID = 1L;
 
-    // ----------------------------------------------------------- Constructors
+  /**
+   * Constructs a new VirtualKeyboard Field object with no name defined.
+   * <p/>
+   * <b>Please note</b> the control's name must be defined before it is valid.
+   */
+  public VirtualKeyboard() {
+    super();
+    addStyleClass("keyboardInput");
+  }
 
-    /**
-     * Constructs a new VirtualKeyboard Field object with no name defined.
-     * <p/>
-     * <b>Please note</b> the control's name must be defined before it is valid.
-     */
-    public VirtualKeyboard() {
-        super();
-        addStyleClass("keyboardInput");
+  /**
+   * Constructs the VirtualKeyboard Field with the given name.
+   *
+   * @param name the name of the VirtualKeyboard field
+   */
+  public VirtualKeyboard(String name) {
+    super(name);
+    addStyleClass("keyboardInput");
+  }
+
+  /**
+   * Constructs the VirtualKeyboard Field with the given name and label.
+   *
+   * @param name the name of the VirtualKeyboard field
+   * @param label the label of the VirtualKeyboard field
+   */
+  public VirtualKeyboard(String name, String label) {
+    super(name, label);
+    addStyleClass("keyboardInput");
+  }
+
+
+  /**
+   * Return the VirtualKeyboard HTML HEAD elements for the following
+   * resources:
+   * <p/>
+   * <ul>
+   * <li><tt>click/keyboard.css</tt></li>
+   * <li><tt>click/keyboard.js</tt></li>
+   * <li><tt>click/keyboard.png</tt></li>
+   * </ul>
+   *
+   * @see org.apache.click.Control#getHeadElements()
+   *
+   * @return the HTML HEAD elements for the control
+   */
+  @Override
+  public List<Element> getHeadElements() {
+    Context context = Context.getThreadLocalContext();
+    String versionIndicator = ClickUtils.getResourceVersionIndicator(context);
+
+    if (headElements == null) {
+      headElements = super.getHeadElements();
+
+      JsImport jsImport = new JsImport("/click/keyboard.js", versionIndicator);
+      jsImport.setAttribute("charset", "UTF-8");
+      headElements.add(jsImport);
+      headElements.add(new CssImport("/click/keyboard.css", versionIndicator));
     }
 
-    /**
-     * Constructs the VirtualKeyboard Field with the given name.
-     *
-     * @param name the name of the VirtualKeyboard field
-     */
-    public VirtualKeyboard(String name) {
-        super(name);
-        addStyleClass("keyboardInput");
+    String fieldId = getId();
+    JsScript script = new JsScript();
+    script.setId(fieldId + "-js-setup");
+
+    if (!headElements.contains(script)) {
+      HtmlStringBuffer buffer = new HtmlStringBuffer(150);
+      buffer.append("var keyboard_png_path=\"");
+      buffer.append(context.getRequest().getContextPath());
+      buffer.append("/click/keyboard");
+      buffer.append(versionIndicator);
+      buffer.append(".png\"");
+      script.setContent(buffer.toString());
+      headElements.add(script);
     }
-
-    /**
-     * Constructs the VirtualKeyboard Field with the given name and label.
-     *
-     * @param name the name of the VirtualKeyboard field
-     * @param label the label of the VirtualKeyboard field
-     */
-    public VirtualKeyboard(String name, String label) {
-        super(name, label);
-        addStyleClass("keyboardInput");
-    }
-
-    // --------------------------------------------------------- Public Methods
-
-    /**
-     * Return the VirtualKeyboard HTML HEAD elements for the following
-     * resources:
-     * <p/>
-     * <ul>
-     * <li><tt>click/keyboard.css</tt></li>
-     * <li><tt>click/keyboard.js</tt></li>
-     * <li><tt>click/keyboard.png</tt></li>
-     * </ul>
-     *
-     * @see org.apache.click.Control#getHeadElements()
-     *
-     * @return the HTML HEAD elements for the control
-     */
-    @Override
-    public List<Element> getHeadElements() {
-        Context context = getContext();
-        String versionIndicator = ClickUtils.getResourceVersionIndicator(context);
-
-        if (headElements == null) {
-            headElements = super.getHeadElements();
-
-            JsImport jsImport = new JsImport("/click/keyboard.js", versionIndicator);
-            jsImport.setAttribute("charset", "UTF-8");
-            headElements.add(jsImport);
-            headElements.add(new CssImport("/click/keyboard.css", versionIndicator));
-        }
-
-        String fieldId = getId();
-        JsScript script = new JsScript();
-        script.setId(fieldId + "-js-setup");
-
-        if (!headElements.contains(script)) {
-            HtmlStringBuffer buffer = new HtmlStringBuffer(150);
-            buffer.append("var keyboard_png_path=\"");
-            buffer.append(context.getRequest().getContextPath());
-            buffer.append("/click/keyboard");
-            buffer.append(versionIndicator);
-            buffer.append(".png\"");
-            script.setContent(buffer.toString());
-            headElements.add(script);
-        }
-        return headElements;
-    }
+    return headElements;
+  }
 }

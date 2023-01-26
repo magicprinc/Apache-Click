@@ -18,20 +18,20 @@
  */
 package org.apache.click.extras.control;
 
-import java.util.List;
-
+import lombok.NonNull;
+import org.apache.click.control.ActionLink;
 import org.apache.click.control.Button;
 import org.apache.click.control.Column;
 import org.apache.click.control.Field;
 import org.apache.click.control.Form;
 import org.apache.click.control.HiddenField;
 import org.apache.click.control.Table;
+import org.apache.click.dataprovider.PagingDataProvider;
 import org.apache.click.element.Element;
 import org.apache.click.util.HtmlStringBuffer;
-
-import org.apache.click.control.ActionLink;
-import org.apache.click.dataprovider.PagingDataProvider;
 import org.apache.commons.lang.StringUtils;
+
+import java.util.List;
 
 /**
  * Provides a FormTable data grid control.
@@ -348,7 +348,7 @@ public class FormTable extends Table {
      * @throws IllegalArgumentException if the name is null
      */
     @Override
-    public void setName(String name) {
+    public void setName(@NonNull String name) {
         super.setName(name);
 
         if (useInternalForm) {

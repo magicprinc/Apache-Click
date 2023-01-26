@@ -18,8 +18,9 @@
  */
 package org.apache.click.control;
 
-import java.util.List;
 import org.apache.click.Control;
+
+import java.util.List;
 
 /**
  * Provides the interface for a container which holds a list of child controls.
@@ -68,6 +69,7 @@ public interface Container extends Control {
      * the container
      * @return the new control that replaced the current control
      */
+    @Deprecated
     Control replace(Control currentControl, Control newControl);
 
     /**
