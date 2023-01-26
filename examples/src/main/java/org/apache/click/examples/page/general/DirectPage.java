@@ -1,85 +1,67 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.click.examples.page.general;
 
+import lombok.val;
 import org.apache.click.Page;
-import org.apache.click.util.ClickUtils;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Serial;
+import java.nio.charset.StandardCharsets;
 
 /**
- * Provides a example direct <tt>HttpServletResponse</tt> handling.
+ * Provides an example direct <tt>HttpServletResponse</tt> handling.
  */
 public class DirectPage extends Page {
+  @Serial private static final long serialVersionUID = 1L;
 
-    @Serial private static final long serialVersionUID = 1L;
+  /**
+   * Render the Java source file as "text/plain".
+   *
+   * @see Page#onGet()
+   */
+  @Override public void onGet () {
+    val fileName1 = "/readme.txt";// getClass().getName().replace('.', '/');
+    val fileName2 = "/WEB-INF/classes/click-page.properties";
+    val fileName3 = "/META-INF/MANIFEST.MF";
 
-    /**
-     * Render the Java source file as "text/plain".
-     *
-     * @see Page#onGet()
-     */
-    @Override
-    public void onGet() {
-        String filename = getClass().getName().replace('.', '/');
-        filename = "/WEB-INF/classes/" + filename + ".java";
+    HttpServletResponse response = getContext().getResponse();
 
-        HttpServletResponse response = getContext().getResponse();
+    response.setContentType("text/plain");
+    response.setCharacterEncoding("UTF-8");
+    response.setHeader("Pragma", "no-cache");
 
-        response.setContentType("text/plain");
-        response.setHeader("Pragma", "no-cache");
+    ServletContext context = getContext().getServletContext();
 
-        ServletContext context = getContext().getServletContext();
+    try {
+      PrintWriter writer = response.getWriter();
 
-        InputStream inputStream = null;
-        try {
-            inputStream = context.getResourceAsStream(filename);
+      downloadFileWithLineNumber(context, fileName1, writer);
+      downloadFileWithLineNumber(context, fileName2, writer);
+      downloadFileWithLineNumber(context, fileName3, writer);
 
-            PrintWriter writer = response.getWriter();
+      //!!! Set page path to null to signal to ClickServlet that rendering has been completed
+      setPath(null);
 
-            BufferedReader reader =
-                new BufferedReader(new InputStreamReader(inputStream));
-
-            String line = reader.readLine();
-
-            while (line != null) {
-                writer.println(line);
-                line = reader.readLine();
-            }
-
-            // Set page path to null to signal to ClickServlet that rendering
-            // has been completed
-            setPath(null);
-
-        } catch (IOException ioe) {
-            throw new RuntimeException(ioe);
-
-        } finally {
-            ClickUtils.close(inputStream);
-        }
+    } catch (IOException ioe){
+      throw new RuntimeException(ioe);
     }
+  }
+
+  void downloadFileWithLineNumber (ServletContext context, String fileName, PrintWriter writer) throws IOException {
+    try ( val inputStream = context.getResourceAsStream(fileName) ){
+
+      val reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+
+      String line;  int i = 0;
+
+      while (( line = reader.readLine() ) != null){
+        writer.println(i++ + "\t" + line);
+      }
+    }
+  }
 
 }
