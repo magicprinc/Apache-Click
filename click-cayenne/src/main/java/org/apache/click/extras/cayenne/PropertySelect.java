@@ -476,7 +476,7 @@ public class PropertySelect extends Select {
         DataObject dataObject =
             CayenneUtils.getObjectForPK(dataContext, doClass, doPk);
 
-        String getterName = ClickUtils.toPropertyName(getName(), GET_GETTER);
+        String getterName = ClickUtils.toPropertyName(GET_GETTER, getName());
 
         try {
           Method method = doClass.getMethod(getterName);
@@ -509,7 +509,7 @@ public class PropertySelect extends Select {
 
     if (StringUtils.isNotBlank(getValue())) {
 
-      String getterName = ClickUtils.toPropertyName(getName(), GET_GETTER);
+      String getterName = ClickUtils.toPropertyName(GET_GETTER, getName());
       try {
         Method method = doClass.getMethod(getterName);
 
@@ -594,7 +594,7 @@ public class PropertySelect extends Select {
 
       } else {
         Class doClass = cayenneForm.getDataObjectClass();
-        String getterName = ClickUtils.toPropertyName(getName(), GET_GETTER);
+        String getterName = ClickUtils.toPropertyName(GET_GETTER, getName());
         Method method = doClass.getMethod(getterName);
         Class propertyClass = method.getReturnType();
 
