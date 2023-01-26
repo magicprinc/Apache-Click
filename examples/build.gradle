@@ -12,13 +12,15 @@ plugins {
 
 repositories {
   mavenLocal()
+  jcenter() // helps with JMS!
+  maven {
+    url "https://repository.jboss.org/maven2" // "https://repository.jboss.org/nexus/content/groups/public"
+  }
+  maven {
+    url "https://repository.jboss.org/nexus/content/repositories/thirdparty-releases/"
+  }
+
   mavenCentral()
-  maven {
-    url "https://repository.jboss.org/maven2"
-  }
-  maven {
-    url "https://repository.jboss.org/nexus/content/groups/public"
-  }
 }
 
 sourceCompatibility = 17
@@ -75,7 +77,7 @@ dependencies {
 
   implementation("hsqldb:hsqldb:1.8.0.10")
   implementation("javax.servlet:jstl:1.1.2")
-  //implementation("opensymphony:oscache:2.4.1","javax.jms:jms:1.1")
+  implementation("opensymphony:oscache:2.4.1", "javax.jms:jms:1.1")
   implementation("taglibs:standard:1.1.2")
 
   // we need to put it in .war
