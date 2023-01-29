@@ -1,7 +1,6 @@
 package com.mycorp.page;
 
-import java.util.List;
-
+import com.mycorp.service.CustomerService;
 import org.apache.click.Page;
 import org.apache.click.control.AbstractLink;
 import org.apache.click.control.ActionLink;
@@ -11,7 +10,7 @@ import org.apache.click.control.Table;
 import org.apache.click.extras.control.LinkDecorator;
 import org.apache.click.util.Bindable;
 
-import com.mycorp.service.CustomerService;
+import java.util.List;
 
 public class ViewCustomers extends BorderPage {
 
@@ -79,7 +78,7 @@ public class ViewCustomers extends BorderPage {
 
 	/**
 	 * Return CustomerService instance from Spring application context.
-	 * 
+	 *
 	 * @return CustomerService instance
 	 */
 	public CustomerService getCustomerService() {

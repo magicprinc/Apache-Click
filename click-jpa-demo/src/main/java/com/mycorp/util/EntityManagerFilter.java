@@ -1,6 +1,8 @@
 package com.mycorp.util;
 
-import java.io.IOException;
+import org.apache.click.service.ConfigService;
+import org.apache.click.service.LogService;
+import org.apache.click.util.ClickUtils;
 
 import javax.persistence.EntityManager;
 import javax.servlet.Filter;
@@ -10,10 +12,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-
-import org.apache.click.service.ConfigService;
-import org.apache.click.service.LogService;
-import org.apache.click.util.ClickUtils;
+import java.io.IOException;
 
 public class EntityManagerFilter implements Filter {
 

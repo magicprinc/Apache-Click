@@ -1,5 +1,13 @@
 package com.mycorp.util;
 
+import com.mycorp.domain.Customer;
+import com.mycorp.service.CustomerService;
+import org.apache.click.util.ClickUtils;
+
+import javax.persistence.EntityManager;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,16 +17,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
-
-import javax.persistence.EntityManager;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-
-import org.apache.click.util.ClickUtils;
-
-import com.mycorp.domain.Customer;
-import com.mycorp.service.CustomerService;
 
 public class DatabaseInitListener implements ServletContextListener {
 
@@ -53,7 +51,7 @@ public class DatabaseInitListener implements ServletContextListener {
 
 	/**
 	 * Load data files into the database
-	 * 
+	 *
 	 * @throws IOException
 	 *             if an I/O error occurs
 	 */

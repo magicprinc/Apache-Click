@@ -1,11 +1,10 @@
 package com.mycorp.service;
 
-import java.util.List;
+import com.mycorp.util.EMF;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-
-import com.mycorp.util.EMF;
+import java.util.List;
 
 public class ServiceTemplate {
 

@@ -1,9 +1,9 @@
 package com.mycorp.service;
 
+import com.mycorp.domain.Customer;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import com.mycorp.domain.Customer;
 
 public class CustomerService extends ServiceTemplate {
 

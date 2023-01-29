@@ -1,11 +1,10 @@
 package com.mycorp.page;
 
+import com.mycorp.service.CustomerService;
 import org.apache.click.Page;
 import org.apache.click.extras.control.Menu;
 import org.apache.click.extras.control.MenuFactory;
 import org.apache.click.util.ClickUtils;
-
-import com.mycorp.service.CustomerService;
 
 public class BorderPage extends Page {
 
@@ -32,7 +31,7 @@ public class BorderPage extends Page {
     public String getTemplate() {
         return "/page/border-template.htm";
     }
-    
+
     public CustomerService getCustomerService() {
         return new CustomerService();
     }

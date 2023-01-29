@@ -1,5 +1,6 @@
 package com.mycorp.page;
 
+import com.mycorp.domain.Customer;
 import org.apache.click.Page;
 import org.apache.click.control.Checkbox;
 import org.apache.click.control.FieldSet;
@@ -15,8 +16,6 @@ import org.apache.click.extras.control.EmailField;
 import org.apache.click.extras.control.IntegerField;
 import org.apache.click.util.Bindable;
 
-import com.mycorp.domain.Customer;
-
 public class EditCustomer extends BorderPage {
 
     // Public controls are automatically added to the page
@@ -29,7 +28,7 @@ public class EditCustomer extends BorderPage {
     private HiddenField idField = new HiddenField("id", Long.class);
 
     private Select investmentSelect = new Select("investments");
-    
+
     public EditCustomer() {
         form.add(referrerField);
 
