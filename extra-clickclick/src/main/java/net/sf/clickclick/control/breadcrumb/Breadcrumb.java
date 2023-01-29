@@ -198,7 +198,7 @@ public class Breadcrumb extends AbstractControl {
    * of the parent Page in the {@link Trail} instance.</li>
    * </ul>
    */
-  public void onInit() {
+  @Override public void onInit() {
     Context context = Context.getThreadLocalContext();
     restoreState(context);
     String contextPath = context.getRequest().getContextPath();
@@ -213,7 +213,7 @@ public class Breadcrumb extends AbstractControl {
    * {@link Trail} instance between requests.</li>
    * </ul>
    */
-  public void onDestroy() {
+  @Override public void onDestroy() {
     Context context = Context.getThreadLocalContext();
     saveState(context);
   }
@@ -225,7 +225,7 @@ public class Breadcrumb extends AbstractControl {
    *
    * @return true to continue Page event processing or false otherwise
    */
-  public boolean onProcess() {
+  @Override public boolean onProcess() {
     return true;
   }
 
@@ -293,7 +293,7 @@ public class Breadcrumb extends AbstractControl {
    *
    * @param buffer the specified buffer to render the control's output to
    */
-  public void render(HtmlStringBuffer buffer) {
+  @Override public void render(HtmlStringBuffer buffer) {
     buffer.elementStart("div");
     buffer.appendAttribute("id", getId());
     buffer.closeTag();

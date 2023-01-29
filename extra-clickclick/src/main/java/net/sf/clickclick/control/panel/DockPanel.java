@@ -13,13 +13,14 @@
  */
 package net.sf.clickclick.control.panel;
 
+import net.sf.clickclick.control.html.table.Cell;
+import net.sf.clickclick.control.html.table.Row;
+import org.apache.click.Control;
+import org.apache.click.util.HtmlStringBuffer;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import org.apache.click.Control;
-import org.apache.click.util.HtmlStringBuffer;
-import net.sf.clickclick.control.html.table.Cell;
-import net.sf.clickclick.control.html.table.Row;
 
 /**
  * Provides a dock panel where controls can be docked to either the
@@ -120,7 +121,7 @@ public class DockPanel extends AbstractTablePanel {
      *
      * @param buffer the specified buffer to render the Panel's output to
      */
-    public void render(HtmlStringBuffer buffer) {
+    @Override public void render(HtmlStringBuffer buffer) {
         assemblePanel();
         super.render(buffer);
     }

@@ -147,7 +147,7 @@ public class Image extends AbstractControl {
    *
    * @param buffer the specified buffer to render the control's output to
    */
-  public void render(HtmlStringBuffer buffer) {
+  @Override public void render(HtmlStringBuffer buffer) {
     buffer.elementStart(getTag());
     buffer.appendAttribute("name", getName());
     buffer.appendAttribute("id", getId());

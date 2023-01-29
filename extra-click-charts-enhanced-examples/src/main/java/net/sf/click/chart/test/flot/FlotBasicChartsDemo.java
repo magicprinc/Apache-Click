@@ -2,14 +2,12 @@ package net.sf.click.chart.test.flot;
 
 import net.sf.click.chart.Color;
 import net.sf.click.chart.Data;
+import net.sf.click.chart.flot.FlotChart;
+import net.sf.click.chart.flot.FlotDataSeries;
+import net.sf.click.chart.test.BorderPage;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import net.sf.click.chart.flot.FlotChart;
-import net.sf.click.chart.flot.FlotDataSeries;
-import net.sf.click.chart.flot.FlotPieChart;
-import net.sf.click.chart.test.BorderPage;
 
 /**
  * This example illustrates the flot example at
@@ -17,7 +15,7 @@ import net.sf.click.chart.test.BorderPage;
  * and
  * http://people.iola.dk/olau/flot/examples/graph-types.html
  */
-public class FlotBasicChartsDemo extends BorderPage 
+public class FlotBasicChartsDemo extends BorderPage
 {
 	private static final long serialVersionUID = 1L;
 
@@ -104,7 +102,7 @@ public class FlotBasicChartsDemo extends BorderPage
 			line6.add(i, Math.sqrt(2*i + Math.sin(i)+5) );
 		line6.getLines().setShow(true);
 		line6.getLines().setSteps(true);
-		
+
 		lineChart2.add( line1 );
 		lineChart2.add( line2 );
 		lineChart2.add( line3 );
@@ -120,11 +118,11 @@ public class FlotBasicChartsDemo extends BorderPage
 
 		lineChart3.getSeries().getLines().setShow(true);
 		lineChart3.getSeries().getPoints().setShow(true);
-		
+
 		lineChart3.getYaxis().setMin( -2d );
 		lineChart3.getYaxis().setMax( 2d );
 		lineChart3.getYaxis().setTicks( 10 );
-		
+
 		Map<Double, String> mapTicks = new HashMap<Double, String>();
 		mapTicks.put( 0d, "0");
 		mapTicks.put( Math.PI/2, "\u03c0/2");
@@ -132,14 +130,14 @@ public class FlotBasicChartsDemo extends BorderPage
 		mapTicks.put( 3*Math.PI/2, "3\u03c0/2");
 		mapTicks.put( 2*Math.PI, "2\u03c0");
 		lineChart3.getXaxis().setTicks( mapTicks );
-		
+
 		lineChart3.getGrid().setBackgroundColor( new Color[] { new Color( 0xffffff ), new Color( 0xeeeeee ) } );
 
 		FlotDataSeries line1 = new FlotDataSeries();
 		for (double i = 0; i < 2*Math.PI; i += 0.25)
 			line1.add(i, Math.sin(i) );
 		line1.setLabel( "sin(x)" );
-		
+
 		FlotDataSeries line2 = new FlotDataSeries();
 		for (double i = 0; i < 2*Math.PI; i += 0.25)
 			line2.add( i, Math.cos( i ) );

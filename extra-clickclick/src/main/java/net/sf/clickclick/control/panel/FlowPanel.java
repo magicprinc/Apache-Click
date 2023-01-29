@@ -13,9 +13,9 @@
  */
 package net.sf.clickclick.control.panel;
 
+import net.sf.clickclick.control.html.Div;
 import org.apache.click.Control;
 import org.apache.click.control.AbstractContainer;
-import net.sf.clickclick.control.html.Div;
 import org.apache.click.util.HtmlStringBuffer;
 
 /**
@@ -136,7 +136,7 @@ public class FlowPanel extends SimplePanel {
      *
      * @param buffer the specified buffer to render the Panel's output to
      */
-    public void render(HtmlStringBuffer buffer) {
+    @Override public void render(HtmlStringBuffer buffer) {
         container.getAttributes().putAll(getAttributes());
         container.setId(getId());
         super.render(buffer);

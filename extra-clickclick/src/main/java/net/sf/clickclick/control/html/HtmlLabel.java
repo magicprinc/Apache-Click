@@ -175,7 +175,7 @@ public class HtmlLabel extends Label {
    * @throws IllegalArgumentException if the given parent instance is
    * referencing <tt>this</tt> object: <tt>if (parent == this)</tt>
    */
-  public void setParent(Object parent) {
+  @Override public void setParent(Object parent) {
     if (parent == this) {
       throw new IllegalArgumentException("Cannot set parent to itself");
     }
@@ -342,7 +342,7 @@ public class HtmlLabel extends Label {
    *
    * @param buffer the specified buffer to render the control's output to
    */
-  public void render(HtmlStringBuffer buffer) {
+  @Override public void render(HtmlStringBuffer buffer) {
 
     String label = getLabel();
     if (label == null) {
