@@ -10,7 +10,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Serial;
-import java.nio.charset.StandardCharsets;
+import java.io.UncheckedIOException;
+
+import static java.nio.charset.StandardCharsets.*;
 
 /**
  * Provides an example direct <tt>HttpServletResponse</tt> handling.
@@ -36,9 +38,7 @@ public class DirectPage extends Page {
 
     ServletContext context = getContext().getServletContext();
 
-    try {
-      PrintWriter writer = response.getWriter();
-
+    try (PrintWriter writer = response.getWriter()){
       downloadFileWithLineNumber(context, fileName1, writer);
       downloadFileWithLineNumber(context, fileName2, writer);
       downloadFileWithLineNumber(context, fileName3, writer);
@@ -47,16 +47,17 @@ public class DirectPage extends Page {
       setPath(null);
 
     } catch (IOException ioe){
-      throw new RuntimeException(ioe);
+      throw new UncheckedIOException(ioe);
     }
   }
 
   void downloadFileWithLineNumber (ServletContext context, String fileName, PrintWriter writer) throws IOException {
-    try ( val inputStream = context.getResourceAsStream(fileName) ){
-
-      val reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
-
+    try (val reader = new BufferedReader(new InputStreamReader( context.getResourceAsStream(fileName), UTF_8)) ){
       String line;  int i = 0;
+
+      writer.println("# ");
+      writer.println("# "+fileName + "\t→\t"+context.getRealPath(fileName));
+      writer.println("# ");
 
       while (( line = reader.readLine() ) != null){
         writer.println(i++ + "\t" + line);
