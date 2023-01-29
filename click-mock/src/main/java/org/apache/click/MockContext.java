@@ -179,8 +179,7 @@ public class MockContext extends Context {
   public static MockContext initContext(MockServletConfig servletConfig,
       MockRequest request, MockResponse response, ClickServlet clickServlet) {
 
-    return initContext(servletConfig, request, response, clickServlet,
-        null, null);
+    return initContext(servletConfig, request, response, clickServlet, null, null);
   }
 
   /**
