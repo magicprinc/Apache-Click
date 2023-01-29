@@ -9,7 +9,6 @@ import org.apache.click.element.Element;
 import org.apache.click.element.JsScript;
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
-import org.apache.click.util.MessagesMap;
 
 import java.text.MessageFormat;
 import java.util.Iterator;
@@ -49,15 +48,12 @@ public abstract class AbstractJQBehavior extends DefaultAjaxBehavior {
    */
   public static String blockUIPath = "/click-jquery/blockui/jquery.blockUI.2.31.js";
 
-
-
   /** Page provides access to its localized messages. */
   protected Page page;
 
   /** The Behavior localized messages Map. */
   protected transient Map<String, String> messages;
 
-  // Public Methods ---------------------------------------------------------
 
   /**
    * Return a Map of localized messages for this behavior.
@@ -66,7 +62,8 @@ public abstract class AbstractJQBehavior extends DefaultAjaxBehavior {
    */
   public Map<String, String> getMessages() {
     if (messages == null){
-      messages = new MessagesMap(getClass(), BEHAVIOR_MESSAGES);
+      var context = Context.getThreadLocalContext();
+      messages = context.createMessagesMap(getClass(), BEHAVIOR_MESSAGES);
     }
     return messages;
   }
