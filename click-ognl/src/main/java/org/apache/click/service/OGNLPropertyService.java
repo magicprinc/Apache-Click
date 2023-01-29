@@ -13,7 +13,6 @@ import ognl.TypeConverter;
 
 import javax.servlet.ServletContext;
 import java.io.IOException;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -86,37 +85,6 @@ public class OGNLPropertyService implements PropertyService {
   private Node cacheOrParse (Object root, String name) {
     return EXPRESSION_CACHE.asMap().computeIfAbsent(PropertyService.distinctClassName(root)+'#'+name,
         k -> ognlParseExpression(name));
-  }
-
-
-  /**
-   * Return the property value for the given object and property name.
-   * <p/>
-   * For performance and backward compatibility reasons this method uses
-   * reflection internally to get the property value.
-   * <p/>
-   * This method uses reflection internally to get the property value.
-   * <p/>
-   * This method caches the reflected property methods in the given Map cache.
-   * You must NOT modify the cache. Also note cache is ONLY valid for the
-   * current thread, as access to the cache is not synchronized. If you need
-   * multithreaded access to shared cache use a thread-safe Map object, such
-   * as <tt>Collections.synchronizedMap(new HashMap())</tt>.
-   * <p/>
-   * If the given source object is a <tt>Map</tt> this method will simply
-   * return the value for the given key name.
-   *
-   * @see PropertyService#getValue(Object, String, Map)
-   *
-   * @param source the source object
-   * @param name the name of the property
-   * @param cache the cache of reflected property Method objects, do NOT modify
-   * this cache
-   * @return the property value for the given source object and property name
-   */
-  @Override public Object getValue(Object source, String name, Map<?,?> cache) {
-    //return PropertyUtils.getValue(source, name, cache);
-    return getValue(source, name);
   }
 
   /**
