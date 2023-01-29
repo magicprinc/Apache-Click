@@ -1,3 +1,7 @@
+// https://docs.gradle.org/7.6/userguide/multi_project_builds.html
+// https://docs.gradle.org/7.6/samples
+
+rootProject.name = 'click'
 
 include 'click'
 include 'click-cayenne'
