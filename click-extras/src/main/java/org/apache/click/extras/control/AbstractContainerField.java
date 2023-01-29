@@ -1,6 +1,7 @@
 package org.apache.click.extras.control;
 
 import lombok.Getter;
+import lombok.NonNull;
 import org.apache.click.Context;
 import org.apache.click.Control;
 import org.apache.click.control.Container;
@@ -403,12 +404,7 @@ public abstract class AbstractContainerField extends Field implements Container 
    * @param tagName the name of the tag to render
    * @param buffer the buffer to append the output to
    */
-  @Override
-  protected void renderTagBegin(String tagName, HtmlStringBuffer buffer) {
-    if (tagName == null) {
-      throw new IllegalStateException("Tag cannot be null");
-    }
-
+  @Override protected void renderTagBegin (@NonNull String tagName, HtmlStringBuffer buffer){
     buffer.elementStart(tagName);
 
     String id = getId();

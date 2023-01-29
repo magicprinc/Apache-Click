@@ -13,7 +13,6 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 import javax.servlet.ServletContext;
 import java.io.IOException;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class SPELPropertyService implements PropertyService {
@@ -38,12 +37,7 @@ public class SPELPropertyService implements PropertyService {
   }
 
 
-  @Override public Object getValue (Object source, String name, Map<?,?> cache) {
-    return getValue(source, name);
-  }
-
-
-  @Override public void setValue (Object target, String name, Object value) {
+  @Override public void setValue (Object target, String name, Object value){
     val expression = cacheOrParse(target, name.trim());
 
     val context = new StandardEvaluationContext(target);// object cannot be changed after the context object is created

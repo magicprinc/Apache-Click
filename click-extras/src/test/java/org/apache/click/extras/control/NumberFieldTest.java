@@ -1,24 +1,8 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.click.extras.control;
 
 import junit.framework.TestCase;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.click.MockContext;
 import org.apache.click.control.Form;
 import org.apache.click.servlet.MockRequest;
@@ -32,281 +16,286 @@ import java.util.Map;
 
 public class NumberFieldTest extends TestCase{
 
-    Locale defaultLocale;
+  Locale defaultLocale;
 
-    @Override
-    protected void setUp() {
-        defaultLocale = Locale.getDefault();
-        Locale.setDefault(Locale.US);
-    }
+  @Override
+  protected void setUp() {
+    defaultLocale = Locale.getDefault();
+    Locale.setDefault(Locale.US);
+  }
 
-    @Override
-    protected void tearDown() {
-        Locale.setDefault(defaultLocale);
-    }
+  @Override
+  protected void tearDown() {
+    Locale.setDefault(defaultLocale);
+  }
 
-    public void testFormat() {
-        MockContext.initContext(Locale.US);
-        
-        Number decNum = 2.56f;
-        
-        NumberField engF = new NumberField("en");
+  public void testFormat() {
+    MockContext.initContext(Locale.US);
 
-        assertNull(engF.getPattern());
-        engF.setPattern("#.00");
-        assertEquals("#.00", engF.getPattern());
-        engF.setPattern(null);
-        assertNull(engF.getPattern());
+    Number decNum = 2.56f;
 
-        engF.setValue("some Text");
-        assertEquals("some Text", engF.getValue());
-        assertNull(engF.getNumber());
-        
-        engF.setValue("12.456,5656");
-        assertEquals("12.456,5656", engF.getValue());
-        assertEquals(12.456, engF.getNumber());
-        
-        engF.setNumber(decNum);
-        assertEquals("2.56", engF.getValue());
-        assertEquals(2.56d, engF.getNumber().doubleValue(),0);
-        
-        engF.setValue("123.6");
-        assertEquals(123.6d, engF.getNumber().doubleValue(),0);
-        assertEquals(engF.getNumber(), engF.getValueObject());
-        
-        engF.setPattern("0");
-        engF.setNumber(123.6f);
-        assertEquals("124", engF.getValue());
-        assertEquals(124, engF.getNumber().intValue());
-        
-        engF.setValue("123.6");
-        assertEquals("123.6", engF.getValue());
-        assertEquals(123.6f, engF.getNumber().floatValue(),0);
-        
-        engF.setPattern("0.00");
-        engF.setNumber(123.6f);
-        assertEquals("123.60", engF.getValue());
-        assertEquals(123.6f, engF.getNumber().floatValue(),0);
-        
-        engF.setValue("12.223");
-        assertEquals(12.223f, engF.getNumber().floatValue(),0);
-        
-        //keeps the pattern
-        engF.setNumberFormat(NumberFormat.getInstance(Locale.GERMAN));
-        engF.setNumber(decNum);
-        assertEquals("2,56", engF.getValue());
-        engF.setValue("3456,134");
-        assertEquals(3456.134f, engF.getNumber().floatValue(),0);
-        
-        MockContext.initContext(Locale.GERMANY);
-        
-        NumberField germanF = new NumberField("de");
-        
-        germanF.setNumber(decNum);
-        assertEquals("2,56", germanF.getValue());
-        germanF.setValue("3.456,134");
-        assertEquals(3456.134f, germanF.getNumber().floatValue(),0);
-    }
-    
-    public void testOnProcess() {
-        MockContext mockContext = MockContext.initContext(Locale.US);
-        MockRequest req = mockContext.getMockRequest();
-        Map<String, Object> params = req.getParameterMap();
-        
-        NumberField engF = new NumberField("en");
-        engF.setPattern("#,##0.00");
-        
-        engF.setValidate(false);
-        params.put("en", "no number");
-        assertTrue(engF.onProcess());
-        assertEquals("no number", engF.getValue());
-        assertTrue(engF.isValid());
-        assertNull(engF.getNumber());
-        engF.validate();
-        assertFalse(engF.isValid());
-        
-        engF = new NumberField("en");
-        engF.setPattern("#,##0.00");
-        params.put("en", "12.3");
+    NumberField engF = new NumberField("en");
 
-        engF.setValidate(false);
-        assertTrue(engF.onProcess());
-        assertEquals("12.3",engF.getValue());
-        assertEquals(12.3f,engF.getNumber().floatValue(),0);
-        engF.validate();
-        assertEquals("12.30",engF.getValue());
-        
-        engF = new NumberField("en");
-        engF.setPattern("#,##0.00");
-        params.put("en", "12.3");
-        
-        assertTrue(engF.onProcess());
-        assertEquals("12.30",engF.getValue());
-        assertEquals("12.3", req.getParameter(engF.getName()));
-        
-        params.put("en", "some value");
-        assertTrue(engF.onProcess());
-        assertEquals("some value", engF.getValue());
-        assertNull(engF.getNumber());
-        assertEquals("some value", req.getParameter(engF.getName()));
-    }
-    
-    public void testValidate() {
-        MockContext mockContext = MockContext.initContext(Locale.US);
-        MockRequest req = mockContext.getMockRequest();
-        Map<String, Object> params = req.getParameterMap();
-        
-        NumberField engF = new NumberField("en");
-        engF.setPattern("0");
-        
-        engF.setMaxValue(100);
-        engF.setMinValue(1);
-        engF.setRequired(true);
-        
-        params.put("en", "2.23");
-        assertTrue(engF.onProcess());
-        assertTrue(engF.isValid());
-        assertEquals("2", engF.getValue());
-        
-        engF.setValue("123,45");
-        engF.validate();
-        assertFalse(engF.isValid());
-        assertEquals("123,45", engF.getValue());
-        
-        engF.setValue("-12");
-        engF.validate();
-        assertFalse(engF.isValid());
-        assertEquals("-12", engF.getValue());
-        
-        engF = new NumberField("en");
-        engF.setPattern("0");
-        
-        // Test required + blank value
-        engF.setRequired(true);
-        params.put("en", "");
-        
-        assertTrue(engF.onProcess());
-        assertFalse(engF.isValid());
-        assertEquals(0, engF.getValue().length());
-        
-        engF.setValue("");
-        assertFalse(engF.isValid());
-        assertEquals("",engF.getValue());
-        
-        engF.setValue("some text");
-        assertFalse(engF.isValid());
-        assertEquals("some text", engF.getValue());    
-    }
+    assertNull(engF.getPattern());
+    engF.setPattern("#.00");
+    assertEquals("#.00", engF.getPattern());
+    engF.setPattern(null);
+    assertNull(engF.getPattern());
 
+    engF.setValue("some Text");
+    assertEquals("some Text", engF.getValue());
+    assertNull(engF.getNumber());
 
-    /**
-     * Test that the fix for number->BigDecimal conversion work.
-     *
-     * CLK-694.
-     */
-    public void testFormCopyBigDecimal() {
-        MockContext.initContext(Locale.US);
+    engF.setValue("12.456,5656");
+    assertEquals("12.456,5656", engF.getValue());
+    assertEquals(12.456, engF.getNumber());
 
-        Form form = new Form("form");
+    engF.setNumber(decNum);
+    assertEquals("2.56", engF.getValue());
+    assertEquals(2.56d, engF.getNumber().doubleValue(),0);
 
-        NumberField bigDecimalField = new NumberField("bigDecimalField");
-        NumberField bigIntegerField = new NumberField("bigIntegerField");
+    engF.setValue("123.6");
+    assertEquals(123.6d, engF.getNumber().doubleValue(),0);
+    assertEquals(engF.getNumber(), engF.getValueObject());
 
-        // Specify a very large value
-        final String bigValue = "999999999999999999";
-        bigDecimalField.setValue(bigValue);
-        assertEquals(bigValue, bigDecimalField.getValue());
-        assertEquals(bigValue, bigDecimalField.getNumber().toString());
-        assertEquals(bigValue, bigDecimalField.getValueObject().toString());
+    engF.setPattern("0");
+    engF.setNumber(123.6f);
+    assertEquals("124", engF.getValue());
+    assertEquals(124, engF.getNumber().intValue());
 
-        form.add(bigDecimalField);
-        bigIntegerField.setValue(bigValue);
-        assertEquals(bigValue, bigIntegerField.getValue());
-        form.add(bigIntegerField);
+    engF.setValue("123.6");
+    assertEquals("123.6", engF.getValue());
+    assertEquals(123.6f, engF.getNumber().floatValue(),0);
 
-        MyObj obj = new MyObj();
-        form.copyTo(obj);
+    engF.setPattern("0.00");
+    engF.setNumber(123.6f);
+    assertEquals("123.60", engF.getValue());
+    assertEquals(123.6f, engF.getNumber().floatValue(),0);
 
-        assertEquals(obj.bigDecimalField.getClass()+"="+obj.bigDecimalField.longValue(),
-          bigValue, obj.bigDecimalField.toString());
-        assertEquals(bigValue, obj.bigIntegerField.toString());
-    }
+    engF.setValue("12.223");
+    assertEquals(12.223f, engF.getNumber().floatValue(),0);
 
-    /**
-     * Test that Field->BigInteger conversion works.
-     */
-    public void testFormCopyBigInteger() {
-        MockContext.initContext(Locale.US);
+    //keeps the pattern
+    engF.setNumberFormat(NumberFormat.getInstance(Locale.GERMAN));
+    engF.setNumber(decNum);
+    assertEquals("2,56", engF.getValue());
+    engF.setValue("3456,134");
+    assertEquals(3456.134f, engF.getNumber().floatValue(),0);
 
-        Form form = new Form("form");
+    MockContext.initContext(Locale.GERMANY);
 
-        NumberField bigDecimalField = new NumberField("bigDecimalField");
-        NumberField bigIntegerField = new NumberField("bigIntegerField");
+    NumberField germanF = new NumberField("de");
 
-        // Specify a very large value
-        final String bigValue = "999999999999999999";
-        bigDecimalField.setValue(bigValue);
-        form.add(bigDecimalField);
-        assertEquals(bigDecimalField.getValueObject().getClass()+" = "+bigDecimalField.getValueObject(),
-          bigValue, bigDecimalField.getValueObject().toString());
+    germanF.setNumber(decNum);
+    assertEquals("2,56", germanF.getValue());
+    germanF.setValue("3.456,134");
+    assertEquals(3456.134f, germanF.getNumber().floatValue(),0);
+  }
 
-        bigIntegerField.setValue(bigValue);
-        form.add(bigIntegerField);
+  public void testOnProcess() {
+    MockContext mockContext = MockContext.initContext(Locale.US);
+    MockRequest req = mockContext.getMockRequest();
+    Map<String, Object> params = req.getParameterMap();
 
-        MyObj obj = new MyObj();
-        form.copyTo(obj);
+    NumberField engF = new NumberField("en");
+    engF.setPattern("#,##0.00");
 
-        assertEquals(bigValue, obj.bigIntegerField.toString());
-        assertEquals(bigValue, obj.bigDecimalField.toString());
-    }
+    engF.setValidate(false);
+    params.put("en", "no number");
+    assertTrue(engF.onProcess());
+    assertEquals("no number", engF.getValue());
+    assertTrue(engF.isValid());
+    assertNull(engF.getNumber());
+    engF.validate();
+    assertFalse(engF.isValid());
+
+    engF = new NumberField("en");
+    engF.setPattern("#,##0.00");
+    params.put("en", "12.3");
+
+    engF.setValidate(false);
+    assertTrue(engF.onProcess());
+    assertEquals("12.3",engF.getValue());
+    assertEquals(12.3f,engF.getNumber().floatValue(),0);
+    engF.validate();
+    assertEquals("12.30",engF.getValue());
+
+    engF = new NumberField("en");
+    engF.setPattern("#,##0.00");
+    params.put("en", "12.3");
+
+    assertTrue(engF.onProcess());
+    assertEquals("12.30",engF.getValue());
+    assertEquals("12.3", req.getParameter(engF.getName()));
+
+    params.put("en", "some value");
+    assertTrue(engF.onProcess());
+    assertEquals("some value", engF.getValue());
+    assertNull(engF.getNumber());
+    assertEquals("some value", req.getParameter(engF.getName()));
+  }
+
+  public void testValidate() {
+    MockContext mockContext = MockContext.initContext(Locale.US);
+    MockRequest req = mockContext.getMockRequest();
+    Map<String, Object> params = req.getParameterMap();
+
+    NumberField engF = new NumberField("en");
+    engF.setPattern("0");
+
+    engF.setMaxValue(100);
+    engF.setMinValue(1);
+    engF.setRequired(true);
+
+    params.put("en", "2.23");
+    assertTrue(engF.onProcess());
+    assertTrue(engF.isValid());
+    assertEquals("2", engF.getValue());
+
+    engF.setValue("123,45");
+    engF.validate();
+    assertFalse(engF.isValid());
+    assertEquals("123,45", engF.getValue());
+
+    engF.setValue("-12");
+    engF.validate();
+    assertFalse(engF.isValid());
+    assertEquals("-12", engF.getValue());
+
+    engF = new NumberField("en");
+    engF.setPattern("0");
+
+    // Test required + blank value
+    engF.setRequired(true);
+    params.put("en", "");
+
+    assertTrue(engF.onProcess());
+    assertFalse(engF.isValid());
+    assertEquals(0, engF.getValue().length());
+
+    engF.setValue("");
+    assertFalse(engF.isValid());
+    assertEquals("",engF.getValue());
+
+    engF.setValue("some text");
+    assertFalse(engF.isValid());
+    assertEquals("some text", engF.getValue());
+  }
 
 
-    // https://github.com/mvel/mvel
-    public void testMvelPure () {
-        final String bigValue = "999999999999999999";
-        MyObj obj = new MyObj();
+  /**
+   * Test that the fix for number->BigDecimal conversion work.
+   *
+   * CLK-694.
+   */
+  public void testFormCopyBigDecimal() {
+    MockContext.initContext(Locale.US);
 
-        final String expr = "obj.bigDecimalField = bigValue; obj.bigIntegerField = bigValue";
-        MVEL.eval(expr, Map.of("obj", obj, "bigValue", bigValue));
+    Form form = new Form("form");
 
-        assertEquals(bigValue, obj.bigIntegerField.toString());
-        assertEquals(bigValue, obj.bigDecimalField.toString());
+    NumberField bigDecimalField = new NumberField("bigDecimalField");
+    NumberField bigIntegerField = new NumberField("bigIntegerField");
 
-        obj.bigDecimalField = new BigDecimal(Long.valueOf(bigValue));
-        assertEquals(bigValue, obj.bigDecimalField.toString());
+    // Specify a very large value
+    final String bigValue = Long.toString(Long.MIN_VALUE);
+    bigDecimalField.setValue(bigValue);
+    assertEquals(bigValue, bigDecimalField.getValue());
+    assertEquals(bigValue, bigDecimalField.getNumber().toString());
+    assertEquals(bigValue, bigDecimalField.getValueObject().toString());
+    form.add(bigDecimalField);
 
-        MVEL.eval(expr, Map.of("obj", obj, "bigValue", Long.valueOf(bigValue)));
+    bigIntegerField.setValue(bigValue);
+    assertEquals(bigValue, bigIntegerField.getValue());
+    form.add(bigIntegerField);
 
-        assertEquals(bigValue, obj.bigIntegerField.toString());
-        assertEquals(bigValue, obj.bigDecimalField.toString());
-    }
+    MyObj obj = new MyObj();
+    form.copyTo(obj);
+
+    assertEquals(obj.bigDecimalField.getClass()+"="+obj.bigDecimalField.longValue(),
+        bigValue, obj.bigDecimalField.toString());
+    assertEquals(bigValue, obj.bigIntegerField.toString());
+  }
+
+  /**
+   * Test that Field->BigInteger conversion works.
+   */
+  public void testFormCopyBigInteger() {
+    MockContext.initContext(Locale.US);
+
+    Form form = new Form("form");
+
+    NumberField bigDecimalField = new NumberField("bigDecimalField");
+    NumberField bigIntegerField = new NumberField("bigIntegerField");
+    NumberField longField = new NumberField("longField");// there is a specialized LongField!
+
+    // very large value      9223372036854775808
+    final String bigValue = "999999999999999999";
+    bigDecimalField.setValue(bigValue);
+    form.add(bigDecimalField);
+    System.out.println(bigDecimalField.getValueObject().getClass());
+    assertTrue(bigDecimalField.getValueObject() instanceof Long);// wtf?
+    long d = (Long) bigDecimalField.getValueObject();
+    assertEquals(bigDecimalField.getValueObject().getClass()+" = "+bigDecimalField.getValueObject(), bigValue, bigDecimalField.getValueObject().toString());
+    assertEquals(bigDecimalField.getValueObject().getClass()+" = "+bigDecimalField.getValueObject(), bigValue, ""+d);
+    //
+    bigIntegerField.setValue(bigValue);
+    form.add(bigIntegerField);
+    //
+    longField.setValue(bigValue);
+    form.add(longField);
+
+    MyObj obj = new MyObj();
+    form.copyTo(obj);
+
+    assertEquals(bigValue, obj.bigIntegerField.toString());
+    assertEquals(bigValue, ""+obj.longField);
+    assertEquals(bigValue, obj.bigDecimalField.toString());
+  }
 
 
-    // https://github.com/mvel/mvel/issues/313
-    public void testBugReport () {
-        final String bigValue = "999999999999999999";
-        MyObj obj = new MyObj();
-        final String expr = "obj.bigDecimalField = bigValue";
+  // https://github.com/mvel/mvel
+  public void testMvelPure () {
+    final String bigValue = "999999999999999999";
+    MyObj obj = new MyObj();
 
-        MVEL.eval(expr, Map.of("obj", obj, "bigValue", bigValue));
-        assertEquals(bigValue, obj.bigDecimalField.toString());// OK
+    final String expr = "obj.bigDecimalField = bigValue; obj.bigIntegerField = bigValue";
+    MVEL.eval(expr, Map.of("obj", obj, "bigValue", bigValue));
 
-        assertEquals(bigValue, new BigDecimal(Long.valueOf(bigValue).toString()).toString());
+    assertEquals(bigValue, obj.bigIntegerField.toString());
+    assertEquals(bigValue, obj.bigDecimalField.toString());
 
-        MVEL.eval(expr, Map.of("obj", obj, "bigValue", Long.valueOf(bigValue)));
-        assertEquals(bigValue, obj.bigDecimalField.toString());// Failure
-        // Expected :999999999999999999
-        // Actual   :1000000000000000000
-    }
+    obj.bigDecimalField = new BigDecimal(Long.valueOf(bigValue));
+    assertEquals(bigValue, obj.bigDecimalField.toString());
 
-    /** POJO for testing of copying values between Fields and domain objects */
-    public static class MyObj {
-      BigDecimal bigDecimalField;
-      BigInteger bigIntegerField;
+    MVEL.eval(expr, Map.of("obj", obj, "bigValue", Long.valueOf(bigValue)));
 
-      public void setBigDecimalField (BigDecimal v) { bigDecimalField = v;}
+    assertEquals(bigValue, obj.bigIntegerField.toString());
+    assertEquals(bigValue, obj.bigDecimalField.toString());
+  }
 
-      public void setBigIntegerField (BigInteger v) { bigIntegerField = v;}
-    }
 
+  // https://github.com/mvel/mvel/issues/313
+  public void testBugReport () {
+    final String bigValue = "999999999999999999";
+    MyObj obj = new MyObj();
+    final String expr = "obj.bigDecimalField = bigValue";
+
+    MVEL.eval(expr, Map.of("obj", obj, "bigValue", bigValue));
+    assertEquals(bigValue, obj.bigDecimalField.toString());// OK
+
+    assertEquals(bigValue, new BigDecimal(Long.valueOf(bigValue).toString()).toString());
+
+    MVEL.eval(expr, Map.of("obj", obj, "bigValue", Long.valueOf(bigValue)));
+    assertEquals(bigValue, obj.bigDecimalField.toString());// Failure
+    // Expected :999999999999999999
+    // Actual   :1000000000000000000
+  }
+
+  /** POJO for testing of copying values between Fields and domain objects */
+  @Setter @Getter
+  public static class MyObj {
+    BigDecimal bigDecimalField;
+    BigInteger bigIntegerField;
+    long longField;
+  }
 }
