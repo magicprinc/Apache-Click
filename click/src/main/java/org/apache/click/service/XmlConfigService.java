@@ -2062,7 +2062,7 @@ public class XmlConfigService implements ConfigService, EntityResolver {
   static final ConcurrentHashMap<String,Boolean> NOT_FOUND_MESSAGE_MAP_CACHE = new ConcurrentHashMap<>();
 
   /** Provides a synchronized cache of get value reflection methods, with support for multiple class loaders. */
-  static final ConcurrentMap<String, Map<String,String>> MESSAGE_MAP_CACHE = new ConcurrentHashMap<>();
+  static final ConcurrentMap<String, MessagesMap> MESSAGE_MAP_CACHE = new ConcurrentHashMap<>();
 
 
   @Override public Map<String, String> createMessagesMap (@NonNull Class<?> baseClass, String globalResource, @Nullable Locale locale){
@@ -2083,13 +2083,13 @@ public class XmlConfigService implements ConfigService, EntityResolver {
     // new MessagesMap(baseClass, globalResource, locale)
     val resourceKey = baseClass.getName()+'|'+globalResource+'_'+locale;
 
-    var messages = MESSAGE_MAP_CACHE.get(resourceKey);
+    val mm = MESSAGE_MAP_CACHE.get(resourceKey);
 
-    if (messages != null){
-      return new MessagesMap(resourceKey, messages);
+    if (mm != null){
+      return mm;
     }
 
-    messages = new HashMap<>();
+    Map<String,String> messages = new HashMap<>();
 
     loadResourceValuesIntoMap(globalResource, locale, messages);
 
@@ -2109,12 +2109,13 @@ public class XmlConfigService implements ConfigService, EntityResolver {
     }
 
     messages = Collections.unmodifiableMap(messages);
+    val messagesMap = new MessagesMap(resourceKey, messages);
 
-    if ( (isProductionMode() || isProfileMode()) && messages.size() > 0){
-      MESSAGE_MAP_CACHE.putIfAbsent(resourceKey, messages);
+    if ( isProductionMode() || isProfileMode() ){
+      MESSAGE_MAP_CACHE.putIfAbsent(resourceKey, messagesMap);
     }
 
-    return new MessagesMap(resourceKey, messages);
+    return messagesMap;
   }
 
 
@@ -2137,7 +2138,7 @@ public class XmlConfigService implements ConfigService, EntityResolver {
    *
    * @return the ResourceBundle for the given resource name and locale
    */
-  private static ResourceBundle createResourceBundle (String resourceName, Locale locale) {
+  protected ResourceBundle createResourceBundle (String resourceName, Locale locale) {
     return ClickUtils.getBundle(resourceName, locale);
   }
 
@@ -2147,7 +2148,7 @@ public class XmlConfigService implements ConfigService, EntityResolver {
    * @param resourceBundleName the resource bundle name
    * @param toMap the map to load resource values into
    */
-  private static void loadResourceValuesIntoMap (String resourceBundleName, Locale locale, Map<String,String> toMap){
+  protected void loadResourceValuesIntoMap (String resourceBundleName, Locale locale, Map<String,String> toMap){
     if (resourceBundleName == null || resourceBundleName.length() == 0){
       return;
     }

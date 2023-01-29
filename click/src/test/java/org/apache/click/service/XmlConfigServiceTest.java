@@ -661,7 +661,8 @@ public class XmlConfigServiceTest extends TestCase {
     } catch (Exception e){
       assertEquals("java.util.MissingResourceException: Message key none not found in bundle org.apache.click.service.XmlConfigServiceTest|fakeName_ru_RU", e.toString());
     }
-    assertEquals(XmlConfigService.MESSAGE_MAP_CACHE.toString(), 0, XmlConfigService.MESSAGE_MAP_CACHE.size());
+    assertEquals(XmlConfigService.MESSAGE_MAP_CACHE.toString(), 1, XmlConfigService.MESSAGE_MAP_CACHE.size());// one empty map
+    assertEquals("{org.apache.click.service.XmlConfigServiceTest|fakeName_ru_RU={}}", XmlConfigService.MESSAGE_MAP_CACHE.toString());
     assertEquals(4, XmlConfigService.NOT_FOUND_MESSAGE_MAP_CACHE.size());
     assertEquals("fakeName_ru_RU, junit.framework.Assert_ru_RU, junit.framework.TestCase_ru_RU, org.apache.click.service.XmlConfigServiceTest_ru_RU",
         XmlConfigService.NOT_FOUND_MESSAGE_MAP_CACHE.keySet().stream().sorted().collect(Collectors.joining(", ")));
