@@ -122,7 +122,7 @@ public class CustomerService extends ServiceTemplate {
 
     public Customer findCustomerByID(Object id) {
         if (id != null && id.toString().length() > 0) {
-            return (Customer) getCustomerForID(id);
+            return getCustomerForID(id);
         } else {
             return null;
         }

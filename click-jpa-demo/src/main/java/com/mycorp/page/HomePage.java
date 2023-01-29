@@ -1,7 +1,10 @@
 package com.mycorp.page;
 
-public class HomePage extends BorderPage {
+import java.io.Serial;
 
-    public String title = "Home";
+public class HomePage extends BorderPage {
+  @Serial private static final long serialVersionUID = -6041687444622531154L;
+
+  public String title = "Home";
 
 }

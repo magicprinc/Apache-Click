@@ -12,6 +12,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -20,15 +21,13 @@ import java.util.StringTokenizer;
 
 public class DatabaseInitListener implements ServletContextListener {
 
-	private static final SimpleDateFormat FORMAT = new SimpleDateFormat(
-			"yyyy-MM-dd");
+	private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
-	// --------------------------------------------------------- Public Methods
 
 	/**
 	 * @see ServletContextListener#contextInitialized(ServletContextEvent)
 	 */
-	public void contextInitialized(ServletContextEvent sce) {
+	@Override public void contextInitialized(ServletContextEvent sce) {
 		ServletContext servletContext = sce.getServletContext();
 
 		try {
@@ -44,19 +43,16 @@ public class DatabaseInitListener implements ServletContextListener {
 	/**
 	 * @see ServletContextListener#contextDestroyed(ServletContextEvent)
 	 */
-	public void contextDestroyed(ServletContextEvent sce) {
-	}
+	@Override public void contextDestroyed (ServletContextEvent sce){}
 
 	// -------------------------------------------------------- Private Methods
 
 	/**
 	 * Load data files into the database
 	 *
-	 * @throws IOException
-	 *             if an I/O error occurs
+	 * @throws IOException if an I/O error occurs
 	 */
 	private void loadDatabase() throws IOException {
-
 		CustomerService service = new CustomerService();
 		if (service.getCustomers().size() > 0) {
 			return;
@@ -105,11 +101,9 @@ public class DatabaseInitListener implements ServletContextListener {
 		}
 	}
 
-	private static void loadFile(String filename, LineProcessor lineProcessor)
-			throws IOException {
+	private static void loadFile(String filename, LineProcessor lineProcessor) throws IOException {
 
-		InputStream is = ClickUtils.getResourceAsStream(filename,
-				DatabaseInitListener.class);
+		InputStream is = ClickUtils.getResourceAsStream(filename,	DatabaseInitListener.class);
 
 		if (is == null) {
 			throw new RuntimeException("classpath file not found: " + filename);
@@ -117,7 +111,7 @@ public class DatabaseInitListener implements ServletContextListener {
 
 		BufferedReader reader = null;
 		try {
-			reader = new BufferedReader(new InputStreamReader(is));
+			reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
 
 			String line = reader.readLine();
 			while (line != null) {
@@ -136,37 +130,35 @@ public class DatabaseInitListener implements ServletContextListener {
 
 	private static void loadCustomers() throws IOException {
 		// Load customers data file
-		loadFile("customers.txt", new LineProcessor() {
-			public void processLine(String line) {
-				StringTokenizer tokenizer = new StringTokenizer(line, ",");
+		loadFile("customers.txt", line->{
+			StringTokenizer tokenizer = new StringTokenizer(line, ",");
 
-				Customer customer = new Customer();
-				customer.setName(next(tokenizer));
-				if (tokenizer.hasMoreTokens()) {
-					customer.setEmail(next(tokenizer));
-				}
-				if (tokenizer.hasMoreTokens()) {
-					customer.setAge(Integer.valueOf(next(tokenizer)));
-				}
-				if (tokenizer.hasMoreTokens()) {
-					customer.setInvestments(next(tokenizer));
-				}
-				if (tokenizer.hasMoreTokens()) {
-					customer.setHoldings(Double.valueOf(next(tokenizer)));
-				}
-				if (tokenizer.hasMoreTokens()) {
-					customer.setDateJoined(createDate(next(tokenizer)));
-				}
-				if (tokenizer.hasMoreTokens()) {
-					customer.setActive(Boolean.valueOf(next(tokenizer)));
-				}
+			Customer customer = new Customer();
+			customer.setName(next(tokenizer));
+			if (tokenizer.hasMoreTokens()) {
+				customer.setEmail(next(tokenizer));
+			}
+			if (tokenizer.hasMoreTokens()) {
+				customer.setAge(Integer.valueOf(next(tokenizer)));
+			}
+			if (tokenizer.hasMoreTokens()) {
+				customer.setInvestments(next(tokenizer));
+			}
+			if (tokenizer.hasMoreTokens()) {
+				customer.setHoldings(Double.valueOf(next(tokenizer)));
+			}
+			if (tokenizer.hasMoreTokens()) {
+				customer.setDateJoined(createDate(next(tokenizer)));
+			}
+			if (tokenizer.hasMoreTokens()) {
+				customer.setActive(Boolean.valueOf(next(tokenizer)));
+			}
 
-				EntityManager em = EMF.getEM();
-				try {
-					em.persist(customer);
-				} finally {
-					em.close();
-				}
+			EntityManager em = EMF.getEM();
+			try {
+				em.persist(customer);
+			} finally {
+				em.close();
 			}
 		});
 	}
@@ -190,9 +182,8 @@ public class DatabaseInitListener implements ServletContextListener {
 		}
 	}
 
-	// Inner Classes ----------------------------------------------------------
 
-	private static interface LineProcessor {
-		public void processLine(String line);
+	private interface LineProcessor {
+		void processLine(String line);
 	}
 }
