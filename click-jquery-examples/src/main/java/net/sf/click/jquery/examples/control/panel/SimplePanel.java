@@ -50,7 +50,7 @@ public class SimplePanel extends Panel {
    *
    * @param buffer the specified buffer to render the Panel's output to
    */
-  public void render(HtmlStringBuffer buffer) {
+  @Override public void render(HtmlStringBuffer buffer) {
 
     if (getTemplate() != null) {
       super.render(buffer);
