@@ -1,7 +1,10 @@
 package template.page;
 
-public class NotAuthorizedPage extends BorderPage {
+import java.io.Serial;
 
-    public String title = "Not Authorized";
+public class NotAuthorizedPage extends BorderPage {
+  @Serial private static final long serialVersionUID = -6102876045620336703L;
+
+  public String title = "Not Authorized";
 
 }

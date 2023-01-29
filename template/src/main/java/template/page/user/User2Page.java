@@ -2,8 +2,11 @@ package template.page.user;
 
 import template.page.BorderPage;
 
-public class User2Page extends BorderPage {
+import java.io.Serial;
 
-    public String title = "User 2 Page";
+public class User2Page extends BorderPage {
+  @Serial private static final long serialVersionUID = 3772649686042606560L;
+
+  public String title = "User 2 Page";
 
 }
