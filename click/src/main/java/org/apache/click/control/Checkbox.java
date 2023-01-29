@@ -3,6 +3,7 @@ package org.apache.click.control;
 import org.apache.click.Context;
 import org.apache.click.util.HtmlStringBuffer;
 
+import java.io.Serial;
 import java.text.MessageFormat;
 
 /**
@@ -23,6 +24,7 @@ import java.text.MessageFormat;
  *    href="http://www.w3.org/TR/html401/interact/forms.html#h-17.4">INPUT</a>
  */
 public class Checkbox extends Field {
+  @Serial private static final long serialVersionUID = -7633748887517807868L;
 
   /**
    * The field validation JavaScript function template.

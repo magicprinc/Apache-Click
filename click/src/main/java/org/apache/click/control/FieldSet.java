@@ -6,6 +6,7 @@ import org.apache.click.util.ClickUtils;
 import org.apache.click.util.ContainerUtils;
 import org.apache.click.util.HtmlStringBuffer;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -77,7 +78,7 @@ import java.util.Objects;
  *    href="http://www.w3.org/TR/html401/interact/forms.html#h-17.10">FIELDSET</a>
  */
 public class FieldSet extends Field implements Container {
-
+  @Serial private static final long serialVersionUID = 2099721243731800869L;
 
   /** The list of controls. */
   protected List<Control> controls;
@@ -171,7 +172,7 @@ public class FieldSet extends Field implements Container {
    * @throws IllegalArgumentException if the control is null, the Field's name
    * is not defined or if the control is neither a Field nor FieldSet
    */
-  public Control insert(Control control, int index) {
+  @Override public Control insert(Control control, int index) {
     // Check if container already contains the control
     String controlName = control.getName();
     if (controlName != null) {
@@ -302,7 +303,7 @@ public class FieldSet extends Field implements Container {
    * @throws IllegalArgumentException if the control is null, the Field's name
    * is not defined or if the control is neither a Field nor FieldSet
    */
-  public Control add(Control control) {
+  @Override public Control add(Control control) {
     return insert(control, getControls().size());
   }
 
@@ -402,7 +403,7 @@ public class FieldSet extends Field implements Container {
    * @return true if the control was removed from the container
    * @throws IllegalArgumentException if the control is null
    */
-  public boolean remove(Control control) {
+  @Override public boolean remove(Control control) {
     boolean removed = ContainerUtils.remove(this, control, getControlMap());
 
     if (removed && control instanceof Field field) {
@@ -452,7 +453,7 @@ public class FieldSet extends Field implements Container {
    *
    * @return the sequential list of controls held by the container
    */
-  public List<Control> getControls() {
+  @Override public List<Control> getControls() {
     if (controls == null) {
       controls = new ArrayList<>();
     }
@@ -465,7 +466,7 @@ public class FieldSet extends Field implements Container {
    * @param controlName the name of the control to get from the container
    * @return the named control from the container if found or null otherwise
    */
-  public Control getControl(String controlName) {
+  @Override public Control getControl(String controlName) {
     if (hasControls()) {
       return getControlMap().get(controlName);
     }
@@ -478,7 +479,7 @@ public class FieldSet extends Field implements Container {
    * @param control the control whose presence in this container is to be tested
    * @return true if the container contains the specified control
    */
-  public boolean contains(Control control) {
+  @Override public boolean contains(Control control) {
     return getControls().contains(control);
   }
 
@@ -489,7 +490,7 @@ public class FieldSet extends Field implements Container {
    *
    * @return true if the container has existing controls, false otherwise.
    */
-  public boolean hasControls() {
+  @Override public boolean hasControls() {
     return (controls != null) && !controls.isEmpty();
   }
 
@@ -500,10 +501,7 @@ public class FieldSet extends Field implements Container {
    *
    * @return this controls html tag
    */
-  @Override
-  public String getTag() {
-    return "fieldset";
-  }
+  @Override public String getTag (){ return "fieldset";}
 
   /**
    * Return true if the FieldSet is disabled. The FieldSet will also be

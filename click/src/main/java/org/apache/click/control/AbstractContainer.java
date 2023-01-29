@@ -85,7 +85,7 @@ public abstract class AbstractContainer extends AbstractControl implements
      * <p/>
      * <b>Please note</b>: if the container contains a control with the same name
      * as the given control, that control will be
-     * {@link #replace(org.apache.click.Control, org.apache.click.Control) replaced}
+     * {@link #replace(org.apache.click.Control, org.apache.click.Control)} replaced
      * by the given control. If a control has no name defined it cannot be replaced.
      *
      * @param control the control to add to the container

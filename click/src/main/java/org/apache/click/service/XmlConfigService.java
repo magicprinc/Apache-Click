@@ -1,8 +1,11 @@
 package org.apache.click.service;
 
+import com.google.common.annotations.VisibleForTesting;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import org.apache.click.Context;
 import org.apache.click.Control;
 import org.apache.click.Page;
 import org.apache.click.PageInterceptor;
@@ -10,6 +13,7 @@ import org.apache.click.util.Bindable;
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.Format;
 import org.apache.click.util.HtmlStringBuffer;
+import org.apache.click.util.MessagesMap;
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -28,16 +32,22 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.MissingResourceException;
+import java.util.Objects;
+import java.util.ResourceBundle;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import static org.apache.click.util.ClickUtils.sysEnv;
 import static org.apache.click.util.ClickUtils.trim;
@@ -176,13 +186,11 @@ public class XmlConfigService implements ConfigService, EntityResolver {
   /** The application TemplateService. */
   private TemplateService templateService;
 
-  /** The application TemplateService. */
-  private MessagesMapService messagesMapService;
 
   /** Flag indicating whether Click is running on Google App Engine. */
   private boolean onGoogleAppEngine = false;
 
-  // --------------------------------------------------------- Public Methods
+
 
   /**
    * @see ConfigService#onInit(ServletContext)
@@ -196,7 +204,6 @@ public class XmlConfigService implements ConfigService, EntityResolver {
 
     onGoogleAppEngine = servletContext.getServerInfo().startsWith(GOOGLE_APP_ENGINE);
 
-    messagesMapService = new DefaultMessagesMapService();
 
     InputStream inputStream = ClickUtils.getClickConfig(servletContext);
     try {
@@ -245,9 +252,6 @@ public class XmlConfigService implements ConfigService, EntityResolver {
       // Load the Resource service
       loadResourceService(rootElm);
 
-      // Load the Messages Map service
-      loadMessagesMapService(rootElm);
-
       // Load the PageInterceptors
       loadPageInterceptors(rootElm);
 
@@ -272,13 +276,9 @@ public class XmlConfigService implements ConfigService, EntityResolver {
     if (getResourceService() != null) {
       getResourceService().onDestroy();
     }
-    if (getMessagesMapService() != null) {
-      getMessagesMapService().onDestroy();
-    }
-    logService.onDestroy();
   }
 
-  // --------------------------------------------------------- Public Methods
+
 
   /**
    * Return the application mode String value: &nbsp; <tt>["production",
@@ -334,14 +334,6 @@ public class XmlConfigService implements ConfigService, EntityResolver {
     return templateService;
   }
 
-  /**
-   * @see ConfigService#getMessagesMapService()
-   *
-   * @return the messages map service
-   */
-  @Override public MessagesMapService getMessagesMapService() {
-    return messagesMapService;
-  }
 
   /**
    * @see ConfigService#createFormat()
@@ -767,7 +759,7 @@ public class XmlConfigService implements ConfigService, EntityResolver {
     }
   }
 
-  // ------------------------------------------------------ Protected Methods
+
 
   /**
    * Find and return the page class for the specified pagePath and
@@ -1458,37 +1450,9 @@ public class XmlConfigService implements ConfigService, EntityResolver {
     logService.onInit(getServletContext());
   }
 
-  private void loadMessagesMapService(Element rootElm) throws Exception {
-    Element messagesMapServiceElm = ClickUtils.getChild(rootElm, "messages-map-service");
-
-    if (messagesMapServiceElm != null) {
-      Class messagesMapServiceClass = DefaultMessagesMapService.class;
-
-      String classname = messagesMapServiceElm.getAttribute("classname");
-
-      if (StringUtils.isNotBlank(classname)) {
-        messagesMapServiceClass = ClickUtils.classForName(classname);
-      }
-
-      messagesMapService = (MessagesMapService) messagesMapServiceClass.newInstance();
-
-      Map<String, String> propertyMap = loadPropertyMap(messagesMapServiceElm);
-
-      for (String name : propertyMap.keySet()) {
-        String value = propertyMap.get(name);
-
-        getPropertyService().setValue(messagesMapService, name, value);
-      }
-    }
-
-    logService.debug("initializing MessagesMapService: {}", messagesMapService.getClass().getName());
-
-    messagesMapService.onInit(servletContext);
-  }
 
   private void loadPageInterceptors(Element rootElm) throws Exception {
-    List<Element> interceptorList =
-        ClickUtils.getChildren(rootElm, "page-interceptor");
+    List<Element> interceptorList = ClickUtils.getChildren(rootElm, "page-interceptor");
 
     for (Element interceptorElm : interceptorList) {
       String classname = interceptorElm.getAttribute("classname");
@@ -2072,9 +2036,7 @@ public class XmlConfigService implements ConfigService, EntityResolver {
           PropertyService propertyService = configService.getPropertyService();
 
           for (Property property : properties) {
-            propertyService.setValue(listener,
-                property.name(),
-                property.value());
+            propertyService.setValue(listener, property.name(), property.value());
           }
 
         } catch (Exception e) {
@@ -2094,4 +2056,129 @@ public class XmlConfigService implements ConfigService, EntityResolver {
   }
 
   record Property(String name, String value) {}
+
+
+  /** Cache of resource bundle and locales which were not found, with support for multiple class loaders. */
+  static final ConcurrentHashMap<String,Boolean> NOT_FOUND_MESSAGE_MAP_CACHE = new ConcurrentHashMap<>();
+
+  /** Provides a synchronized cache of get value reflection methods, with support for multiple class loaders. */
+  static final ConcurrentMap<String, Map<String,String>> MESSAGE_MAP_CACHE = new ConcurrentHashMap<>();
+
+
+  @Override public Map<String, String> createMessagesMap (@NonNull Class<?> baseClass, String globalResource, @Nullable Locale locale){
+    val context = Context.getThreadLocalContext();
+
+    if (locale == null){
+      if (context != null){
+        locale = context.getLocale();// 4 variants
+
+      } else {//context==null: in test
+        locale = getLocale();//this ConfigService.getLocale()
+
+        if (locale == null){
+          locale = Locale.getDefault();
+        }
+      }
+    }
+    // new MessagesMap(baseClass, globalResource, locale)
+    val resourceKey = baseClass.getName()+'|'+globalResource+'_'+locale;
+
+    var messages = MESSAGE_MAP_CACHE.get(resourceKey);
+
+    if (messages != null){
+      return new MessagesMap(resourceKey, messages);
+    }
+
+    messages = new HashMap<>();
+
+    loadResourceValuesIntoMap(globalResource, locale, messages);
+
+    List<String> classnameList = new ArrayList<>();
+
+    // Build a class list
+    Class<?> aClass = baseClass;
+    while ( !(aClass == null || Objects.equals(aClass , Object.class)) ){
+      classnameList.add(aClass.getName());
+      aClass = aClass.getSuperclass();
+    }
+
+    // Load messages from parent to child order, so that child class messages override parent messages
+    for (int i = classnameList.size() - 1; i >= 0; i--){
+      String className = classnameList.get(i);
+      loadResourceValuesIntoMap(className, locale, messages);
+    }
+
+    messages = Collections.unmodifiableMap(messages);
+
+    if ( (isProductionMode() || isProfileMode()) && messages.size() > 0){
+      MESSAGE_MAP_CACHE.putIfAbsent(resourceKey, messages);
+    }
+
+    return new MessagesMap(resourceKey, messages);
+  }
+
+
+  /**
+   * Return the ResourceBundle for the given resource name and locale.
+   * By default: create a ResourceBundle using the standard JDK method:
+   * {@link java.util.ResourceBundle#getBundle(java.lang.String, java.util.Locale, java.lang.ClassLoader)}.
+   * <p/>
+   * You can create your own custom ResourceBundle by overriding this method.
+   * <p/>
+   * In order for Click to use your custom MessagesMap implementation, you
+   * need to provide your own {@link org.apache.click.service.MessagesMapService}
+   * or extend {@link org.apache.click.service.DefaultMessagesMapService}.
+   * <p/>
+   * The method {@link org.apache.click.service.MessagesMapService#createMessagesMap(java.lang.Class, java.lang.String, java.util.Locale)  createMessagesMap},
+   * can be implemented to return your custom MessagesMap instances.
+   *
+   * @param resourceName the resource bundle name
+   * @param locale the resource bundle locale.
+   *
+   * @return the ResourceBundle for the given resource name and locale
+   */
+  private static ResourceBundle createResourceBundle (String resourceName, Locale locale) {
+    return ClickUtils.getBundle(resourceName, locale);
+  }
+
+  /**
+   * Load the values of the given resourceBundleName into the map.
+   *
+   * @param resourceBundleName the resource bundle name
+   * @param toMap the map to load resource values into
+   */
+  private static void loadResourceValuesIntoMap (String resourceBundleName, Locale locale, Map<String,String> toMap){
+    if (resourceBundleName == null || resourceBundleName.length() == 0){
+      return;
+    }
+    val resourceKey = resourceBundleName+'_'+ locale;// this is just a key in the map
+
+    if (!NOT_FOUND_MESSAGE_MAP_CACHE.containsKey(resourceKey)){
+      try {
+        ResourceBundle resources = createResourceBundle(resourceBundleName, locale);
+        Enumeration<String> e = resources.getKeys();
+
+        try {
+          while (e.hasMoreElements()){
+            String name = e.nextElement();
+            String value = resources.getString(name);
+            toMap.put(name, value);
+          }
+        } catch (Exception ignore){}
+
+      } catch (MissingResourceException mre){//it's normal, thus without stacktrace
+        log.debug("loadResourceValuesIntoMap: NOT FOUND {}: {}", resourceKey, mre.toString());
+        NOT_FOUND_MESSAGE_MAP_CACHE.put(resourceKey,Boolean.TRUE);
+      }
+    }
+  }
+
+  @VisibleForTesting
+  public static void clearMessagesMapCache (){
+    MESSAGE_MAP_CACHE.clear();
+    NOT_FOUND_MESSAGE_MAP_CACHE.clear();
+    ResourceBundle.clearCache();
+    ResourceBundle.clearCache(Thread.currentThread().getContextClassLoader());
+    ResourceBundle.clearCache(XmlConfigService.class.getClassLoader());
+  }
 }

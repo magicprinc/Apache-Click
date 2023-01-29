@@ -3,6 +3,8 @@ package org.apache.click.control;
 import org.apache.click.Context;
 import org.apache.click.util.HtmlStringBuffer;
 
+import java.io.Serial;
+
 /**
  * Provides a Button control: &nbsp; &lt;input type='button'/&gt;.
  *
@@ -40,6 +42,7 @@ import org.apache.click.util.HtmlStringBuffer;
  * @see Submit
  */
 public class Button extends Field {
+  @Serial private static final long serialVersionUID = 543986425189975461L;
 
   /**
    * Create a button with the given name.

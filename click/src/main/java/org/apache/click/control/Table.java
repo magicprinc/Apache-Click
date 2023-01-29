@@ -16,6 +16,7 @@ import org.apache.click.util.HtmlStringBuffer;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -277,6 +278,7 @@ import java.util.StringTokenizer;
  * @see Decorator
  */
 public class Table extends AbstractControl implements Stateful {
+  @Serial private static final long serialVersionUID = 3096465347838579988L;
 
   private static final Set<String> DARK_STYLES;
 
@@ -978,7 +980,7 @@ public class Table extends AbstractControl implements Stateful {
     super.setName(name);
     ActionLink localControlLink = getControlLink();
     localControlLink.setName(getName() + "-controlLink");
-    if ((localControlLink.getParent()) == null) {
+    if (localControlLink.getParent() == null){
       localControlLink.setParent(this);
     }
   }

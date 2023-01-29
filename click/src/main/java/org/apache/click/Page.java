@@ -1,6 +1,5 @@
 package org.apache.click;
 
-import com.google.errorprone.annotations.DoNotCall;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.click.element.Element;
@@ -840,7 +839,7 @@ public class Page implements Serializable {
    *
    * @return the Page header imports
    */
-  @Deprecated @DoNotCall
+  @Deprecated
   final PageImports getPageImports() {
     return pageImports;
   }
@@ -869,7 +868,7 @@ public class Page implements Serializable {
    *
    * @param pageImports the new pageImports instance to set
    */
-  @Deprecated @DoNotCall
+  @Deprecated
   final void setPageImports(PageImports pageImports) {
     this.pageImports = pageImports;
   }

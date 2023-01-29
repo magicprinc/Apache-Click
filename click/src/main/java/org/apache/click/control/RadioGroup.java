@@ -1,16 +1,17 @@
 package org.apache.click.control;
 
 import lombok.Getter;
+import lombok.NonNull;
 import org.apache.click.Context;
 import org.apache.click.service.ConfigService;
 import org.apache.click.service.PropertyService;
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
 
+import java.io.Serial;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -76,6 +77,7 @@ import java.util.Map;
  * @see Radio
  */
 public class RadioGroup extends Field {
+  @Serial private static final long serialVersionUID = -2948831296931107461L;
 
   /**
    * The field validation JavaScript function template.
@@ -98,7 +100,6 @@ public class RadioGroup extends Field {
           + "   '}'\n"
           + "'}'\n";
 
-  // Instance Variables -----------------------------------------------------
 
   /** The list of Radio controls. */
   @Getter protected final List<Radio> radioList = new ArrayList<>();
@@ -173,11 +174,7 @@ public class RadioGroup extends Field {
    * @param radio the radio control to add to the radio group
    * @throws IllegalArgumentException if the radio parameter is null
    */
-  public void add(Radio radio) {
-    if (radio == null) {
-      throw new IllegalArgumentException("Null radio parameter");
-    }
-
+  public void add (@NonNull Radio radio) {
     radio.setParent(this);
     getRadioList().add(radio);
     if (getForm() != null) {
@@ -191,12 +188,8 @@ public class RadioGroup extends Field {
    * @param options the collection of Radio items to add
    * @throws IllegalArgumentException if options is null
    */
-  public void addAll(Collection<Radio> options) {
-    if (options == null) {
-      String msg = "options parameter cannot be null";
-      throw new IllegalArgumentException(msg);
-    }
-    for (Radio radio : options) {
+  public void addAll (@NonNull Collection<Radio> options) {
+    for (Radio radio : options){
       add(radio);
     }
   }
@@ -212,14 +205,9 @@ public class RadioGroup extends Field {
    * @param options the Map of radio option values and labels to add
    * @throws IllegalArgumentException if options is null
    */
-  public void addAll(Map<?, ?> options) {
-    if (options == null) {
-      String msg = "options parameter cannot be null";
-      throw new IllegalArgumentException(msg);
-    }
+  public void addAll (@NonNull Map<?, ?> options){
     for (Map.Entry<?, ?> entry : options.entrySet()) {
-      Radio radio = new Radio(entry.getKey().toString(),
-          entry.getValue().toString());
+      Radio radio = new Radio(entry.getKey().toString(), entry.getValue().toString());
       add(radio);
     }
   }
@@ -239,33 +227,18 @@ public class RadioGroup extends Field {
    * @param label the name of the object property to render as the Radio label
    * @throws IllegalArgumentException if options, value or label parameter is null
    */
-  public void addAll(Collection<?> objects, String value, String label) {
-    if (objects == null) {
-      String msg = "objects parameter cannot be null";
-      throw new IllegalArgumentException(msg);
-    }
-    if (value == null) {
-      String msg = "value parameter cannot be null";
-      throw new IllegalArgumentException(msg);
-    }
-    if (label == null) {
-      String msg = "label parameter cannot be null";
-      throw new IllegalArgumentException(msg);
-    }
-
+  public void addAll (@NonNull Collection<?> objects, @NonNull String value, @NonNull String label){
     if (objects.isEmpty()) {
       return;
     }
-
-    Map<?, ?> cache = new HashMap<>();
 
     ConfigService configService = ClickUtils.getConfigService();
     PropertyService propertyService = configService.getPropertyService();
 
     for (Object object : objects) {
       try {
-        Object valueResult = propertyService.getValue(object, value, cache);
-        Object labelResult = propertyService.getValue(object, label, cache);
+        Object valueResult = propertyService.getValue(object, value);
+        Object labelResult = propertyService.getValue(object, label);
 
         Radio radio;
 

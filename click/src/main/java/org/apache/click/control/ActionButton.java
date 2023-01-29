@@ -8,6 +8,7 @@ import org.apache.click.util.HtmlStringBuffer;
 import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.Serial;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -43,6 +44,7 @@ import java.util.Set;
  * @see org.apache.click.control.ActionLink
  */
 public class ActionButton extends Button {
+  @Serial private static final long serialVersionUID = 1139950945895672795L;
 
   /** The action button parameter name: &nbsp; <tt>actionButton</tt>. */
   public static final String ACTION_BUTTON = "actionButton";
@@ -57,7 +59,6 @@ public class ActionButton extends Button {
   /** The button parameters map. */
   @Setter protected Map<String, Object> parameters;
 
-  // ----------------------------------------------------------- Constructors
 
   /**
    * Create an ActionButton for the given name.

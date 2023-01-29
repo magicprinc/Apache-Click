@@ -83,9 +83,6 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.TreeMap;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.function.Supplier;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -1101,8 +1098,7 @@ public class ClickUtils {
    * @param response the servlet response
    * @param cookieName The name of the cookie you want to delete.
    */
-  public static void invalidateCookie(HttpServletRequest request,
-      HttpServletResponse response, String cookieName) {
+  public static void invalidateCookie (HttpServletRequest request, HttpServletResponse response, String cookieName) {
 
     invalidateCookie(request, response, cookieName, "/");
   }
@@ -1115,7 +1111,12 @@ public class ClickUtils {
    * @throws MissingResourceException if no resource bundle for the specified base name can be found
    */
   public static ResourceBundle getBundle(String baseName) {
-    return getBundle(baseName, Locale.getDefault());
+    val context = Context.getThreadLocalContext();
+    val locale = context != null
+        ? context.getLocale()
+        : Locale.getDefault();
+
+    return getBundle(baseName, locale);
   }
 
   /**
@@ -1208,25 +1209,29 @@ public class ClickUtils {
   public static ConfigService getConfigService(ServletContext servletContext){
     ConfigService configService = (ConfigService) servletContext.getAttribute(ConfigService.CONTEXT_NAME);
 
-    if (configService != null) {
+    if (configService != null){
       return configService;
-
-    } else {
-      String msg =
-          "could not find ConfigService in the ServletContext under the"
-              + " name '" + ConfigService.CONTEXT_NAME + "'.\nThis can occur"
-              + " if ClickUtils.getConfigService() is called before"
-              + " ClickServlet is initialized by the servlet container.\n"
-              + "To fix ensure that ClickServlet is loaded at startup by"
-              + " editing your web.xml and setting the load-on-startup to 0:\n\n"
-              + " <servlet>\n"
-              + "   <servlet-name>ClickServlet</servlet-name>\n"
-              + "   <servlet-class>org.apache.click.ClickServlet</servlet-class>\n"
-              + "   <load-on-startup>0</load-on-startup>\n"
-              + " </servlet>\n";
-
-      throw new RuntimeException(msg);
     }
+
+    var context = Context.getThreadLocalContext();
+    if (context != null){
+      configService = context.getClickServlet().getConfigService();
+      if (configService != null){
+        return configService;
+      }
+    }
+
+    String msg =
+        "Could not find ConfigService in the ServletContext under the name '"+ ConfigService.CONTEXT_NAME +"'.\n" +
+            "This can occur if ClickUtils.getConfigService() is called before ClickServlet is initialized by the servlet container.\n"
+            + "To fix, ensure that ClickServlet is loaded at startup by editing your web.xml and setting the load-on-startup to 0:\n\n"
+            + " <servlet>\n"
+            + "   <servlet-name>ClickServlet</servlet-name>\n"
+            + "   <servlet-class>org.apache.click.ClickServlet</servlet-class>\n"
+            + "   <load-on-startup>0</load-on-startup>\n"
+            + " </servlet>\n";
+
+    throw new IllegalStateException(msg);
   }
 
   /**
@@ -1235,10 +1240,16 @@ public class ClickUtils {
    *
    * @return the application config service instance
    */
-  public static ConfigService getConfigService() {
-    ServletContext servletContext = Context.getThreadLocalContext().getServletContext();
+  public static ConfigService getConfigService (){
+    val context = Context.getThreadLocalContext();
+    if (context == null){
+      throw new IllegalStateException("getConfigService() must be called only from HTTP Request Handling code");
+    }
 
-    return getConfigService(servletContext);
+    val configService = context.getClickServlet().getConfigService();
+    assert configService == context.getServletContext().getAttribute(ConfigService.CONTEXT_NAME) : "ConfigService in var ≠ in ConfigService.CONTEXT_NAME";
+
+    return configService;
   }
 
   /**
@@ -1251,10 +1262,10 @@ public class ClickUtils {
    * @param name the name of the cookie
    * @return the Cookie object if it exists, otherwise null
    */
-  public static Cookie getCookie(HttpServletRequest request, String name) {
+  public static @Nullable Cookie getCookie (HttpServletRequest request, String name){
     Cookie[] cookies = request.getCookies();
 
-    if (cookies == null || name == null || name.length() == 0) {
+    if (cookies == null || name == null || name.length() == 0){
       return null;
     }
 
@@ -3191,33 +3202,6 @@ public class ClickUtils {
   @SuppressWarnings("unchecked")
   public static <T> T cast (Class<?> castToClass, Object x) throws ClassCastException, NullPointerException {
     return (T) castToClass.cast(x);
-  }
-
-
-  /**
-   Provides a classloader object map cache - keyed on the current threads classloader.
-
-   ClassLoader → E (anything)
-   <pre><code>
-   // The cache map keyed by classloader
-   private final Map&lt;ClassLoader, E&gt; classLoaderMap = new ConcurrentHashMap<>();
-   </code></pre>
-
-   Return the cached variable for the current thread classloader.
-
-   @param <E> the class to cache against the current threads classloader
-   @return the cached variable for the current thread classloader.
-   */
-  public static <E> E classLoaderCacheGET (ConcurrentMap<ClassLoader,E> CLASSLOADER_CACHE, Supplier<E> supplyIfAbsent) {
-    // private final ConcurrentHashMap<ClassLoader,E> classLoaderMap = new ConcurrentHashMap<>();
-    final ClassLoader cl = getClassLoader();
-    return CLASSLOADER_CACHE.computeIfAbsent(cl, k->supplyIfAbsent.get());
-  }
-
-  public static <K,V> ConcurrentMap<K,V> classLoaderCacheGET (
-      ConcurrentMap<ClassLoader,ConcurrentMap<K,V>> CLASSLOADER_CACHE
-  ){
-    return classLoaderCacheGET(CLASSLOADER_CACHE, ConcurrentHashMap::new);
   }
 
 

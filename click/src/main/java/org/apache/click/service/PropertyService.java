@@ -63,6 +63,7 @@ public interface PropertyService {
    * @param cache the cache of reflected property Method objects, do NOT modify this cache
    * @return the property value for the given source object and property name
    */
+  @Deprecated
   default Object getValue (Object source, String name, Map<?,?> cache){
     return getValue(source, name);
   }

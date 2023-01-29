@@ -1,12 +1,14 @@
 package org.apache.click.util;
 
 import junit.framework.TestCase;
+import org.apache.click.Context;
 import org.apache.click.Control;
 import org.apache.click.MockContext;
+import org.apache.click.service.XmlConfigService;
 
 import java.util.Locale;
+import java.util.Map;
 import java.util.MissingResourceException;
-import java.util.ResourceBundle;
 
 /** Tests for {@link MessagesMap} */
 public class MessagesMapTest extends TestCase {
@@ -17,7 +19,7 @@ public class MessagesMapTest extends TestCase {
     MockContext.initContext(Locale.ENGLISH);
 
     // Load click-control.properties into map
-    MessagesMap map = new MessagesMap(getClass(), Control.CONTROL_MESSAGES);
+    Map<String,String> map = Context.getThreadLocalContext().createMessagesMap(getClass(), Control.CONTROL_MESSAGES);
 
     assertFalse(map.isEmpty());
     assertTrue(map.size() > 28);
@@ -42,7 +44,7 @@ public class MessagesMapTest extends TestCase {
     MockContext.initContext(Locale.CANADA);
 
     // Load click-control.properties into map
-    MessagesMap map = new MessagesMap(getClass(), Control.CONTROL_MESSAGES);
+    Map<String,String> map = (MessagesMap) Context.getThreadLocalContext().createMessagesMap(getClass(), Control.CONTROL_MESSAGES);
 
     assertFalse(map.isEmpty());
     assertTrue(map.size() > 28);
@@ -67,7 +69,7 @@ public class MessagesMapTest extends TestCase {
     MockContext.initContext(Locale.ENGLISH);
 
     // Load the non existing missingResource.properties into map
-    MessagesMap map = new MessagesMap(Object.class, "missingResource");
+    MessagesMap map = (MessagesMap) Context.getThreadLocalContext().createMessagesMap(Object.class, "missingResource");
 
     assertTrue(map.isEmpty());
     assertEquals(0, map.size());
@@ -81,7 +83,7 @@ public class MessagesMapTest extends TestCase {
       assertTrue(true);
     }
 
-    map = new MessagesMap(Object.class, "missingResource");
+    map = (MessagesMap) Context.getThreadLocalContext().createMessagesMap(Object.class, "missingResource");
 
     assertTrue(map.isEmpty());
     assertEquals(0, map.size());
@@ -102,7 +104,7 @@ public class MessagesMapTest extends TestCase {
   public void testPageResources() {
     MockContext.initContext(Locale.ENGLISH);
 
-    MessagesMap map = new MessagesMap(TestPage.class, "click-page");
+    MessagesMap map = (MessagesMap) Context.getThreadLocalContext().createMessagesMap(TestPage.class, "click-page");
 
     assertFalse(map.isEmpty());
     assertEquals(2, map.size());
@@ -114,7 +116,7 @@ public class MessagesMapTest extends TestCase {
   public void testMessageInheritance() {
     MockContext.initContext(Locale.ENGLISH);
 
-    MessagesMap map = new MessagesMap(Test2TextField.class, Control.CONTROL_MESSAGES);
+    MessagesMap map = (MessagesMap) Context.getThreadLocalContext().createMessagesMap(Test2TextField.class, Control.CONTROL_MESSAGES);
 
     assertFalse(map.isEmpty());
     assertTrue(map.size() > 30);
@@ -139,10 +141,10 @@ public class MessagesMapTest extends TestCase {
    */
   public void testGlobalResourceKey() {
     MockContext.initContext(Locale.ENGLISH);
-    MessagesMap emptyMap = new MessagesMap(Object.class, "missingResource");
+    MessagesMap emptyMap = (MessagesMap) Context.getThreadLocalContext().createMessagesMap(Object.class, "missingResource");
     assertTrue(emptyMap.isEmpty());
 
-    MessagesMap map = new MessagesMap(Object.class, "click-control");
+    MessagesMap map = (MessagesMap) Context.getThreadLocalContext().createMessagesMap(Object.class, "click-control");
     assertFalse(map.isEmpty());
     assertEquals("First", map.get("table-first-label"));
   }
@@ -165,7 +167,9 @@ public class MessagesMapTest extends TestCase {
     Locale.setDefault(locale);
 
     MockContext.initContext(locale);
-    MessagesMap nonEnglishMessages = new ReloadableMessagesMap(Object.class, "click-control");
+    XmlConfigService.clearMessagesMapCache();
+    MessagesMap nonEnglishMessages = (MessagesMap) Context.getThreadLocalContext().createMessagesMap(Object.class, "click-control");
+    XmlConfigService.clearMessagesMapCache();
     assertFalse(nonEnglishMessages.isEmpty());
 
     //Test that property from click-control.properties are picked up
@@ -175,7 +179,9 @@ public class MessagesMapTest extends TestCase {
     //Test that property from click-control.properties are picked up
     //when specified locale is English and default Locale cannot be found
     MockContext.initContext(Locale.ENGLISH);
-    MessagesMap englishMessages = new ReloadableMessagesMap(Object.class, "click-control");
+    XmlConfigService.clearMessagesMapCache();
+    MessagesMap englishMessages = (MessagesMap) Context.getThreadLocalContext().createMessagesMap(Object.class, "click-control");
+    XmlConfigService.clearMessagesMapCache();
     assertFalse(englishMessages.isEmpty());
     assertEquals("First", englishMessages.get("table-first-label"));
 
@@ -198,49 +204,24 @@ public class MessagesMapTest extends TestCase {
     Locale.setDefault(locale);
 
     MockContext.initContext(locale);
-    MessagesMap nonEnglishMessages = new ReloadableMessagesMap(Object.class, "click-control");
+    XmlConfigService.clearMessagesMapCache();
+    MessagesMap nonEnglishMessages = (MessagesMap) Context.getThreadLocalContext().createMessagesMap(Object.class, "click-control");
+    XmlConfigService.clearMessagesMapCache();
     assertFalse(nonEnglishMessages.isEmpty());
 
     //Test that French property is picked up
-    assertTrue(nonEnglishMessages.get("table-first-label").indexOf("Premi") == 0);
+    assertEquals(0, nonEnglishMessages.get("table-first-label").indexOf("Premi"));
 
     //While using a default French locale, test that a English specified
     //locale picks up properties from click-control.properties
     MockContext.initContext(Locale.ENGLISH);
-    MessagesMap englishMessages = new ReloadableMessagesMap(Object.class, "click-control");
+    XmlConfigService.clearMessagesMapCache();
+    MessagesMap englishMessages = (MessagesMap) Context.getThreadLocalContext().createMessagesMap(Object.class, "click-control");
+    XmlConfigService.clearMessagesMapCache();
     assertFalse(englishMessages.isEmpty());
     assertEquals("First", englishMessages.get("table-first-label"));
 
     // Restore default locale
     Locale.setDefault(defaultLocale);
-  }
-
-  /**
-   * This messagesMap subclass will clear its static cached properties each
-   * time a new instance is created. The properties will then be reloaded.
-   */
-  private static class ReloadableMessagesMap extends MessagesMap {
-
-    public ReloadableMessagesMap(Class<?> baseClass, String globalResource) {
-      super(baseClass, globalResource);
-      clearCache();
-    }
-
-    public void clearCache() {
-      MESSAGES_CLASSLOADER_CACHE.clear();
-      clearResourceBundleCache();
-    }
-
-    private void clearResourceBundleCache() {
-      try {
-        ResourceBundle.clearCache();
-        ResourceBundle.clearCache(Thread.currentThread().getContextClassLoader());
-        ResourceBundle.clearCache(this.getClass().getClassLoader());
-      } catch (Exception jvmNotSupported){
-        System.err.println("WARNING: Could not clear the MessagesMap cache. This could lead to some test cases failing, because " +
-            "cached properties from previous tests could be returned.");
-        jvmNotSupported.printStackTrace();
-      }
-   }
   }
 }

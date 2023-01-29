@@ -2,13 +2,14 @@ package org.apache.click;
 
 import lombok.Getter;
 import lombok.NonNull;
+import org.apache.click.service.ConfigService;
 import org.apache.click.service.LogService;
-import org.apache.click.service.MessagesMapService;
 import org.apache.click.service.TemplateService;
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.FlashAttribute;
 import org.apache.commons.fileupload.FileItem;
 
+import javax.annotation.Nullable;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
@@ -514,11 +515,8 @@ public class Context {
    * @param globalResource the global resource bundle name
    * @return a new messages map with the messages for the target.
    */
-  public Map<String, String> createMessagesMap(Class<?> baseClass, String globalResource) {
-    MessagesMapService messagesMapService =
-        clickServlet.getConfigService().getMessagesMapService();
-
-    return messagesMapService.createMessagesMap(baseClass, globalResource, getLocale());
+  public Map<String,String> createMessagesMap (@NonNull Class<?> baseClass, String globalResource){
+    return clickServlet.getConfigService().createMessagesMap(baseClass, globalResource, getLocale());
   }
 
   /**
@@ -571,18 +569,15 @@ public class Context {
    */
   public Locale getLocale() {
     Locale locale = (Locale) getSessionAttribute(LOCALE);
+    if (locale != null){ return locale;}
 
-    if (locale == null) {
+    locale = clickServlet.getConfigService().getLocale();
+    if (locale != null){ return locale;}
 
-      if (clickServlet.getConfigService().getLocale() != null) {
-        locale = clickServlet.getConfigService().getLocale();
+    locale = getRequest().getLocale();
+    if (locale != null){ return locale;}
 
-      } else {
-        locale = getRequest().getLocale();
-      }
-    }
-
-    return locale;
+    return Locale.getDefault();
   }
 
   /**
@@ -595,7 +590,7 @@ public class Context {
    * @param locale the Locale to store in the users session using the key
    * "locale"
    */
-  public void setLocale(Locale locale) {
+  public void setLocale (@Nullable Locale locale) {
     if (locale == null && hasSession()) {
       getSession().removeAttribute(LOCALE);
     } else {
@@ -726,6 +721,10 @@ public class Context {
     } else {
       throw new IllegalStateException("Click request is not present");
     }
+  }
+
+  public ConfigService getConfigService () {
+    return clickServlet.getConfigService();
   }
 
 }

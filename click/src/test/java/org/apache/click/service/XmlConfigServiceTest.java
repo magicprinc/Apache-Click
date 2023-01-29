@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.click.Context;
 import org.apache.click.MockContainer;
+import org.apache.click.MockContext;
 import org.apache.click.Page;
 import org.apache.click.PageInterceptor;
 import org.apache.click.control.AbstractControl;
@@ -15,7 +16,6 @@ import org.apache.click.service.ConfigService.AutoBinding;
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.ErrorPage;
 import org.apache.click.util.Format;
-import org.apache.click.util.MessagesMap;
 
 import javax.servlet.ServletContext;
 import java.io.File;
@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.apache.click.util.ClickTestUtils.deleteDir;
 import static org.apache.click.util.ClickTestUtils.makeFile;
@@ -561,40 +562,6 @@ public class XmlConfigServiceTest extends TestCase {
     deleteDir(tmpdir);
   }
 
-  public void testMessagesMapService() throws Exception {
-    File tmpdir = makeTmpDir();
-
-    PrintStream pstr = makeXmlStream(tmpdir, "WEB-INF/click.xml");
-    pstr.println("<click-app>");
-    pstr.println(" <pages/>");
-    pstr.println(" <messages-map-service classname='org.apache.click.service.XmlConfigServiceTest$MyMessagesMapService'/>");
-    pstr.println("</click-app>");
-    pstr.close();
-
-    MockContainer container = new MockContainer(tmpdir.getAbsolutePath());
-    container.start();
-
-    ConfigService config = ClickUtils.getConfigService(container.getServletContext());
-
-    assertTrue(config.getMessagesMapService() instanceof MyMessagesMapService);
-
-    container.stop();
-    deleteDir(tmpdir);
-  }
-
-  static public class MyMessagesMapService implements MessagesMapService {
-
-    @Override public void onInit(ServletContext servletContext) throws Exception {
-    }
-
-    @Override public void onDestroy() {
-    }
-
-    @Override public Map<String, String> createMessagesMap(Class<?> baseClass,
-        String globalResource, Locale locale) {
-      return new MessagesMap(baseClass, globalResource, locale);
-    }
-  }
 
   public void testControls() throws Exception {
     File tmpdir = makeTmpDir();
@@ -679,4 +646,29 @@ public class XmlConfigServiceTest extends TestCase {
       return type;
     }
   }
+
+
+  public void testMessagesMap () {
+    XmlConfigService.clearMessagesMapCache();
+    var context = MockContext.initContext();
+
+    var map = context.createMessagesMap(this.getClass(), "fakeName");
+    assertEquals(0, map.size());
+
+    try {
+      map.get("none");
+      fail();
+    } catch (Exception e){
+      assertEquals("java.util.MissingResourceException: Message key none not found in bundle org.apache.click.service.XmlConfigServiceTest|fakeName_ru_RU", e.toString());
+    }
+    assertEquals(XmlConfigService.MESSAGE_MAP_CACHE.toString(), 0, XmlConfigService.MESSAGE_MAP_CACHE.size());
+    assertEquals(4, XmlConfigService.NOT_FOUND_MESSAGE_MAP_CACHE.size());
+    assertEquals("fakeName_ru_RU, junit.framework.Assert_ru_RU, junit.framework.TestCase_ru_RU, org.apache.click.service.XmlConfigServiceTest_ru_RU",
+        XmlConfigService.NOT_FOUND_MESSAGE_MAP_CACHE.keySet().stream().sorted().collect(Collectors.joining(", ")));
+
+    map = context.createMessagesMap(this.getClass(), "click-page");
+    assertEquals(1, map.size());
+    assertEquals("Version 0.21", map.get("version"));
+  }
+
 }

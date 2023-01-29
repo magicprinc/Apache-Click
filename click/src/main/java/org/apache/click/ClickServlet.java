@@ -1,5 +1,6 @@
 package org.apache.click;
 
+import lombok.Getter;
 import org.apache.click.service.ConfigService;
 import org.apache.click.service.ConfigService.AutoBinding;
 import org.apache.click.service.LogService;
@@ -34,7 +35,6 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.TreeMap;
 
 /**
@@ -85,10 +85,7 @@ import java.util.TreeMap;
  * ServletContext using the key {@value org.apache.click.service.ConfigService#CONTEXT_NAME}.
  */
 public class ClickServlet extends HttpServlet {
-
-  // -------------------------------------------------------------- Constants
-
-  @Serial private static final long serialVersionUID = 1L;
+  @Serial private static final long serialVersionUID = -2529351634349647916L;
 
   /**
    * The <tt>mock page reference</tt> request attribute: key: &nbsp;
@@ -126,10 +123,10 @@ public class ClickServlet extends HttpServlet {
    */
   protected final static String FORWARD_PAGE = "forward-page";
 
-  // ----------------------------------------------------- Instance Variables
 
-  /** The click application configuration service. */
-  protected ConfigService configService;
+
+  /** The click application configuration service instance. Same as in ServletContext */
+  @Getter protected ConfigService configService;
 
   /** The application log service. */
   protected LogService logger;
@@ -138,8 +135,7 @@ public class ClickServlet extends HttpServlet {
   protected ResourceService resourceService;
 
   /** The thread local page listeners. */
-  private static final ThreadLocal<List<PageInterceptor>>
-      THREAD_LOCAL_INTERCEPTORS = new ThreadLocal<>();
+  private static final ThreadLocal<List<PageInterceptor>>THREAD_LOCAL_INTERCEPTORS = new ThreadLocal<>();
 
   // --------------------------------------------------------- Public Methods
 
@@ -151,9 +147,7 @@ public class ClickServlet extends HttpServlet {
    * @throws ServletException if the application configuration service could
    * not be initialized
    */
-  @Override
-  public void init() throws ServletException {
-
+  @Override public void init() throws ServletException {
     try {
 
       // Create and initialize the application config service
@@ -336,8 +330,7 @@ public class ClickServlet extends HttpServlet {
       processPage(page);
 
     } catch (Exception e) {
-      Class<? extends Page> pageClass =
-          configService.getPageClass(ClickUtils.getResourcePath(request));
+      Class<? extends Page> pageClass = configService.getPageClass(ClickUtils.getResourcePath(request));
 
       handleException(request, response, isPost, e, pageClass);
 
@@ -345,8 +338,7 @@ public class ClickServlet extends HttpServlet {
       Throwable cause = eiie.getException();
       cause = (cause != null) ? cause : eiie;
 
-      Class<? extends Page> pageClass =
-          configService.getPageClass(ClickUtils.getResourcePath(request));
+      Class<? extends Page> pageClass = configService.getPageClass(ClickUtils.getResourcePath(request));
 
       handleException(request, response, isPost, cause, pageClass);
 
@@ -796,8 +788,7 @@ public class ClickServlet extends HttpServlet {
         renderJSP(page);
 
       } else {
-        RequestDispatcher dispatcher =
-            request.getRequestDispatcher(page.getForward());
+        RequestDispatcher dispatcher = request.getRequestDispatcher(page.getForward());
 
         dispatcher.forward(request, response);
       }
@@ -1569,14 +1560,6 @@ public class ClickServlet extends HttpServlet {
     }
   }
 
-  /**
-   * Return the application configuration service instance.
-   *
-   * @return the application configuration service instance
-   */
-  protected ConfigService getConfigService() {
-    return configService;
-  }
 
   /**
    * Return a new Page instance for the given path. The path must start with
@@ -1954,10 +1937,10 @@ public class ClickServlet extends HttpServlet {
   List<PageInterceptor> getThreadLocalInterceptors() {
     List<PageInterceptor> listeners = THREAD_LOCAL_INTERCEPTORS.get();
 
-    return Objects.requireNonNullElse(listeners, Collections.emptyList());
+    return listeners != null ? listeners : Collections.emptyList();
   }
 
-  void setThreadLocalInterceptors(List<PageInterceptor> listeners) {
+  void setThreadLocalInterceptors(List<PageInterceptor> listeners){
     THREAD_LOCAL_INTERCEPTORS.set(listeners);
   }
 
@@ -1970,13 +1953,11 @@ public class ClickServlet extends HttpServlet {
    */
   Writer getWriter(HttpServletResponse response) throws IOException {
     try {
-
       return response.getWriter();
 
     } catch (IllegalStateException ignore) {
       // If writer cannot be retrieved fallback to OutputStream. CLK-644
-      return new OutputStreamWriter(response.getOutputStream(),
-          response.getCharacterEncoding());
+      return new OutputStreamWriter(response.getOutputStream(), response.getCharacterEncoding());
     }
   }
 

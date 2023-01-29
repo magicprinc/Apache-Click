@@ -7,6 +7,7 @@ import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
 import org.apache.commons.lang.math.NumberUtils;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.Comparator;
@@ -179,7 +180,7 @@ import java.util.StringTokenizer;
  * @see Table
  */
 public class Column implements Serializable {
-
+  @Serial private static final long serialVersionUID = 7156325965121717980L;
 
   /** The Column attributes Map. */
   protected Map<String, String> attributes;
@@ -235,9 +236,6 @@ public class Column implements Serializable {
 
   /** The column render id attribute status. The default value is false. */
   protected Boolean renderId;
-
-  /** The method cached for rendering column values. */
-  protected transient Map<Object, Object> methodCache;
 
   /** The column sortable status. The default value is false. */
   protected Boolean sortable;
@@ -1184,7 +1182,7 @@ public class Column implements Serializable {
           (getHeaderClass() != null) ? getHeaderClass() + " " : "";
 
       if (sortedColumn) {
-        classValue += (ascending) ? "ascending" : "descending";
+        classValue += ascending ? "ascending" : "descending";
       } else {
         classValue += "sortable";
       }
@@ -1289,16 +1287,12 @@ public class Column implements Serializable {
       object = map.get(lowerCaseName);
       return object;
     } else {
-      if (methodCache == null) {
-        methodCache = new HashMap<>();
-      }
-
       if (propertyService == null) {
         ConfigService configService = ClickUtils.getConfigService();
         propertyService = configService.getPropertyService();
       }
 
-      return propertyService.getValue(row, name, methodCache);
+      return propertyService.getValue(row, name);
     }
   }
 
@@ -1420,7 +1414,7 @@ public class Column implements Serializable {
    */
   @SuppressWarnings("unchecked")
   static class ColumnComparator implements Comparator, Serializable {
-
+    @Serial private static final long serialVersionUID = -6326631736346380017L;
     /** The sort ascending flag. */
     protected int ascendingSort;
 

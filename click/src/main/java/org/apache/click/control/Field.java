@@ -1,5 +1,6 @@
 package org.apache.click.control;
 
+import lombok.NonNull;
 import lombok.Setter;
 import org.apache.click.Context;
 import org.apache.click.Control;
@@ -9,6 +10,8 @@ import org.apache.click.util.ClickUtils;
 import org.apache.click.util.ContainerUtils;
 import org.apache.click.util.HtmlStringBuffer;
 import org.apache.commons.lang.StringUtils;
+
+import java.io.Serial;
 
 /**
  * Provides an abstract form Field control. Field controls are contained by
@@ -163,6 +166,7 @@ import org.apache.commons.lang.StringUtils;
  * </dl>
  */
 public abstract class Field extends AbstractControl implements Stateful {
+  @Serial private static final long serialVersionUID = 2196415359858221925L;
 
   /** The Field disabled value. */
   protected boolean disabled;
@@ -987,7 +991,7 @@ public abstract class Field extends AbstractControl implements Stateful {
    *
    * @return the Field state
    */
-  public Object getState() {
+  @Override public Object getState() {
     String state = getValue();
     if (StringUtils.isEmpty(state)) {
       return null;
@@ -1000,7 +1004,7 @@ public abstract class Field extends AbstractControl implements Stateful {
    *
    * @param state the Field state to set
    */
-  public void setState(Object state) {
+  @Override public void setState(Object state) {
     if (state == null) {
       return;
     }
@@ -1119,8 +1123,9 @@ public abstract class Field extends AbstractControl implements Stateful {
    */
   protected String getErrorLabel() {
     String localLabel = getLabel().trim();
-    localLabel = (localLabel.endsWith(":"))
-        ? localLabel.substring(0, localLabel.length() - 1) : localLabel;
+    localLabel = localLabel.endsWith(":")
+        ? localLabel.substring(0, localLabel.length() - 1)
+        : localLabel;
     return localLabel;
   }
 
@@ -1206,12 +1211,7 @@ public abstract class Field extends AbstractControl implements Stateful {
    * @param tagName the name of the tag to render
    * @param buffer the buffer to append the output to
    */
-  @Override
-  protected void renderTagBegin(String tagName, HtmlStringBuffer buffer) {
-    if (tagName == null) {
-      throw new IllegalStateException("Tag cannot be null");
-    }
-
+  @Override protected void renderTagBegin (@NonNull String tagName, HtmlStringBuffer buffer){
     buffer.elementStart(tagName);
 
     String controlName = getName();

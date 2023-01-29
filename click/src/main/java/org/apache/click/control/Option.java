@@ -1,9 +1,10 @@
 package org.apache.click.control;
 
+import lombok.val;
 import org.apache.click.util.HtmlStringBuffer;
 
+import java.io.Serial;
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * Provides a select Option element: &nbsp; &lt;option&gt;&lt;/option&gt;.
@@ -79,6 +80,7 @@ import java.util.List;
  * @see OptionGroup
  */
 public class Option implements Serializable {
+  @Serial private static final long serialVersionUID = -7212239592323960704L;
 
   /** The empty select empty option. */
   public static final Option EMPTY_OPTION = new Option("", "");
@@ -153,7 +155,7 @@ public class Option implements Serializable {
   // --------------------------------------------------------- Public Methods
 
   /**
-   * Return a HTML rendered Option string.
+   * Return an HTML rendered Option string.
    *
    * @param select the parent Select
    * @param buffer the specified buffer to render to
@@ -166,9 +168,8 @@ public class Option implements Serializable {
       if (!select.getSelectedValues().isEmpty()) {
 
         // Search through selection list for matching value
-        List values = select.getSelectedValues();
-        for (Object o : values){
-          String value = o.toString();
+        val values = select.getSelectedValues();
+        for (String value : values){
           if (getValue().equals(value)){
             buffer.appendAttribute("selected", "selected");
             break;

@@ -4,6 +4,8 @@ import org.apache.click.Context;
 import org.apache.click.util.HtmlStringBuffer;
 import org.apache.commons.lang.StringUtils;
 
+import java.io.Serial;
+
 /**
  * Provides an ImageSubmit control: &nbsp; &lt;input type='image' src='edit.gif'&gt;.
  *
@@ -27,6 +29,7 @@ import org.apache.commons.lang.StringUtils;
  * @see Button
  */
 public class ImageSubmit extends Submit {
+  @Serial private static final long serialVersionUID = -1788313119100448719L;
 
   /**
    * The image path src attribute. If the src value is prefixed with

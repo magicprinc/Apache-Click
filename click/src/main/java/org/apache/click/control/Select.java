@@ -10,11 +10,11 @@ import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
 
 import javax.servlet.ServletContext;
+import java.io.Serial;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -268,6 +268,7 @@ import java.util.Map;
  * @see OptionGroup
  */
 public class Select extends Field {
+  @Serial private static final long serialVersionUID = -5733287670323168725L;
 
   /**
    * The field validation JavaScript function template.
@@ -288,7 +289,6 @@ public class Select extends Field {
           + "   '}'\n"
           + "'}'\n";
 
-  // Instance Variables -----------------------------------------------------
 
   /** The multiple options selectable flag. The default value is false. */
   protected boolean multiple;
@@ -392,11 +392,7 @@ public class Select extends Field {
    * @param option the Option value to add
    * @throws IllegalArgumentException if option is null
    */
-  public void add(Option option) {
-    if (option == null) {
-      String msg = "option parameter cannot be null";
-      throw new IllegalArgumentException(msg);
-    }
+  public void add (@NonNull Option option) {
     List optionList = getOptionList();
     optionList.add(option);
     if (optionList.size() == 1) {
@@ -410,11 +406,7 @@ public class Select extends Field {
    * @param optionGroup the OptionGroup value to add
    * @throws IllegalArgumentException if optionGroup is null
    */
-  public void add(OptionGroup optionGroup) {
-    if (optionGroup == null) {
-      String msg = "optionGroup parameter cannot be null";
-      throw new IllegalArgumentException(msg);
-    }
+  public void add (@NonNull OptionGroup optionGroup) {
     getOptionList().add(optionGroup);
   }
 
@@ -426,11 +418,7 @@ public class Select extends Field {
    * @param value the option value to add
    * @throws IllegalArgumentException if the value is null
    */
-  public void add(String value) {
-    if (value == null) {
-      String msg = "value parameter cannot be null";
-      throw new IllegalArgumentException(msg);
-    }
+  public void add (@NonNull String value) {
     List optionList = getOptionList();
     optionList.add(new Option(value));
     if (optionList.size() == 1) {
@@ -484,12 +472,7 @@ public class Select extends Field {
    * @throws IllegalArgumentException if options is null, or the collection
    *     contains an unsupported class
    */
-  public void addAll(Collection<?> options) {
-    if (options == null) {
-      String msg = "options parameter cannot be null";
-      throw new IllegalArgumentException(msg);
-    }
-
+  public void addAll (@NonNull Collection<?> options) {
     if (!options.isEmpty()) {
       for (Object option : options) {
         add(option);
@@ -526,11 +509,7 @@ public class Select extends Field {
    * @param options the array of option values to add
    * @throws IllegalArgumentException if options is null
    */
-  public void addAll(String[] options) {
-    if (options == null) {
-      String msg = "options parameter cannot be null";
-      throw new IllegalArgumentException(msg);
-    }
+  public void addAll (String @NonNull [] options) {
     for (String option : options) {
       getOptionList().add(new Option(option, option));
     }
@@ -566,23 +545,10 @@ public class Select extends Field {
    * @throws IllegalArgumentException if objects or optionValueProperty
    * parameter is null
    */
-  public void addAll(Collection objects, String optionValueProperty,
-      String optionLabelProperty) {
-
-    if (objects == null) {
-      String msg = "objects parameter cannot be null";
-      throw new IllegalArgumentException(msg);
-    }
-    if (optionValueProperty == null) {
-      String msg = "optionValueProperty parameter cannot be null";
-      throw new IllegalArgumentException(msg);
-    }
-
+  public void addAll (@NonNull Collection objects, @NonNull String optionValueProperty, String optionLabelProperty){
     if (objects.isEmpty()) {
       return;
     }
-
-    Map methodCache = new HashMap();
 
     if (propertyService == null) {
       ServletContext sc = Context.getThreadLocalContext().getServletContext();
@@ -592,10 +558,7 @@ public class Select extends Field {
 
     for (Object object : objects) {
       try {
-        Object valueResult =
-            propertyService.getValue(object,
-                optionValueProperty,
-                methodCache);
+        Object valueResult = propertyService.getValue(object, optionValueProperty);
 
         // Default labelResult to valueResult
         Object labelResult = valueResult;
@@ -603,10 +566,7 @@ public class Select extends Field {
         // If optionLabelProperty is specified, lookup the labelResult
         // from the object
         if (optionLabelProperty != null) {
-          labelResult =
-              propertyService.getValue(object,
-                  optionLabelProperty,
-                  methodCache);
+          labelResult = propertyService.getValue(object, optionLabelProperty);
         }
 
         Option option;
@@ -614,7 +574,7 @@ public class Select extends Field {
         if (labelResult != null) {
           option = new Option(valueResult, labelResult.toString());
         } else {
-          option = new Option(valueResult.toString());
+          option = new Option(""+valueResult);// nullable!!!
         }
 
         getOptionList().add(option);
@@ -655,8 +615,7 @@ public class Select extends Field {
     this.dataProvider = dataProvider;
     if (dataProvider != null) {
       if (optionList != null) {
-        ClickUtils.getLogService().warn("please note that setting a"
-            + " dataProvider nullifies the optionList");
+        ClickUtils.getLogService().warn("please note that setting a dataProvider nullifies the optionList");
       }
       setOptionList(null);
     }

@@ -44,6 +44,7 @@ public class PropertyUtils implements PropertyService {
   @Override public void onDestroy (){}
 
 
+
   /**
    * Return the property value for the given object and property name. This
    * method uses reflection internally to get the property value.
@@ -52,27 +53,6 @@ public class PropertyUtils implements PropertyService {
    * internal synchronized cache.
    * <p/>
    * If the given source object is a {@link Map} this method will simply
-   * return the value for the given key name.
-   *
-   * @param source the source object
-   * @param propertyName the name of the property
-   * @return the property value for the given source object and property name
-   */
-  @Override public Object getValue (Object source, String propertyName, @NonNull Map<?,?> getMethodCache){
-    return getValue(source, propertyName);
-  }
-
-  /**
-   * Return the property value for the given object and property name. This
-   * method uses reflection internally to get the property value.
-   * <p/>
-   * This method caches the reflected property methods in the given Map cache.
-   * You must NOT modify the cache. Also note cache is ONLY valid for the
-   * current thread, as access to the cache is not synchronized. If you need
-   * multithreaded access to shared cache use a thread-safe Map object, such
-   * as <tt>Collections.synchronizedMap(new HashMap())</tt>.
-   * <p/>
-   * If the given source object is a <tt>Map</tt> this method will simply
    * return the value for the given key name.
    *
    * @param source the source object

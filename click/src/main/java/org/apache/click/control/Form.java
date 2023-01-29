@@ -20,6 +20,7 @@ import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -491,6 +492,7 @@ import java.util.UUID;
  @see Field
  @see Submit */
 public class Form extends AbstractContainer implements Stateful {
+  @Serial private static final long serialVersionUID = -5038737218349023962L;
 
   /** The align left, form layout constant: &nbsp; <tt>"left"</tt>. */
   public static final String ALIGN_LEFT = "left";
@@ -546,7 +548,6 @@ public class Form extends AbstractContainer implements Stateful {
           + "if (field && field.focus && field.type != 'hidden' && field.disabled != true) { field.focus(); };\n"
           + "//--></script>\n";
 
-  // Instance Variables -----------------------------------------------------
 
   /** The form action URL. */
   protected String actionURL;
@@ -1741,8 +1742,7 @@ public class Form extends AbstractContainer implements Stateful {
    */
   public void clearValues () {
     for (Field field : ContainerUtils.getInputFields(this)){
-      if (!field.getName().equals(FORM_NAME)
-          && ( !field.getName().startsWith(SUBMIT_CHECK) )){
+      if (!field.getName().equals(FORM_NAME) && !field.getName().startsWith(SUBMIT_CHECK)){
         field.setValue(null);
       }
     }
@@ -3103,7 +3103,7 @@ public class Form extends AbstractContainer implements Stateful {
    incoming value. In addition, the field name cannot be changed once set.
    */
   private static class NonProcessedHiddenField extends HiddenField {
-
+    @Serial private static final long serialVersionUID = 5716774345794705088L;
 
     /**
      Create a field with the given name and class.
@@ -3155,6 +3155,8 @@ public class Form extends AbstractContainer implements Stateful {
    is set.
    */
   private static class ImmutableHiddenField extends NonProcessedHiddenField {
+    @Serial private static final long serialVersionUID = 1588695221234483698L;
+
     /**
      Create a field with the given name and value.
 

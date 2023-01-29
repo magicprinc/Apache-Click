@@ -1,9 +1,11 @@
 package org.apache.click.service;
 
+import lombok.NonNull;
 import org.apache.click.Page;
 import org.apache.click.PageInterceptor;
 import org.apache.click.util.Format;
 
+import javax.annotation.Nullable;
 import javax.servlet.ServletContext;
 import java.lang.reflect.Field;
 import java.util.List;
@@ -148,12 +150,6 @@ public interface ConfigService {
    */
   TemplateService getTemplateService();
 
-  /**
-   * Return the application messages map service.
-   *
-   * @return the application messages Map service
-   */
-  MessagesMapService getMessagesMapService();
 
   enum Mode {
     /** The production application mode. */
@@ -346,4 +342,18 @@ public interface ConfigService {
    * @return the application servlet context
    */
   ServletContext getServletContext();
+
+  /** [Implements the application messages map service]
+   * Create a resource bundle messages <tt>Map</tt> adaptor for the given
+   * object's class resource bundle, the global resource bundle and
+   * <tt>Context</tt>.
+   * <p/>
+   * Messages located in the object's resource bundle will override any
+   * messages defined in the global resource bundle.
+   *
+   * @param baseClass the target class
+   * @param globalResource The class global resource bundle base name (aka globalBaseName).
+   * @param locale The resource bundle locale (detected if null).
+   */
+  Map<String,String> createMessagesMap (@NonNull Class<?> baseClass, String globalResource, @Nullable Locale locale);
 }

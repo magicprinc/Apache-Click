@@ -7,6 +7,7 @@ import org.apache.click.util.HtmlStringBuffer;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang.StringUtils;
 
+import java.io.Serial;
 import java.text.MessageFormat;
 
 /**
@@ -50,6 +51,7 @@ import java.text.MessageFormat;
  * </ul>
  */
 public class FileField extends Field {
+  @Serial private static final long serialVersionUID = 1375330044029313119L;
 
   /**
    * The field validation JavaScript function template.
