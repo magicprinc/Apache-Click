@@ -99,7 +99,11 @@ dependencies {
 
 
   implementation("javax.persistence:javax.persistence-api:2.2")
-  implementation("org.datanucleus:datanucleus-core:3.2.15")
+  implementation("com.google.appengine.orm:datanucleus-appengine:1.+")
+  //implementation("org.datanucleus:datanucleus-core:2.0.+")
+  implementation("org.datanucleus:datanucleus-api-jpa:3.1.4")
+  implementation("org.apache.geronimo.specs:geronimo-jpa_2.0_spec:1.+")
+  implementation("javax.jdo:jdo-api:3.2.1")
 
   //*** TEST TEST TEST
 
