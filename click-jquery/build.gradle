@@ -2,8 +2,10 @@ plugins {
   id 'java-library'
   id 'idea'
   id 'maven-publish'
-  id 'net.ltgt.errorprone' version 'latest.release'
-  id 'io.franzbecker.gradle-lombok' version 'latest.release'
+
+  id("io.freefair.lombok")   version "latest.release" // id 'io.franzbecker.gradle-lombok' version 'latest.release'
+  id("name.remal.sonarlint") version "latest.release" // https://github.com/remal-gradle-plugins/sonarlint + https://lift.sonatype.com/
+  id("net.ltgt.errorprone")  version "latest.release" // https://errorprone.info/
 }
 
 repositories {
@@ -25,10 +27,10 @@ tasks.withType(JavaCompile).configureEach {
   options.deprecation = false // todo step2: deprecated
 
   options.errorprone {
-    enabled = false
+    enabled = true
     disableWarningsInGeneratedCode = true
-    excludedPaths = ".*/build/gen.*/.*"
-    //disable("ParameterName") disable("UnusedVariable") errorproneArgs = ["--illegal-access=warn"]
+    excludedPaths = ".*/(build/gen|test).*/.*"
+    disable("MissingSummary")
   }
 }
 
@@ -102,5 +104,7 @@ test {
 
 lombok {
   version = "latest.release"
-  sha256 = "" // don't verify lombok.jar
+}
+sonarLint {
+  ignoreFailures = true
 }

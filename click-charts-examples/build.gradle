@@ -8,7 +8,9 @@ plugins {
   // https://github.com/bmuschko/gradle-tomcat-plugin
   id "com.bmuschko.tomcat" version "latest.release"
 
-  id 'io.franzbecker.gradle-lombok' version 'latest.release'
+  id("io.freefair.lombok")   version "latest.release" // id 'io.franzbecker.gradle-lombok' version 'latest.release'
+  id("name.remal.sonarlint") version "latest.release" // https://github.com/remal-gradle-plugins/sonarlint + https://lift.sonatype.com/
+  id("net.ltgt.errorprone")  version "latest.release" // https://errorprone.info/
 }
 
 repositories {
@@ -22,15 +24,22 @@ tasks.withType(JavaCompile).configureEach {
   options.encoding = 'UTF-8'
   options.compilerArgs.addAll(['-Xlint:all', '-parameters', '-g', '-Xmaxwarns', '999'])
   options.release.set(17) // javac --release 7..18+
-  options.deprecation = false // todo step2 deprecated...
+  options.deprecation = false // todo step2: deprecated
+
+  options.errorprone {
+    enabled = true
+    disableWarningsInGeneratedCode = true
+    excludedPaths = ".*/(build/gen|test).*/.*"
+    disable("MissingSummary")
+  }
 }
 
 dependencies {
+  errorprone "com.google.errorprone:error_prone_core:latest.release"
   // https://javadoc.io/doc/com.google.errorprone/error_prone_annotations/latest/index.html
   implementation("com.google.errorprone:error_prone_annotations:latest.release")
   // https://javadoc.io/doc/com.google.code.findbugs/jsr305/latest/index.html  [x] remove? jsr305→jsr308 ^ Nope! This is THE WINNER!
   implementation("com.google.code.findbugs:jsr305:latest.release")
-  implementation("javax.annotation:javax.annotation-api:1.3.2")
 
 
   implementation 'javax.servlet:servlet-api:2.5'
@@ -75,6 +84,15 @@ dependencies {
 
 }
 
+configurations {
+  all*.exclude group: "velocity", module: "velocity" // 1.3 they come from somewhere..
+  all*.exclude group: "commons-logging", module: "commons-logging"
+}
+// https://tomgregory.com/how-to-exclude-gradle-dependencies/
+configurations.all { // .implementation
+  exclude group: 'velocity', module: 'velocity'
+}
+
 idea {
   module {
     downloadJavadoc = true
@@ -97,7 +115,9 @@ test {
 
 lombok {
   version = "latest.release"
-  sha256 = "" // don't verify lombok.jar
+}
+sonarLint {
+  ignoreFailures = true
 }
 
 publishing {
