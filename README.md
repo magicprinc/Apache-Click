@@ -108,24 +108,43 @@ Further information on building Click is available here:
    `documentation/docs/developer-guide/building.html`
 
 
-2022-2023
+## 2022-2023
 
-Main site: 
+Main site
+
 https://click.apache.org/
 
-User guide, documents, book:
+User guide, documents, book
 
-https://click.apache.org/docs/user-guide.html
-https://click.apache.org/docs/user-guide/htmlsingle/click-book.html
-https://click.apache.org/docs/user-guide/html/index.html
-https://click.apache.org/docs/user-guide/pdf/click-book.pdf
+- https://click.apache.org/docs/user-guide.html
+- https://click.apache.org/docs/user-guide/htmlsingle/click-book.html
+- https://click.apache.org/docs/user-guide/html/index.html
+- https://click.apache.org/docs/user-guide/pdf/click-book.pdf
 
 Why Click?
+
 https://click.apache.org/docs/why-click.html
 
 FAQ
+
 https://click.apache.org/docs/faq.html
 
 GitHub
-https://github.com/magicprinc/Apache-Click
-https://github.com/apache/click
+
+- https://github.com/magicprinc/Apache-Click
+- https://github.com/apache/click
+
+Run examples
+
+💡 You will probably need to stop gradle's daemon, to run next example: 
+`gradlew --stop`  
+
+- $ `gradlew :examples:clean :examples:tomcatRunWar --stacktrace --info --warning-mode all`
+- $ `gradlew :extra-clickclick-examples:clean :extra-clickclick-examples:tomcatRunWar --stacktrace --info --warning-mode all`
+- $ `gradlew :click-charts-examples:clean :click-charts-examples:tomcatRunWar --stacktrace --info --warning-mode all`
+- $ `gradlew :click-jquery-examples:clean :click-jquery-examples:tomcatRunWar --stacktrace --info --warning-mode all`
+- $ `gradlew :extra-ajax4click-examples:clean :extra-ajax4click-examples:tomcatRunWar --stacktrace --info --warning-mode all`
+- $ `gradlew :extra-click-calendar-examples:clean :extra-click-calendar-examples:tomcatRunWar --stacktrace --info --warning-mode all`
+- $ `gradlew :extra-click-charts-enhanced-examples:clean :extra-click-charts-enhanced-examples:tomcatRunWar --stacktrace --info --warning-mode all`
+
+(see also https://docs.gradle.org/current/userguide/command_line_interface.html)
