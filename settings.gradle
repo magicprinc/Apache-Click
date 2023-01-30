@@ -28,3 +28,6 @@ include 'extra-click-charts-enhanced'
 include 'extra-click-charts-enhanced-examples'
 
 include 'click-jpa-demo'
+
+include 'extra-click-calendar'
+include 'extra-click-calendar-examples'

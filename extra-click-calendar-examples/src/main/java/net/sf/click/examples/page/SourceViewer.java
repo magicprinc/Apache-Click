@@ -1,18 +1,16 @@
 package net.sf.click.examples.page;
 
+import org.apache.click.Page;
+import org.apache.click.util.ClickUtils;
+import org.apache.click.util.HtmlStringBuffer;
+import org.apache.commons.lang.StringUtils;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.click.Page;
-import org.apache.click.util.ClickUtils;
-import org.apache.click.util.HtmlStringBuffer;
-
-import org.apache.commons.lang.StringUtils;
 
 /**
  * Provides a Java source code, HTML and XML examples rendering page.
@@ -247,5 +245,5 @@ public class SourceViewer extends BorderPage {
     private String renderVelocityToken(String token) {
         return "<font color=\"red\">" + token + "</font>";
     }
-    
+
 }

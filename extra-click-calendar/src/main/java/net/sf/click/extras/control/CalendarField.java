@@ -13,10 +13,6 @@
  */
 package net.sf.click.extras.control;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
 import org.apache.click.element.CssImport;
 import org.apache.click.element.Element;
 import org.apache.click.element.JsImport;
@@ -24,6 +20,11 @@ import org.apache.click.element.JsScript;
 import org.apache.click.extras.control.DateField;
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Provides a Calendar Field control: &nbsp; &lt;input type='text'&gt;&lt;img&gt;.

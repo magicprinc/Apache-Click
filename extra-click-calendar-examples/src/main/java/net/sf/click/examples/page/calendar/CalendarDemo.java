@@ -1,21 +1,22 @@
 package net.sf.click.examples.page.calendar;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import net.sf.click.examples.page.BorderPage;
+import net.sf.click.examples.page.HomePage;
+import net.sf.click.extras.control.CalendarField;
 import org.apache.click.control.Checkbox;
 import org.apache.click.control.Field;
 import org.apache.click.control.FieldSet;
 import org.apache.click.control.Form;
 import org.apache.click.control.Submit;
-import net.sf.click.examples.page.BorderPage;
-import net.sf.click.examples.page.HomePage;
-import net.sf.click.extras.control.CalendarField;
 import org.apache.click.extras.control.DateField;
 import org.apache.click.extras.control.PageSubmit;
 import org.apache.click.util.ContainerUtils;
 import org.apache.commons.lang.BooleanUtils;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Demonstrates CalendarField usage.
@@ -98,4 +99,3 @@ public class CalendarDemo extends BorderPage {
         jsValidate.setChecked(javascriptValidate);
     }
 }
-

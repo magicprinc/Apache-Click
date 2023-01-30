@@ -1,22 +1,22 @@
 package net.sf.click.examples.page.calendar;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
+import net.sf.click.examples.domain.Customer;
+import net.sf.click.examples.page.BorderPage;
+import net.sf.click.extras.control.CalendarField;
 import org.apache.click.control.Checkbox;
 import org.apache.click.control.Column;
 import org.apache.click.control.Form;
 import org.apache.click.control.Submit;
 import org.apache.click.control.Table;
 import org.apache.click.control.TextField;
-import net.sf.click.examples.domain.Customer;
-import net.sf.click.examples.page.BorderPage;
-import net.sf.click.extras.control.CalendarField;
 import org.apache.click.extras.control.EmailField;
 import org.apache.click.extras.control.FieldColumn;
 import org.apache.click.extras.control.FormTable;
 import org.apache.click.extras.control.NumberField;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Provides an demonstration of Table control paging.
