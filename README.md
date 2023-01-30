@@ -136,15 +136,17 @@ GitHub
 
 Run examples
 
-💡 You will probably need to stop gradle's daemon, to run next example: 
-`gradlew --stop`  
+💡 If you have *gradle* installed, you can use command `gradle` otherwise use `gradlew` in project's root folder.               
 
-- $ `gradlew :examples:clean :examples:tomcatRunWar --stacktrace --info --warning-mode all`
-- $ `gradlew :extra-clickclick-examples:clean :extra-clickclick-examples:tomcatRunWar --stacktrace --info --warning-mode all`
-- $ `gradlew :click-charts-examples:clean :click-charts-examples:tomcatRunWar --stacktrace --info --warning-mode all`
-- $ `gradlew :click-jquery-examples:clean :click-jquery-examples:tomcatRunWar --stacktrace --info --warning-mode all`
-- $ `gradlew :extra-ajax4click-examples:clean :extra-ajax4click-examples:tomcatRunWar --stacktrace --info --warning-mode all`
-- $ `gradlew :extra-click-calendar-examples:clean :extra-click-calendar-examples:tomcatRunWar --stacktrace --info --warning-mode all`
-- $ `gradlew :extra-click-charts-enhanced-examples:clean :extra-click-charts-enhanced-examples:tomcatRunWar --stacktrace --info --warning-mode all`
+💡 You will probably need to stop gradle's daemon, to successfully start next example: 
+`gradle --stop`  
+
+- $ `gradle :examples:clean :examples:tomcatRunWar --stacktrace --info --warning-mode all`
+- $ `gradle :extra-clickclick-examples:clean :extra-clickclick-examples:tomcatRunWar --stacktrace --info --warning-mode all`
+- $ `gradle :click-charts-examples:clean :click-charts-examples:tomcatRunWar --stacktrace --info --warning-mode all`
+- $ `gradle :click-jquery-examples:clean :click-jquery-examples:tomcatRunWar --stacktrace --info --warning-mode all`
+- $ `gradle :extra-ajax4click-examples:clean :extra-ajax4click-examples:tomcatRunWar --stacktrace --info --warning-mode all`
+- $ `gradle :extra-click-calendar-examples:clean :extra-click-calendar-examples:tomcatRunWar --stacktrace --info --warning-mode all`
+- $ `gradle :extra-click-charts-enhanced-examples:clean :extra-click-charts-enhanced-examples:tomcatRunWar --stacktrace --info --warning-mode all`
 
 (see also https://docs.gradle.org/current/userguide/command_line_interface.html)
