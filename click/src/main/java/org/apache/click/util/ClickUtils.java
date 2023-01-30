@@ -3141,10 +3141,14 @@ public class ClickUtils {
     return pageMap;
   }
 
-  static void setAccessible (Method method) {
+  static void setAccessible (Method method){
     try {
-      method.trySetAccessible();
-    } catch (Throwable ignore){}
+      method.setAccessible(true);
+    } catch (Throwable ignore){
+      try {
+        method.trySetAccessible();
+      } catch (Throwable ignored){}
+    }
   }
 
   /**

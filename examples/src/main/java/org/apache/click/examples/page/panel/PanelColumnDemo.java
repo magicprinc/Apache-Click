@@ -1,21 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.click.examples.page.panel;
 
 import org.apache.click.control.Form;
@@ -40,97 +22,96 @@ import java.util.List;
  */
 @Component
 public class PanelColumnDemo extends BorderPage {
+  @Serial private static final long serialVersionUID = 1L;
 
-    @Serial private static final long serialVersionUID = 1L;
+  //todo MVEL can't access non-public fields?
+  @Bindable public String nameSearch;
 
-    @Bindable protected String nameSearch;
+  private final Panel panel = new Panel("panel", "/panel/customerDetailsPanel.htm");
+  private final Form form = new Form("form");
+  private final Table table;
 
-    private Panel panel = new Panel("panel", "/panel/customerDetailsPanel.htm");
-    private Form form = new Form("form");
-    private Table table;
+  private final TextField textName = new TextField("name", true);
 
-    private TextField textName = new TextField("name", true);
+  @Resource(name="customerService")
+  private CustomerService customerService;
 
-    @Resource(name="customerService")
-    private CustomerService customerService;
 
-    // Constructor ------------------------------------------------------------
+  public PanelColumnDemo() {
+    addControl(panel);
+    addControl(form);
 
-    public PanelColumnDemo() {
-        addControl(panel);
-        addControl(form);
+    table = new Table("table") {
+      @Override
+      protected void renderHeaderRow(HtmlStringBuffer buffer) {
+        // We don't want to render table columns so we override #renderHeaderRow
+        // to do nothing
+      }
+    };
+    addControl(table);
 
-        table = new Table("table") {
-            @Override
-            protected void renderHeaderRow(HtmlStringBuffer buffer) {
-                // We don't want to render table columns so we override #renderHeaderRow
-                // to do nothing
-            }
-        };
-        addControl(table);
+    form.add(textName);
+    textName.setFocus(true);
+    form.add(new Submit("search", " Search ", this, "onSearch"));
 
-        form.add(textName);
-        textName.setFocus(true);
-        form.add(new Submit("search", " Search ", this, "onSearch"));
+    // The name of the PanelColumn is "customer" thus ${customer}
+    // variable will be available in the template
+    table.addColumn(new PanelColumn("customer", panel));
+    table.setPageSize(3);
+  }
 
-        // The name of the PanelColumn is "customer" thus ${customer}
-        // variable will be available in the template
-        table.addColumn(new PanelColumn("customer", panel));
-        table.setPageSize(3);
+  // Event Handlers ---------------------------------------------------------
+
+  /**
+   * Search button handler
+   */
+  public boolean onSearch() {
+    if (form.isValid()) {
+      String value = textName.getValue().trim();
+
+      processSearch(value);
+
+      return true;
     }
+    return false;
+  }
 
-    // Event Handlers ---------------------------------------------------------
+  @Override
+  public void onPost() {
+    handleRequest();
+  }
 
-    /**
-     * Search button handler
-     */
-    public boolean onSearch() {
-        if (form.isValid()) {
-            String value = textName.getValue().trim();
+  @Override
+  public void onGet() {
+    handleRequest();
+  }
 
-            processSearch(value);
+  // Private Methods --------------------------------------------------------
 
-            return true;
-        }
-        return false;
+  private void handleRequest() {
+    if (StringUtils.isNotEmpty(nameSearch)) {
+
+      // Just fill the value so the user can see it
+      textName.setValue(nameSearch);
+
+      // And fill the table again.
+      processSearch(nameSearch);
     }
+  }
 
-    @Override
-    public void onPost() {
-        handleRequest();
-    }
+  /**
+   * Search the Customer by name and create the Table control
+   *
+   * @param value
+   */
+  private void processSearch(String value) {
+    // Search for user entered value
+    List<Customer> list = customerService.getCustomersForName(value);
 
-    @Override
-    public void onGet() {
-        handleRequest();
-    }
+    table.setRowList(list);
 
-    // Private Methods --------------------------------------------------------
-
-    private void handleRequest() {
-        if (StringUtils.isNotEmpty(nameSearch)) {
-
-            // Just fill the value so the user can see it
-            textName.setValue(nameSearch);
-
-            // And fill the table again.
-            processSearch(nameSearch);
-        }
-    }
-
-    /**
-     * Search the Customer by name and create the Table control
-     *
-     * @param value
-     */
-    private void processSearch(String value) {
-        // Search for user entered value
-        List<Customer> list = customerService.getCustomersForName(value);
-
-        table.setRowList(list);
-
-        // Set the parameter in the pagination link,
-        // so in the next page, we can fill the table again.
-        table.getControlLink().setParameter("nameSearch", value);
-    }
+    // Set the parameter in the pagination link,
+    // so in the next page, we can fill the table again.
+    table.getControlLink().setParameter("nameSearch", value);
+  }
 }
