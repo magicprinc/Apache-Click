@@ -1,19 +1,6 @@
-/*
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package net.sf.click.ajax4click.control;
 
-import java.util.List;
+import org.apache.click.Context;
 import org.apache.click.ControlRegistry;
 import org.apache.click.control.Field;
 import org.apache.click.control.Form;
@@ -22,11 +9,14 @@ import org.apache.click.element.JsScript;
 import org.apache.click.util.HtmlStringBuffer;
 import org.apache.commons.lang.StringUtils;
 
+import java.io.Serial;
+import java.util.List;
+
 /**
  * Provide an Ajax ready Form control.
  * <p/>
  * <b>Please note:</b> AjaxForm does not by itself  provide any client-side Ajax
- * functionality,it is up to you to add the necessary JavaScript.
+ * functionality. It is up to you to add the necessary JavaScript.
  * <p/>
  * AjaxFrom provides the following:
  * <ul>
@@ -76,76 +66,75 @@ import org.apache.commons.lang.StringUtils;
  * } </pre>
  */
 public class AjaxForm extends Form {
+  @Serial private static final long serialVersionUID = 7206688366093594607L;
 
-    // Variables --------------------------------------------------------------
+  /** The JavaScript focus function HEAD element. */
+  protected JsScript focusScript;
 
-    /** The JavaScript focus function HEAD element. */
-    protected JsScript focusScript;
+  // Constructors -----------------------------------------------------------
 
-    // Constructors -----------------------------------------------------------
+  /**
+   * Create a default AjaxForm and register the form as an
+   * {@link org.apache.click.ControlRegistry#registerAjaxTarget(org.apache.click.Control) Ajax target}.
+   */
+  public AjaxForm() {
+    ControlRegistry.registerAjaxTarget(this);
+  }
 
-    /**
-     * Create a default AjaxForm and register the form as an
-     * {@link org.apache.click.ControlRegistry#registerAjaxTarget(org.apache.click.Control) Ajax target}.
-     */
-    public AjaxForm() {
-        ControlRegistry.registerAjaxTarget(this);
+  /**
+   * Create a AjaxForm with the given name and register the form as an
+   * {@link org.apache.click.ControlRegistry#registerAjaxTarget(org.apache.click.Control) Ajax target}.
+   *
+   * @param name the name of the form
+   */
+  public AjaxForm(String name) {
+    super(name);
+    ControlRegistry.registerAjaxTarget(this);
+  }
+
+  // Protected Methods ------------------------------------------------------
+
+  /**
+   * Return AjaxForm HEAD elements.
+   *
+   * @return the AjaxForm HEAD elements
+   */
+  @Override
+  public List<Element> getHeadElements() {
+    if (headElements == null) {
+      headElements = super.getHeadElements();
+
+      if (Context.getThreadLocalContext().isAjaxRequest()){
+        focusScript = new JsScript();
+        headElements.add(focusScript);
+      }
     }
+    return headElements;
+  }
 
-    /**
-     * Create a AjaxForm with the given name and register the form as an
-     * {@link org.apache.click.ControlRegistry#registerAjaxTarget(org.apache.click.Control) Ajax target}.
-     *
-     * @param name the name of the form
-     */
-    public AjaxForm(String name) {
-        super(name);
-        ControlRegistry.registerAjaxTarget(this);
+  /**
+   * Render the Form field focus JavaScript to the string buffer.
+   *
+   * @param buffer the StringBuffer to render to
+   * @param formFields the list of form fields
+   */
+  @Override
+  protected void renderFocusJavaScript(HtmlStringBuffer buffer, List<Field> formFields) {
+    if (Context.getThreadLocalContext().isAjaxRequest()){
+      HtmlStringBuffer tempBuf = new HtmlStringBuffer();
+      super.renderFocusJavaScript(tempBuf, formFields);
+      String temp = tempBuf.toString();
+      if (StringUtils.isBlank(temp)) {
+        return;
+      }
+      String prefix = "<script type=\"text/javascript\"><!--";
+      temp = temp.substring(prefix.length());
+      String suffix = "//--></script>\n";
+      int end = temp.indexOf(suffix);
+      temp = temp.substring(0, end);
+      focusScript.setContent(temp);
+    } else {
+      super.renderFocusJavaScript(buffer, formFields);
     }
-
-    // Protected Methods ------------------------------------------------------
-
-    /**
-     * Return AjaxForm HEAD elements.
-     *
-     * @return the AjaxForm HEAD elements
-     */
-    @Override
-    public List<Element> getHeadElements() {
-        if (headElements == null) {
-            headElements = super.getHeadElements();
-
-            if (getContext().isAjaxRequest()) {
-                focusScript = new JsScript();
-                headElements.add(focusScript);
-            }
-        }
-        return headElements;
-    }
-
-    /**
-     * Render the Form field focus JavaScript to the string buffer.
-     *
-     * @param buffer the StringBuffer to render to
-     * @param formFields the list of form fields
-     */
-    @Override
-    protected void renderFocusJavaScript(HtmlStringBuffer buffer, List<Field> formFields) {
-        if (getContext().isAjaxRequest()) {
-            HtmlStringBuffer tempBuf = new HtmlStringBuffer();
-            super.renderFocusJavaScript(tempBuf, formFields);
-            String temp = tempBuf.toString();
-            if (StringUtils.isBlank(temp)) {
-                return;
-            }
-            String prefix = "<script type=\"text/javascript\"><!--";
-            temp = temp.substring(prefix.length());
-            String suffix = "//--></script>\n";
-            int end = temp.indexOf(suffix);
-            temp = temp.substring(0, end);
-            focusScript.setContent(temp);
-        } else {
-            super.renderFocusJavaScript(buffer, formFields);
-        }
-    }
+  }
 }

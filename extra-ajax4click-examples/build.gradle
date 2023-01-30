@@ -63,6 +63,7 @@ dependencies {
   implementation project(':click-extras')
   implementation project(':click-velocity')
   implementation project(':extra-ajax4click')
+  implementation project(':extra-click-calendar')
 
   // we need to put it in .war
   implementation 'org.slf4j:slf4j-simple:1.7.+'
