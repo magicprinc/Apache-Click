@@ -2,6 +2,7 @@ package org.apache.click.examples.page.general;
 
 import lombok.val;
 import org.apache.click.Page;
+import org.apache.click.util.ClickUtils;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
@@ -11,6 +12,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Serial;
 import java.io.UncheckedIOException;
+import java.nio.file.Path;
+import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.*;
 
@@ -45,6 +48,17 @@ public class DirectPage extends Page {
 
       //!!! Set page path to null to signal to ClickServlet that rendering has been completed
       setPath(null);
+
+      if (getContext().hasRequestParameter("more")){
+        writer.println("#\n# More:\n#\n");
+        writer.println(System.getProperty("user.dir"));// ~ C:\opt\github\click
+        writer.println(Path.of(".").toAbsolutePath());// ~ C:\Users\magic\.gradle\daemon\7.6\.
+
+        System.getProperties().entrySet().stream()
+            .map(ClickUtils::<Map.Entry<String,String>>castUnsafe)
+            .sorted(Map.Entry.comparingByKey())
+            .forEach(e -> writer.println(e.getKey()+" = "+e.getValue()));
+      }
 
     } catch (IOException ioe){
       throw new UncheckedIOException(ioe);
