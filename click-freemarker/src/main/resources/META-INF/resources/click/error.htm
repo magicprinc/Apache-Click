@@ -1,44 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
-<title>Error Page</title>
-<style  type='text/css'>
-body, table, td {
-  font-family: arial, sans-serif;
-  font-size: 12px;
-}
-td.header {
-  color: white;
-  background: navy;
-}
-.errorReport {
-  display: none;
-}
-a {
-  color: blue;
-}
-</style>
-<script type='text/javascript'>
-function displayError() {
-  errorReport.style.display = 'block';
-}
-</script>
-</head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, max-age=0, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="Fri, 01 Jan 1990 00:00:00 GMT"/>
 
-<body>
- <h1>Error Page</h1>
+   <title>Error Page</title>
+   <style  type='text/css'>
+     body, table, td {
+     font-family: arial, sans-serif;
+     font-size: 12px;
+   }
+   td.header {
+     color: white;
+     background: navy;
+   }
+   .errorReport {
+     display: none;
+   }
+   a {
+     color: blue;
+   }
+   </style>
+   <script type='text/javascript'>
+     function displayError() {
+       errorReport.style.display = 'block';
+     }
+   </script>
+</head><body>
+     <h1>Error Page</h1>
 
-#if ($errorReport)
- The application encountered an unexpected error.
- <p/>
- To return to the application click <a href="$context">here</a>.
- <p/>
+     <#if errorReport??>
+       The application encountered an unexpected error.
+       <p>
+       To return to the application click <a href="${context}">here</a>.
+       </p>
 
- #if ($mode != "production")
-   To view the error details click <a href="#" onclick="displayError();">here</a>.
-   <p/>
-   $errorReport
-   <p/>
- #end
-#end
+       <#if mode != "PRODUCTION">
+         <p>
+         To view the error details click <a href="#" onclick="displayError();">here</a>.
+         </p><p>
+         ${errorReport}
+         </p>
+       </#if>
+     </#if>
 
-</body>
-</html>
+</body></html>
