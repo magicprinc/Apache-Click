@@ -69,7 +69,8 @@ dependencies {
   //implementation 'org.apache.velocity:velocity:1.+'
 
 
-  implementation project(':click')
+  api project(':click')
+  api project(':click-extras')
 
   //*** TEST TEST TEST
 
