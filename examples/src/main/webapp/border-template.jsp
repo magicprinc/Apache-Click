@@ -26,7 +26,7 @@ ${headElements}
     </div>
     <div class="title-hosted">
       <p>Version ${messages.version}</p>
-      <a target="blank" href="http://www.avoka.com">Hosted by Avoka Technologies</a>
+      <a target="blank" href="https://github.com/magicprinc/Apache-Click">A.Fink presents</a>
     </div>
     <div class="header-color">
     </div>
