@@ -15,6 +15,8 @@ import java.io.InputStreamReader;
 import java.io.Serial;
 import java.nio.charset.StandardCharsets;
 
+import static org.apache.click.util.ClickUtils.trim;
+
 /**
  * Provides a Java source code, HTML and XML examples rendering page.
  *
@@ -68,7 +70,7 @@ public class SourceViewer extends BorderPage {
     String filename = request.getParameter("filename");
 
     if (filename != null) {
-      loadFilename(filename);
+      loadFilename(filename.replace('\\','/'));
 
       getModel().put("title", "Source Viewer : " + filename); // ?
     } else {
@@ -84,44 +86,58 @@ public class SourceViewer extends BorderPage {
 
     InputStream in = null;
     try {
+      //1. web root
       in = context.getResourceAsStream(resourceFilename);
 
+      //2. web root, but .htm→.jsp?
       if (in == null && filename.endsWith(".htm")){
         resourceFilename = resourceFilename.substring(0, resourceFilename.length()-4) +".jsp";
 
         in = context.getResourceAsStream(resourceFilename);
       }
+      //3. in classpath?
+      if (in == null){// && filename.endsWith(".java")
+        if (filename.startsWith("/")){ filename = filename.substring(1);}// without / in ClassPath
+        in = ClickUtils.getClassLoader().getResourceAsStream(filename);
+      }
 
-      if (in == null && filename.endsWith(".java")){
+      if (in == null){// WEB-INF/classes/net/sf/click/examples/page/SourceViewer.java
+        if (filename.startsWith("WEB-INF/classes/")){
+          filename = filename.substring(16);
+        } else if (filename.startsWith("/WEB-INF/classes/")){
+          filename = filename.substring(17);
+        }
+        //4. in class-path without WEB-INF/classes prefix?
         in = ClickUtils.getClassLoader().getResourceAsStream(filename);
 
-        if (in == null){// WEB-INF/classes/net/sf/click/examples/page/SourceViewer.java
-          if (filename.startsWith("WEB-INF/classes/")){
-            filename = filename.substring(16);
-          } else if (filename.startsWith("/WEB-INF/classes/")){
-            filename = filename.substring(17);
-          }
+        //5. in subproject - in file system?
+        if (in == null){// ok. There are no sources... Maybe we are still under gradle?
+          try {
+            in = new FileInputStream("./src/main/java/"+filename);
+          } catch (IOException ignore){}// just best-effort last attempt..
 
-          in = ClickUtils.getClassLoader().getResourceAsStream(filename);
-          if (in == null){// ok. There are no sources... Maybe we are still under gradle?
-
-            try {
-              in = new FileInputStream("./src/main/java/"+filename);
-            } catch (IOException ignore){}// just best-effort last attempt..
+          //6. in root project - in file system?
+          if (in == null){// gradle + project root? ~ catalina.home = C:\opt\github\click\examples\build\tmp\tomcatRunWar
+            String catalina = trim(System.getProperty("catalina.base")).replace('\\','/');
+            int i = catalina.indexOf("/build/");
+            if (i>0){
+              try {
+                in = new FileInputStream(catalina.substring(0,i)+"/src/main/java/"+filename);
+              } catch (IOException ignore){}// just best-effort last attempt..
+            }
           }
         }
-      }//i .java
+      }
 
       if (in != null){
-
         loadResource(in, filename);
 
       } else {
-        addModel("error", "File " + resourceFilename + " not found");
+        addModel("error", "File " + filename + " not found");
       }
 
     } catch (IOException e){
-      addModel("error", "Could not read " + resourceFilename);
+      addModel("error", "Could not read "+ filename);
 
     } finally {
       ClickUtils.close(in);
@@ -253,7 +269,5 @@ public class SourceViewer extends BorderPage {
     return "<font color=\"red\">" + token + "</font>";
   }
 
-    private String renderComment(String comment) {
-        return "<font color=\"#3F7F5F\">" + comment + "</font>";
-    }
+//private String renderComment(String comment){ return "<font color=\"#3F7F5F\">" + comment + "</font>";}
 }
