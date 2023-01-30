@@ -31,3 +31,6 @@ include 'click-jpa-demo'
 
 include 'extra-click-calendar'
 include 'extra-click-calendar-examples'
+
+include 'extra-ajax4click'
+include 'extra-ajax4click-examples'
