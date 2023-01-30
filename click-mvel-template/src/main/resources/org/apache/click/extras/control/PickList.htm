@@ -1,0 +1,81 @@
+
+<table width="$size" $!{attributes}>
+#if($unselectedLabel || $selectedLabel)
+<thead>
+  <tr>
+    <th>$unselectedLabel</th>
+    <th>&#160;</th>
+    <th>$selectedLabel</th>
+  </tr>
+</thead>
+#end
+<tbody>
+<tr>
+<td width="50%">
+  <select id="${id}_unselected" size="$height" style="width:100%;" multiple="multiple"
+    #if($readOnly || $disabled)
+      disabled="disabled"
+    #end
+  >
+    #foreach($item in $options)
+      #if(!$item.get("selected"))
+      <option value="$format.html($item.get("option").value)">$format.html($item.get("option").label)</option>
+      #end
+    #end
+  </select>
+</td>
+<td valign="middle">
+  <input id="${id}_add" type="button" value="&gt;" style="width:60px;"
+         onclick="pickListMove(document.getElementById('${id}_unselected'), document.getElementById('$id'), document.getElementById('${id}_hidden'), true)"
+    #if($readOnly || $disabled)
+      disabled="disabled"
+    #end
+  /><br/>
+  <input id="${id}_remove" type="button" value="&lt;" style="width:60px;"
+         onclick="pickListMove(document.getElementById('$id'), document.getElementById('${id}_unselected'), document.getElementById('${id}_hidden'), false)"
+    #if($readOnly || $disabled)
+      disabled="disabled"
+    #end
+  /><br/>
+  <input id="${id}_add_all" type="button" value="&gt;&gt;" style="width:60px;"
+         onclick="pickListMoveAll(document.getElementById('${id}_unselected'), document.getElementById('$id'), document.getElementById('${id}_hidden'), true)"
+    #if($readOnly || $disabled)
+      disabled="disabled"
+    #end
+  /><br/>
+  <input id="${id}_remove_all" type="button" value="&lt;&lt;" style="width:60px;"
+         onclick="pickListMoveAll(document.getElementById('$id'), document.getElementById('${id}_unselected'), document.getElementById('${id}_hidden'), false)"
+    #if($readOnly || $disabled)
+      disabled="disabled"
+    #end
+  /><br/>
+</td>
+<td width="50%">
+  <select id="$id" size="$height" style="width:100%;" multiple="multiple"
+    #if(!$valid)
+      class="error"
+    #end
+    #if($readOnly || $disabled)
+      disabled="disabled"
+    #end
+  >
+    #foreach($item in $options)
+      #if($item.get("selected"))
+        <option value="$format.html($item.get("option").value)">$format.html($item.get("option").label)</option>
+      #end
+    #end
+  </select>
+</td>
+</tr>
+</tbody>
+</table>
+
+<select id="${id}_hidden" name="$name" style="display: none;" multiple="multiple">
+  #foreach($item in $options)
+    <option value="$format.html($item.get("option").value)"
+      #if($item.get("selected"))
+        selected="selected"
+      #end
+    >$format.html($item.option.label)</option>
+  #end
+</select>
