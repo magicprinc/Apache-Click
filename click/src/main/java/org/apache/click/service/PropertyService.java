@@ -1,5 +1,8 @@
 package org.apache.click.service;
 
+import lombok.val;
+import org.apache.click.Context;
+
 import javax.servlet.ServletContext;
 import java.io.IOException;
 import java.util.Map;
@@ -26,7 +29,7 @@ import java.util.Map;
  * &lt;/click-app&gt; </pre>
  * see OGNLPropertyService
  * @see MVELPropertyService
- * @see org.apache.click.util.PropertyUtils
+ * @see PropertyServiceBase
  */
 public interface PropertyService {
 
@@ -60,11 +63,11 @@ public interface PropertyService {
    *
    * @param source the source object
    * @param name the name of the property
-   * @param cache the cache of reflected property Method objects, do NOT modify this cache
+   * @param ignoredCache the cache of reflected property Method objects. Do NOT modify this cache
    * @return the property value for the given source object and property name
    */
   @Deprecated
-  default Object getValue (Object source, String name, Map<?,?> cache){
+  default Object getValue (Object source, String name, Map<?,?> ignoredCache){
     return getValue(source, name);
   }
 
@@ -84,9 +87,9 @@ public interface PropertyService {
     if (i<0){ return name;}
 
     if (isNumber(name.substring(i + 1))){
-      return name.substring(0, i);// anonymous classes doesn't (usually) have properties
+      return name.substring(0, i);// anonymous classes don't (usually) have properties
     } else {
-      return name; // nested class Foo.Bar
+      return name; //else: nested/local class Foo$Bar
     }
   }
 
@@ -96,4 +99,11 @@ public interface PropertyService {
     }
     return true;
   }
+
+  static PropertyService getPropertyService() {
+    val cfg = Context.getThreadLocalContext().getConfigService();
+
+    return cfg.getPropertyService();
+  }
+
 }

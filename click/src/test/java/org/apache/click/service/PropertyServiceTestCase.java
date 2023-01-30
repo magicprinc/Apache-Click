@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.val;
 import org.apache.click.util.ChildObject;
 import org.apache.click.util.ParentObject;
-import org.apache.click.util.PropertyUtilsTest;
+import org.apache.click.util.PropertyServiceBaseTest;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -71,25 +71,34 @@ public abstract class PropertyServiceTestCase extends TestCase {
 
     propertyService.setValue(parentObject, "name", "malcolm");
     assertEquals("malcolm", parentObject.getName());
+    assertEquals("malcolm", propertyService.getValue(parentObject, "name"));
 
     propertyService.setValue(parentObject, "value", "value");
     assertEquals("value", parentObject.getValue());
+    assertEquals("value", propertyService.getValue(parentObject,"value"));
 
     Date date = new Date();
     propertyService.setValue(parentObject, "date", date);
     assertEquals(date, parentObject.getDate());
+    assertEquals(date, propertyService.getValue(parentObject, "date"));
 
     propertyService.setValue(parentObject, "valid", true);
     assertEquals(Boolean.TRUE, parentObject.getValid());
+    assertTrue((Boolean) propertyService.getValue(parentObject, "valid"));
 
     Map<String, Object> map = new HashMap<>();
     propertyService.setValue(map, "name", "malcolm");
     assertEquals("malcolm", map.get("name"));
+    assertEquals("malcolm", propertyService.getValue(map, "name"));
 
     parentObject.setChild(new ChildObject());
 
     propertyService.setValue(parentObject, "child.name", "malcolm");
     assertEquals("malcolm", parentObject.getChild().getName());
+    assertEquals("malcolm", propertyService.getValue(parentObject, "child.name"));
+    propertyService.setValue(parentObject, "child.name", "malcolm");
+    assertEquals("malcolm", parentObject.getChild().getName());
+    assertEquals("malcolm", propertyService.getValue(parentObject, "child.name"));
   }
 
   public static class Demo {
@@ -143,6 +152,8 @@ public abstract class PropertyServiceTestCase extends TestCase {
     assertTrue(d.getClass().getTypeName().startsWith("org.apache.click.service.PropertyServiceTestCase$"));
 
     assertEquals("org.apache.click.service.PropertyServiceTestCase$Demo$Kaka", Demo.Kaka.class.getTypeName());
+    assertEquals("org.apache.click.service.PropertyServiceTestCase$Demo$Kaka", propertyService.getValue(Demo.Kaka.class, "typeName"));
+    assertEquals("org.apache.click.service.PropertyServiceTestCase$Demo$Kaka", propertyService.getValue(Demo.Kaka.class, "typeName"));
   }
 
 
@@ -201,9 +212,50 @@ public abstract class PropertyServiceTestCase extends TestCase {
     map.put("aa.bbb.cccc", 42);
 
     assertEquals("malcolm", propertyService.getValue(map, "name"));
-    if (this instanceof PropertyUtilsTest){
-      assertEquals(42, propertyService.getValue(map, "aa.bbb.cccc"));
-    }//only our Reflection getValue can do it
+    assertEquals(42, propertyService.getValue(map, "aa.bbb.cccc"));
+
+    propertyService.setValue(map, "BAR", 17L);
+    assertEquals(17L, propertyService.getValue(map, "BAR"));
+    assertEquals(17L, propertyService.getValue(map, "BAR.longValue"));
+    assertEquals(17L, propertyService.getValue(map, "BAR"));//cache hit
+    assertEquals(17L, propertyService.getValue(map, "BAR.longValue"));
+    propertyService.setValue(map, "BAR", 17L);
+    assertEquals(17L, propertyService.getValue(map, "BAR"));
+    assertEquals(17L, propertyService.getValue(map, "BAR.longValue"));
+    assertEquals(17L, propertyService.getValue(map, "BAR"));//cache hit
+    assertEquals(17L, propertyService.getValue(map, "BAR.longValue"));
+  }
+
+  public record MapHolder(Map<String,Object> rmap) {
+
+  }
+
+  public static class MapInRecordHolder {
+    public final MapHolder rec = new MapHolder(new HashMap<>());
+  }
+
+  public void testDeepMapDrive () {
+    val m1 = new HashMap<String,Object>();
+    val m2 = new HashMap<String,Object>();
+    var mapInRecordHolder = new MapInRecordHolder();
+
+    m1.put("long", m2);
+    m2.put("patH", mapInRecordHolder);
+
+    mapInRecordHolder.rec.rmap().put("and.again.and.again", true);
+
+    assertTrue((Boolean)propertyService.getValue(m1, "long \t.patH.rec.rmap. \t and.again.and.again"));
+    assertTrue((Boolean)propertyService.getValue(m1, "long \t.patH.rec.rmap. \t and.again.and.again"));// cache hit
+
+    if (propertyService instanceof PropertyServiceBaseTest.PropertyServiceReflection){
+      propertyService.setValue(m1, "long.patH.rec.rmap.and.again.and.again", "Nice!");
+    } else {
+      mapInRecordHolder.rec.rmap().put("and.again.and.again", "Nice!");
+    }
+    mapInRecordHolder.rec.rmap().put("LA$T", 42);
+    assertEquals("Nice!", propertyService.getValue(m1, "long \t.patH.rec.rmap. \t and.again.and.again"));
+    assertEquals(42L, propertyService.getValue(m1, "long \t.patH.rec.rmap.LA$T.longValue"));
+    assertEquals(42L, propertyService.getValue(m1, "long \t.patH.rec.rmap.LA$T.longValue"));// cache hit
   }
 
 }

@@ -18,6 +18,8 @@
  */
 package org.apache.click;
 
+import org.apache.click.service.PropertyServiceBase;
+
 /**
  * Provides a Page life cycle interceptor. Classes implementing this interface
  * can be used to listen for key page life cycle events and abort further page
@@ -60,7 +62,7 @@ package org.apache.click;
  * <p/>
  * Page interceptors can have multiple properties configured with their XML
  * definition which are set after the constructor has been called. Properties
- * are set using MVEL via {@link org.apache.click.util.PropertyUtils}.
+ * are set using MVEL via {@link PropertyServiceBase}.
  * <p/>
  * An example configuration is provided below:
  *

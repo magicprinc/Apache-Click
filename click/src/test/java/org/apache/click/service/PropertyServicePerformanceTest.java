@@ -4,7 +4,7 @@ import junit.framework.TestCase;
 import org.apache.click.extras.spring.SPELPropertyService;
 import org.apache.click.util.ChildObject;
 import org.apache.click.util.ParentObject;
-import org.apache.click.util.PropertyUtils;
+import org.apache.click.util.PropertyServiceBaseTest;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -13,8 +13,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class PropertyServicePerformanceTest extends TestCase {
-
-  // todo plus w/o reflection  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! todo todo todo
 
   public void test_MVELService() throws Exception {
     loopIt(new MVELPropertyService());
@@ -29,9 +27,12 @@ public class PropertyServicePerformanceTest extends TestCase {
   }
 
   public void test_Reflection() throws Exception {
-    loopIt(new PropertyUtils());
+    loopIt(new PropertyServiceBaseTest.PropertyServiceReflection());
   }
 
+  public void test_zMVELService2() throws Exception {
+    loopIt(new MVELPropertyService());
+  }
 
   public void loopIt (PropertyService ps) throws Exception {
     warmUp(ps);
