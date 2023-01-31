@@ -2083,14 +2083,7 @@ public class Form extends AbstractContainer implements Stateful {
 
    @throws IllegalArgumentException if the page or redirectPath is null
    */
-  public boolean onSubmitCheck (Page page, String redirectPath) {
-    if (page == null){
-      throw new IllegalArgumentException("Null page parameter");
-    }
-    if (redirectPath == null){
-      throw new IllegalArgumentException("Null redirectPath parameter");
-    }
-
+  public boolean onSubmitCheck (@NonNull Page page, @NonNull String redirectPath){
     if (performSubmitCheck()){
       return true;
     } else {

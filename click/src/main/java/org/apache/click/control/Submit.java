@@ -1,6 +1,7 @@
 package org.apache.click.control;
 
 import lombok.Getter;
+import lombok.NonNull;
 import org.apache.click.Context;
 import org.apache.commons.lang.StringUtils;
 
@@ -37,7 +38,7 @@ public class Submit extends Button {
    *
    * @param name the button name
    */
-  public Submit(String name) {
+  public Submit (@NonNull String name) {
     super(name);
   }
 
@@ -47,7 +48,7 @@ public class Submit extends Button {
    * @param name the button name
    * @param label the button display label
    */
-  public Submit(String name, String label) {
+  public Submit (@NonNull String name, String label) {
     super(name, label);
   }
 
@@ -61,12 +62,9 @@ public class Submit extends Button {
    * @throws IllegalArgumentException if listener is null or if the method
    * is blank
    */
-  public Submit(String name, Object listener, String method) {
+  public Submit (@NonNull String name, @NonNull Object listener, @NonNull String method) {
     super(name);
 
-    if (listener == null) {
-      throw new IllegalArgumentException("Null listener parameter");
-    }
     if (StringUtils.isBlank(method)) {
       throw new IllegalArgumentException("Blank listener method");
     }
@@ -84,12 +82,9 @@ public class Submit extends Button {
    * @throws IllegalArgumentException if listener is null or if the method
    * is blank
    */
-  public Submit(String name, String label, Object listener, String method) {
+  public Submit (@NonNull String name, String label, @NonNull Object listener, @NonNull String method) {
     super(name, label);
 
-    if (listener == null) {
-      throw new IllegalArgumentException("Null listener parameter");
-    }
     if (StringUtils.isBlank(method)) {
       throw new IllegalArgumentException("Blank listener method");
     }
@@ -101,11 +96,8 @@ public class Submit extends Button {
    * <p/>
    * <b>Please note</b> the control's name must be defined before it is valid.
    */
-  public Submit() {
-    super();
-  }
+  public Submit() {}//new
 
-  // Public Attributes ------------------------------------------------------
 
 
   /**

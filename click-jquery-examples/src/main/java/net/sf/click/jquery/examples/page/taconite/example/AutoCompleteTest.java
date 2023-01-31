@@ -64,7 +64,7 @@ public class AutoCompleteTest extends BorderPage {
 
         Submit submit = new Submit("submit");
         submit.setActionListener(new ActionListener() {
-            public boolean onAction(Control source) {
+            @Override public boolean onAction(Control source) {
                 System.out.println("On Action Clicked!");
                 return true;
             }

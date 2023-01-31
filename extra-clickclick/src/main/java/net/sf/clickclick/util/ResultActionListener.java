@@ -14,10 +14,10 @@
 package net.sf.clickclick.util;
 
 import org.apache.click.ActionListener;
+import org.apache.click.ActionResult;
 import org.apache.click.Context;
 import org.apache.click.Control;
 import org.apache.click.Page;
-import org.apache.click.ActionResult;
 import org.apache.click.util.ClickUtils;
 import org.apache.commons.lang.ClassUtils;
 
@@ -33,7 +33,7 @@ import org.apache.commons.lang.ClassUtils;
  */
 public abstract class ResultActionListener implements ActionListener {
 
-    public final boolean onAction(Control source) {
+    @Override public final boolean onAction(Control source) {
         Page page = ClickUtils.getParentPage(source);
         if (page == null) {
             String controlClassName = ClassUtils.getShortClassName(source.getClass());

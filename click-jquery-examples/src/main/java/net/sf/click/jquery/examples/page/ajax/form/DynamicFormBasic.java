@@ -87,7 +87,7 @@ public class DynamicFormBasic extends BorderPage {
 
         save.setActionListener(new ActionListener() {
 
-            public boolean onAction(Control source) {
+            @Override public boolean onAction(Control source) {
                 if (form.isValid()) {
                     addModel("msg", "Form saved!");
                 }
