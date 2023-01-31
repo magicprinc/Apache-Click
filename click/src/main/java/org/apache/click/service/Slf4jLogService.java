@@ -28,8 +28,43 @@ import java.util.Objects;
  *     &lt;<span class="red">log-service</span> classname="<span class="blue">org.apache.click.extras.service.Slf4jLogService</span>"/&gt;
  *
  * &lt;/click-app&gt; </pre>
+ *
+ * todo remove: use slf4j log directly; in ClickServlet set/remove MDC with servletContextName, contextPath, https://logback.qos.ch/manual/mdc.html
  */
 public class Slf4jLogService implements LogService {
+
+/* https://logback.qos.ch/xref/ch/qos/logback/classic/helpers/MDCInsertingServletFilter.html
+ void insertIntoMDC(ServletRequest request) {
+57
+58          MDC.put(ClassicConstants.REQUEST_REMOTE_HOST_MDC_KEY, request.getRemoteHost());
+59
+60          if (request instanceof HttpServletRequest) {
+61              HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+62              MDC.put(ClassicConstants.REQUEST_REQUEST_URI, httpServletRequest.getRequestURI());
+63              StringBuffer requestURL = httpServletRequest.getRequestURL();
+64              if (requestURL != null) {
+65                  MDC.put(ClassicConstants.REQUEST_REQUEST_URL, requestURL.toString());
+66              }
+67              MDC.put(ClassicConstants.REQUEST_METHOD, httpServletRequest.getMethod());
+68              MDC.put(ClassicConstants.REQUEST_QUERY_STRING, httpServletRequest.getQueryString());
+69              MDC.put(ClassicConstants.REQUEST_USER_AGENT_MDC_KEY, httpServletRequest.getHeader("User-Agent"));
+70              MDC.put(ClassicConstants.REQUEST_X_FORWARDED_FOR, httpServletRequest.getHeader("X-Forwarded-For"));
+71          }
+72
+73      }
+74
+75      void clearMDC() {
+76          MDC.remove(ClassicConstants.REQUEST_REMOTE_HOST_MDC_KEY);
+77          MDC.remove(ClassicConstants.REQUEST_REQUEST_URI);
+78          MDC.remove(ClassicConstants.REQUEST_QUERY_STRING);
+79          // removing possibly nonexistent item is OK
+80          MDC.remove(ClassicConstants.REQUEST_REQUEST_URL);
+81          MDC.remove(ClassicConstants.REQUEST_METHOD);
+82          MDC.remove(ClassicConstants.REQUEST_USER_AGENT_MDC_KEY);
+83          MDC.remove(ClassicConstants.REQUEST_X_FORWARDED_FOR);
+84      }
+*/
+
 
   /** The wrapped JDK logger instance. */
   protected Logger logger = LoggerFactory.getLogger("Web.Click");

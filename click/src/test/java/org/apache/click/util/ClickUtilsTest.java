@@ -671,4 +671,19 @@ public class ClickUtilsTest extends TestCase {
     // pageMap is also cleared from the session
     assertNull(context.getSessionAttribute(pagePath));
   }
+
+  public void testMicroUtils () {
+    assertEquals("", ClickUtils.trim(null));
+    assertEquals("", ClickUtils.trim(""));
+    assertEquals("", ClickUtils.trim(" \t\r\n  "));
+    assertEquals("Test  \nok", ClickUtils.trim(" Test  \nok \n "));
+
+    assertEquals(0, ClickUtils.len(null));
+    assertEquals(0, ClickUtils.len(""));
+    assertEquals(6, ClickUtils.len(" \t\r\n  "));
+    assertEquals(13, ClickUtils.len(" Test  \nok \n "));
+
+    assertEquals("Nice!", ClickUtils.sysEnv("$$$\nz", "Nice!"));
+    assertTrue(ClickUtils.sysEnv("File.Encoding"), ClickUtils.len(ClickUtils.sysEnv("File.Encoding"))>0);
+  }
 }

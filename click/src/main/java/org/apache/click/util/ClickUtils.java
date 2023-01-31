@@ -3210,17 +3210,25 @@ public class ClickUtils {
 
 
   public static String trim (@Nullable Object o){
-    if (o == null){
-      return "";
-    }
-    return o.toString().trim().strip();
+    return o == null ? ""
+        : o.toString().trim().strip();
   }
+
+  public static int len (@Nullable CharSequence str){
+    return str == null ? 0
+        : str.length();
+  }
+
 
   public static @Nullable String sysEnv (CharSequence key){
     val name = trim(key);  String v;
     // system properties -Dkey_name=key_value  Gradle? -P
     try {
       v = System.getProperty(name);
+      if (v != null && v.length() > 0){ return v;}
+    } catch (Throwable ignore){}
+    try {
+      v = System.getProperty(name.toLowerCase());// Some.Prop → some.prop
       if (v != null && v.length() > 0){ return v;}
     } catch (Throwable ignore){}
 
@@ -3230,7 +3238,7 @@ public class ClickUtils {
       if (v != null && v.length() > 0){ return v;}
     } catch (Exception ignore){}
     try {
-      v = System.getenv(name.toUpperCase());
+      v = System.getenv(name.toUpperCase().replace('.','_'));// foo.bar → FOO_BAR
       if (v != null && v.length() > 0){ return v;}
     } catch (Exception ignore){}
 

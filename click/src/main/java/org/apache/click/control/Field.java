@@ -1,7 +1,9 @@
 package org.apache.click.control;
 
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import lombok.val;
 import org.apache.click.Context;
 import org.apache.click.Control;
 import org.apache.click.Page;
@@ -12,6 +14,8 @@ import org.apache.click.util.HtmlStringBuffer;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.Serial;
+
+import static org.apache.click.util.ClickUtils.len;
 
 /**
  * Provides an abstract form Field control. Field controls are contained by
@@ -202,11 +206,11 @@ public abstract class Field extends AbstractControl implements Stateful {
   /** The Field is readonly flag. */
   protected boolean readonly;
 
-  /** The Field is required flag. */
-  protected boolean required;
+  /** The Field is required flag: true if the Field's value is required. */
+  @Getter @Setter protected boolean required;
 
-  /** The Field 'tabindex' attribute. */
-  protected int tabindex;
+  /** The Field 'tabindex' attribute value. */
+  @Getter @Setter protected int tabIndex;
 
   /** The Field 'title' attribute, which acts as a tooltip help message. */
   protected String title;
@@ -439,13 +443,10 @@ public abstract class Field extends AbstractControl implements Stateful {
     if (help == null) {
       help = getMessage(getName() + ".help");
 
-      if (help != null) {
-        if (help.contains("$context")) {
-          help = StringUtils.replace(help, "$context", Context.getThreadLocalContext().getRequest().getContextPath());
-
-        } else if (help.contains("${context}")) {
-          help = StringUtils.replace(help, "${context}", Context.getThreadLocalContext().getRequest().getContextPath());
-        }
+      if (len(help) > 7){
+        val contextPath = Context.getThreadLocalContext().getRequest().getContextPath();
+        help = StringUtils.replace(help, "$context",   contextPath);
+        help = StringUtils.replace(help, "${context}", contextPath);
       }
     }
     return help;
@@ -457,9 +458,7 @@ public abstract class Field extends AbstractControl implements Stateful {
    *
    * @return false by default
    */
-  public boolean isHidden() {
-    return false;
-  }
+  public boolean isHidden(){ return false;}
 
   /**
    * Return the Form and Field id appended: &nbsp; "<tt>form-field</tt>"
@@ -716,42 +715,6 @@ public abstract class Field extends AbstractControl implements Stateful {
    */
   public void setReadonly(boolean readonly) {
     this.readonly = readonly;
-  }
-
-  /**
-   * Return true if the Field's value is required.
-   *
-   * @return true if the Field's value is required
-   */
-  public boolean isRequired() {
-    return required;
-  }
-
-  /**
-   * Set the Field required status.
-   *
-   * @param required set the Field required status
-   */
-  public void setRequired(boolean required) {
-    this.required = required;
-  }
-
-  /**
-   * Return the field "tabindex" attribute value.
-   *
-   * @return the field "tabindex" attribute value
-   */
-  public int getTabIndex() {
-    return tabindex;
-  }
-
-  /**
-   * Set the field "tabindex" attribute value.
-   *
-   * @param tabindex the field "tabindex" attribute value
-   */
-  public void setTabIndex(int tabindex) {
-    this.tabindex = tabindex;
   }
 
   /**
