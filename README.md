@@ -108,7 +108,7 @@ Further information on building Click is available here:
    `documentation/docs/developer-guide/building.html`
 
 
-## 2022-2023
+## 2022-2023 Gradle build, Java 17, upgraded dependencies 
 
 Main site
 
