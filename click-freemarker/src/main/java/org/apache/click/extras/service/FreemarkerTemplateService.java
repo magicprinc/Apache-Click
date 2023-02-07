@@ -120,157 +120,155 @@ import java.util.Map;
 @Slf4j
 public class FreemarkerTemplateService implements TemplateService {
 
-    /** The click error page template path. */
-    protected static final String ERROR_PAGE_PATH = "/click/error.htm";
+  /** The click error page template path. */
+  protected static final String ERROR_PAGE_PATH = "/click/error.htm";
 
-    /** The click not found page template path. */
-    protected static final String NOT_FOUND_PAGE_PATH = "/click/not-found.htm";
+  /** The click not found page template path. */
+  protected static final String NOT_FOUND_PAGE_PATH = "/click/not-found.htm";
 
-    // -------------------------------------------------------------- Variables
 
-    /** The Freemarker engine configuration. */
-    protected Configuration configuration;
+  /** The Freemarker engine configuration. */
+  protected Configuration configuration;
 
-    /**
-     * The production/profile mode cache duration in seconds. The default value is 24 hours.
-     *
-     * cacheDuration the template cache duration in seconds to use when the application is in "production" or "profile" mode.
-     */
-    @Getter @Setter
-    protected int cacheDuration = 60 * 60 * 24;
+  /**
+   * The production/profile mode cache duration in seconds. The default value is 24 hours.
+   *
+   * cacheDuration the template cache duration in seconds to use when the application is in "production" or "profile" mode.
+   */
+  @Getter @Setter
+  protected int cacheDuration = 60 * 60 * 24;
 
-    /** The application configuration service. */
-    protected ConfigService configService;
+  /** The application configuration service. */
+  protected ConfigService configService;
 
-    /** The /click/error.htm page template has been deployed. */
-    protected boolean deployedErrorTemplate;
+  /** The /click/error.htm page template has been deployed. */
+  protected boolean deployedErrorTemplate;
 
-    /** The /click/not-found.htm page template has been deployed. */
-    protected boolean deployedNotFoundTemplate;
+  /** The /click/not-found.htm page template has been deployed. */
+  protected boolean deployedNotFoundTemplate;
 
-    // --------------------------------------------------------- Public Methods
 
-    /**
-     * @see TemplateService#onInit(javax.servlet.ServletContext)
-     *
-     * @param servletContext the application servlet context
-     * @throws ClassNotFoundException if an error occurs initializing the Template Service
-     */
-    public void onInit (@NonNull ServletContext servletContext) throws ClassNotFoundException {
-        configService = ClickUtils.getConfigService(servletContext);
+  /**
+   * @see TemplateService#onInit(javax.servlet.ServletContext)
+   *
+   * @param servletContext the application servlet context
+   * @throws ClassNotFoundException if an error occurs initializing the Template Service
+   */
+  @Override public void onInit (@NonNull ServletContext servletContext) throws ClassNotFoundException {
+    configService = ClickUtils.getConfigService(servletContext);
 
-        Logger.selectLoggerLibrary(Logger.LIBRARY_SLF4J);
+    Logger.selectLoggerLibrary(Logger.LIBRARY_SLF4J);
 
-        configuration = new Configuration();
+    configuration = new Configuration();
 
-        // Templates are stored in the / directory of the Web app.
-        WebappTemplateLoader webloader = new WebappTemplateLoader(servletContext);
-        // Templates are stored in the root of the classpath.
-        ClassTemplateLoader classLoader = new ClassTemplateLoader(getClass(), "/");
+    // Templates are stored in the / directory of the Web app.
+    WebappTemplateLoader webloader = new WebappTemplateLoader(servletContext);
+    // Templates are stored in the root of the classpath.
+    ClassTemplateLoader classLoader = new ClassTemplateLoader(getClass(), "/");
 
-        TemplateLoader[] loaders = new TemplateLoader[] { webloader, classLoader };
-        MultiTemplateLoader multiLoader = new MultiTemplateLoader(loaders);
+    TemplateLoader[] loaders = new TemplateLoader[] { webloader, classLoader };
+    MultiTemplateLoader multiLoader = new MultiTemplateLoader(loaders);
 
-        configuration.setTemplateLoader(multiLoader);
+    configuration.setTemplateLoader(multiLoader);
 
-        // Set the template cache duration in seconds
-        if (configService.isProductionMode() || configService.isProfileMode()) {
-            configuration.setTemplateUpdateDelay(getCacheDuration());
-        } else {
-            configuration.setTemplateUpdateDelay(1);
-        }
-
-        // Set an error handler that prints errors, so they are readable with a HTML browser.
-        configuration.setTemplateExceptionHandler(TemplateExceptionHandler.HTML_DEBUG_HANDLER);
-
-        // Use beans wrapper (recommended for most applications)
-        configuration.setObjectWrapper(ObjectWrapper.BEANS_WRAPPER);
-
-        String charset = configService.getCharset();
-        if (charset != null) {
-            // Set the default charset of the template files
-            configuration.setDefaultEncoding(charset);
-
-            // Set the charset of the output. This is actually just a hint, that
-            // templates may require for URL encoding and for generating META element
-            // that uses http-equiv="Content-type".
-            configuration.setOutputEncoding(charset);
-        }
-
-        // Set the default locale
-        if (configService.getLocale() != null) {
-            configuration.setLocale(configService.getLocale());
-        }
-
-        // Attempt to load click error page and not found templates from the web click directory
-        try {
-            configuration.getTemplate(ERROR_PAGE_PATH);
-            deployedErrorTemplate = true;
-        } catch (IOException ignore) {
-        }
-        try {
-            configuration.getTemplate(NOT_FOUND_PAGE_PATH);
-            deployedNotFoundTemplate = true;
-        } catch (IOException ignore) {
-        }
+    // Set the template cache duration in seconds
+    if (configService.isProductionMode() || configService.isProfileMode()) {
+      configuration.setTemplateUpdateDelay(getCacheDuration());
+    } else {
+      configuration.setTemplateUpdateDelay(1);
     }
 
-    /** @see TemplateService#onDestroy */
-    public void onDestroy() {}
+    // Set an error handler that prints errors, so they are readable with a HTML browser.
+    configuration.setTemplateExceptionHandler(TemplateExceptionHandler.HTML_DEBUG_HANDLER);
 
-    /**
-     * @see TemplateService#renderTemplate(Page, Map, Writer)
-     *
-     * @param page the page template to render
-     * @param model the model to merge with the template and render
-     * @param writer the writer to send the merged template and model data to
-     * @throws IOException if an IO error occurs
-     * @throws TemplateException if template error occurs
-     */
-    public void renderTemplate(Page page, Map<String, ?> model, Writer writer) throws IOException, TemplateException {
+    // Use beans wrapper (recommended for most applications)
+    configuration.setObjectWrapper(ObjectWrapper.BEANS_WRAPPER);
 
-        String templatePath = page.getTemplate();
+    String charset = configService.getCharset();
+    if (charset != null) {
+      // Set the default charset of the template files
+      configuration.setDefaultEncoding(charset);
 
-        if (!deployedErrorTemplate && templatePath.equals(ERROR_PAGE_PATH)) {
-            templatePath = "META-INF/resources" + ERROR_PAGE_PATH;
-        }
-        if (!deployedErrorTemplate && templatePath.equals(NOT_FOUND_PAGE_PATH)) {
-            templatePath = "META-INF/resources" + NOT_FOUND_PAGE_PATH;
-        }
-
-        // Get the template object
-        Template template = configuration.getTemplate(templatePath);
-
-        // Merge the data-model and the template
-        try {
-            template.process(model, writer);
-
-        } catch (freemarker.template.TemplateException fmte) {
-            throw new TemplateException(fmte);
-        }
+      // Set the charset of the output. This is actually just a hint, that
+      // templates may require for URL encoding and for generating META element
+      // that uses http-equiv="Content-type".
+      configuration.setOutputEncoding(charset);
     }
 
-    /**
-     * @see TemplateService#renderTemplate(String, Map, Writer)
-     *
-     * @param templatePath the path of the template to render
-     * @param model the model to merge with the template and render
-     * @param writer the writer to send the merged template and model data to
-     * @throws IOException if an IO error occurs
-     * @throws TemplateException if template error occurs
-     */
-    public void renderTemplate(String templatePath, Map<String, ?> model, Writer writer) throws IOException, TemplateException {
-
-        // Get the template object
-        Template template = configuration.getTemplate(templatePath);
-
-        // Merge the data-model and the template
-        try {
-            template.process(model, writer);
-
-        } catch (freemarker.template.TemplateException fmte) {
-            throw new TemplateException(fmte);
-        }
+    // Set the default locale
+    if (configService.getLocale() != null) {
+      configuration.setLocale(configService.getLocale());
     }
+
+    // Attempt to load click error page and not found templates from the web click directory
+    try {
+      configuration.getTemplate(ERROR_PAGE_PATH);
+      deployedErrorTemplate = true;
+    } catch (IOException ignore) {
+    }
+    try {
+      configuration.getTemplate(NOT_FOUND_PAGE_PATH);
+      deployedNotFoundTemplate = true;
+    } catch (IOException ignore) {
+    }
+  }
+
+  /** @see TemplateService#onDestroy */
+  @Override public void onDestroy() {}
+
+  /**
+   * @see TemplateService#renderTemplate(Page, Map, Writer)
+   *
+   * @param page the page template to render
+   * @param model the model to merge with the template and render
+   * @param writer the writer to send the merged template and model data to
+   * @throws IOException if an IO error occurs
+   * @throws TemplateException if template error occurs
+   */
+  @Override public void renderTemplate (Page page, Map<String, ?> model, Writer writer) throws IOException, TemplateException {
+
+    String templatePath = page.getTemplate();
+
+    if (!deployedErrorTemplate && templatePath.equals(ERROR_PAGE_PATH)) {
+      templatePath = "META-INF/resources" + ERROR_PAGE_PATH;
+    }
+    if (!deployedErrorTemplate && templatePath.equals(NOT_FOUND_PAGE_PATH)) {
+      templatePath = "META-INF/resources" + NOT_FOUND_PAGE_PATH;
+    }
+
+    // Get the template object
+    Template template = configuration.getTemplate(templatePath);
+
+    // Merge the data-model and the template
+    try {
+      template.process(model, writer);
+
+    } catch (freemarker.template.TemplateException fmte){
+      throw new TemplateException(fmte);
+    }
+  }
+
+  /**
+   * @see TemplateService#renderTemplate(String, Map, Writer)
+   *
+   * @param templatePath the path of the template to render
+   * @param model the model to merge with the template and render
+   * @param writer the writer to send the merged template and model data to
+   * @throws IOException if an IO error occurs
+   * @throws TemplateException if template error occurs
+   */
+  @Override public void renderTemplate (String templatePath, Map<String, ?> model, Writer writer) throws IOException, TemplateException {
+
+    // Get the template object
+    Template template = configuration.getTemplate(templatePath);
+
+    // Merge the data-model and the template
+    try {
+      template.process(model, writer);
+
+    } catch (freemarker.template.TemplateException fmte) {
+      throw new TemplateException(fmte);
+    }
+  }
 
 }
