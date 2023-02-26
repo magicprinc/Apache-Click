@@ -34,3 +34,5 @@ include 'extra-click-calendar-examples'
 
 include 'extra-ajax4click'
 include 'extra-ajax4click-examples'
+
+include 'click-groovy-ps'
