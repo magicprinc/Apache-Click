@@ -36,4 +36,3 @@ include 'extra-ajax4click'
 include 'extra-ajax4click-examples'
 
 include 'click-groovy-ps'
-include 'click-mvel-ps'
