@@ -7,6 +7,7 @@ import org.apache.click.util.ChildObject;
 import org.apache.click.util.ParentObject;
 import org.apache.click.util.PropertyServiceBaseTest;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +19,7 @@ public abstract class PropertyServiceTestCase extends TestCase {
 
   public void test_getValue () {
     try {
-      propertyService.getValue(new Object(), "username", new HashMap<>());
+      propertyService.getValue(new Object(), "username", null/*Map*/);
       fail();
     } catch (Exception ignore){
     }
@@ -29,7 +30,7 @@ public abstract class PropertyServiceTestCase extends TestCase {
     }
 
     ParentObject testObject = new ParentObject();
-    Map<?, ?> cache = new HashMap<>();
+    Map<?, ?> cache = Collections.emptyMap();
 
     assertNull(propertyService.getValue(testObject, "name", cache));
     assertNull(propertyService.getValue(testObject, "value", cache));
