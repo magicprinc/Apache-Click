@@ -15,10 +15,10 @@ repositories {
 
 sourceCompatibility = 17
 
-//javadoc {
-//  options.encoding = 'UTF-8'
-//  options.addBooleanOption('html5', true)
-//}
+javadoc {
+  options.encoding = 'UTF-8'
+  options.addBooleanOption('html5', true)
+}
 
 tasks.withType(JavaCompile).configureEach {
   options.encoding = 'UTF-8'
@@ -33,15 +33,14 @@ tasks.withType(JavaCompile).configureEach {
     disable("MissingSummary")
   }
 }
-
+// https://docs.gradle.org/current/userguide/publishing_maven.html
 publishing {
-  publications { // artifactId = folder name
+  publications { // artifactId == folder name
     maven(MavenPublication) {
       from components.java
     }
   }
 }
-// https://docs.gradle.org/current/userguide/publishing_maven.html
 java {
   withSourcesJar()
 //  withJavadocJar()
@@ -49,10 +48,8 @@ java {
 
 dependencies {
   errorprone "com.google.errorprone:error_prone_core:latest.release"
-  // https://javadoc.io/doc/com.google.errorprone/error_prone_annotations/latest/index.html
-  implementation("com.google.errorprone:error_prone_annotations:latest.release")
-  // https://javadoc.io/doc/com.google.code.findbugs/jsr305/latest/index.html  [x] remove? jsr305→jsr308 ^ Nope! This is THE WINNER!
-  implementation("com.google.code.findbugs:jsr305:latest.release")
+  implementation("com.google.code.findbugs:jsr305:latest.release")// https://javadoc.io/doc/com.google.code.findbugs/jsr305/latest/index.html
+  implementation("com.google.errorprone:error_prone_annotations:latest.release")// https://javadoc.io/doc/com.google.errorprone/error_prone_annotations/latest/index.html
 
   implementation 'javax.servlet:servlet-api:2.5'
 
@@ -63,14 +60,12 @@ dependencies {
   implementation 'org.mvel:mvel2:latest.release'// 2.4.14
   implementation("com.github.ben-manes.caffeine:caffeine:latest.release")
 
-
   implementation 'org.apache.commons:commons-lang3:3.+'
   implementation ('commons-lang:commons-lang:2.+')
   implementation 'commons-io:commons-io:2.+'
   implementation 'commons-fileupload:commons-fileupload:1.3.+'
   //implementation 'commons-codec:commons-codec:1.+'
   //implementation 'org.apache.velocity:velocity:1.+'
-
 
   //*** TEST TEST TEST
 
@@ -81,7 +76,7 @@ dependencies {
 
   testImplementation project(':click-mock')
   testImplementation project(':click-ognl')
-  testImplementation project(path: ':click-groovy-ps')
+  testImplementation project(path: ':click-groovy-ps') // groovy is fast and can set private fields, but have problems with type conversions
   testImplementation project(path: ':click-extras')
   testImplementation project(':click-velocity')
 }
@@ -94,7 +89,6 @@ configurations {
 configurations.all { // .implementation
   exclude group: 'velocity', module: 'velocity'
 }
-
 
 idea {
   module {

@@ -7,7 +7,9 @@ import groovy.lang.GroovyShell;
 import groovy.util.Eval;
 import lombok.val;
 import org.codehaus.groovy.control.CompilerConfiguration;
+import org.codehaus.groovy.runtime.typehandling.GroovyCastException;
 
+import java.math.BigDecimal;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 
@@ -68,8 +70,19 @@ public class GroovyPropertyService extends PropertyServiceBase {
    * @param newValue the property value to set
    */
   @Override public void setValue (Object target, String propertyName, Object newValue){
-    val bc = cachedOrNew(propertyName.trim());
+    val bc = cachedOrNew(propertyName.trim().strip());
 
-    bc.accept(target, newValue);
+    try {
+      bc.accept(target, newValue);
+    } catch (GroovyCastException e){
+      // usually in tests: org.codehaus.groovy.runtime.typehandling.GroovyCastException: Cannot cast object '42' with class 'java.lang.String' to class 'java.lang.Integer'
+      if (newValue instanceof CharSequence){
+        try {
+          bc.accept(target, new BigDecimal(newValue.toString().trim()));
+          return;
+        } catch (Exception ignore){}
+      }
+      throw e;
+    }
   }
 }
