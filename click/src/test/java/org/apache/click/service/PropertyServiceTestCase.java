@@ -259,4 +259,28 @@ public abstract class PropertyServiceTestCase extends TestCase {
     assertEquals(42L, propertyService.getValue(m1, "long \t.patH.rec.rmap.LA$T.longValue"));// cache hit
   }
 
+
+  public static class TypesHolder {
+    public Byte fbyte  = 0;
+    public Character fchar = 0;
+    public Integer fint = 0;
+    public Long flong = 0L;
+    public Float ffloat = 0f;
+    public Double fdbl = 0d;
+
+    public Integer fint0;
+  }
+
+  public void testTypeConversionFromString () {
+    var th = new TypesHolder();
+    propertyService.setValue(th, "fbyte", "42");
+    propertyService.setValue(th, "fchar", "4");
+    propertyService.setValue(th, "fint", "42");
+    propertyService.setValue(th, "fint0", "42");
+    propertyService.setValue(th, "flong", "42");
+    propertyService.setValue(th, "ffloat", "42.314");
+    propertyService.setValue(th, "fdbl", "42.314");
+  }
+
+
 }

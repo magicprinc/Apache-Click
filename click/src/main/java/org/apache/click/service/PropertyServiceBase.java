@@ -142,6 +142,9 @@ public abstract class PropertyServiceBase implements PropertyService {
     try {
       return invoke(methodNameKey, name, source);// as is ~ fooBar
     } catch (NoSuchMethodException e){
+      if (source instanceof Map<?,?> map){
+        return null;// in Map such "field" can be easily created
+      }
       throw new IllegalArgumentException("getObjectPropertyValue: No matching getter method found for property '"
           + name + "' on (" + methodNameKey.getSourceClass().getTypeName()+") "+source,  e);
     } catch (Exception e) {
@@ -163,7 +166,6 @@ public abstract class PropertyServiceBase implements PropertyService {
     REFLECTION_CACHE.put(k, field);// only if ^^ ok
     return returnValue;
   }
-
 
   /** <a href="http://www.javaspecialists.eu/archive/Issue134.html">
    See DRY Performance article by Kirk Pepperdine.</a> */

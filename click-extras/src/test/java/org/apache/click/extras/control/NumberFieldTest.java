@@ -222,8 +222,8 @@ public class NumberFieldTest {
   }
 
   static boolean isTestHard (){
-    // wtf? doesn't work under gradle: return System.getProperty("test.hard") != null;
-    return false;
+    // wtf? doesn't work under gradle?
+    return System.getProperty("test.hard") != null;
   }
 
   /**
