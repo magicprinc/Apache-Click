@@ -81,6 +81,7 @@ dependencies {
 
   testImplementation project(':click-mock')
   testImplementation project(':click-ognl')
+  testImplementation project(path: ':click-groovy-ps')
   testImplementation project(path: ':click-extras')
   testImplementation project(':click-velocity')
 }

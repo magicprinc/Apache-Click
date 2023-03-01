@@ -9,7 +9,8 @@ import org.codehaus.groovy.control.CompilerConfiguration;
 import java.util.function.BiConsumer;
 
 /**
- * Provides an OGNL based property services.
+ * Provides a <a href="https://groovy-lang.org/">Groovy</a> based property services.
+ * <br>See <a href="https://docs.groovy-lang.org/latest/html/documentation/guide-integrating.html">Integrating Groovy in a Java application</a>
  * @see Eval#me(String, Object, String)
  */
 public class GroovyPropertyService extends PropertyServiceBase {
@@ -27,20 +28,20 @@ public class GroovyPropertyService extends PropertyServiceBase {
 
   final GroovyShell groovyShell = createGroovyShell();
 
-  /** We don't use Binding (no vars), so it is safe to share between threads:
-   × binding.setVariable("t", target);  binding.setVariable("v", newValue):  Unsafe in multi-thread env ! */
+  /** We don't use Binding (== no vars), so it's safe to share GroovyShell and Binding between threads:
+   ××× binding.setVariable("t", target);  binding.setVariable("v", newValue) → Unsafe in multi-thread env! */
   private GroovyShell createGroovyShell (){
-    val binding = new Binding();
+    val binding = new Binding();// not actually used but required in Scripts
 
     val groovyCompilerConfiguration = new CompilerConfiguration();
     groovyCompilerConfiguration.setSourceEncoding("UTF-8");
-    groovyCompilerConfiguration.setScriptBaseClass(BiConsumerScript.class.getName());
+    groovyCompilerConfiguration.setScriptBaseClass(BiConsumerScript.class.getName());// to make Script implement BiConsumer
 
     return new GroovyShell(binding, groovyCompilerConfiguration);
   }
 
   /**
-   * Set the named property value on the target object using the OGNL library.
+   * Set the named property value on the target object using the Groovy scripting capabilities.
    *
    * @see PropertyService#setValue(Object, String, Object)
    *
@@ -63,5 +64,4 @@ public class GroovyPropertyService extends PropertyServiceBase {
 
     bc.accept(target, newValue);
   }
-
 }

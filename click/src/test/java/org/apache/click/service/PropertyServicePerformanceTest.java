@@ -34,6 +34,10 @@ public class PropertyServicePerformanceTest extends TestCase {
     loopIt(new MVELPropertyService());
   }
 
+  public void test_GroovyService() throws Exception {
+    loopIt(new GroovyPropertyService());
+  }
+
   public void loopIt (PropertyService ps) throws Exception {
     warmUp(ps);
 
