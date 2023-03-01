@@ -30,7 +30,7 @@ tasks.withType(JavaCompile).configureEach {
     errorproneArgs = ["--illegal-access=warn"]
   }
 }
-
+// https://docs.gradle.org/current/userguide/publishing_maven.html
 publishing {
   publications { // artifactId → folder name
     maven(MavenPublication){
@@ -38,7 +38,6 @@ publishing {
     }
   }
 }
-// https://docs.gradle.org/current/userguide/publishing_maven.html
 java {
   withSourcesJar()
 //  withJavadocJar()
@@ -46,24 +45,21 @@ java {
 
 dependencies {
   errorprone "com.google.errorprone:error_prone_core:latest.release"
-  implementation("com.google.errorprone:error_prone_annotations:latest.release") // https://javadoc.io/doc/com.google.errorprone/error_prone_annotations/latest/index.html
   implementation("com.google.code.findbugs:jsr305:latest.release") // https://javadoc.io/doc/com.google.code.findbugs/jsr305/latest/index.html
+  implementation("com.google.errorprone:error_prone_annotations:latest.release") // https://javadoc.io/doc/com.google.errorprone/error_prone_annotations/latest/index.html
 
   implementation 'javax.servlet:servlet-api:2.5'
 
-  implementation 'org.slf4j:slf4j-api:1.7.+'
   implementation("org.codehaus.groovy:groovy:3.+")
   implementation("com.github.ben-manes.caffeine:caffeine:latest.release")
 
 
   implementation project(':click')
 
-  // TEST
+  //*** TEST TEST TEST
 
   testImplementation 'junit:junit:4.+'
   testImplementation 'org.mockito:mockito-inline:+'
-
-  testRuntimeOnly 'org.slf4j:slf4j-simple:1.7.+'
 
   testImplementation project(':click-mock')
 }
