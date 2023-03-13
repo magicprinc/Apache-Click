@@ -22,7 +22,7 @@ import org.apache.cayenne.DataObject;
 import org.apache.cayenne.access.DataContext;
 import org.apache.click.extras.cayenne.CayenneForm;
 
-import java.io.Serial;
+
 
 /**
  * Provides a CayenneForm which uses a Nested DataContext that is created as a
@@ -35,7 +35,7 @@ import java.io.Serial;
  */
 public class NestedCayenneForm extends CayenneForm {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     /** A transient reference to a nested DataContext. */
     protected transient DataContext nestedDataContext;

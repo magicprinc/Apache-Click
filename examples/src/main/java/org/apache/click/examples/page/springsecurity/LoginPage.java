@@ -20,13 +20,13 @@ package org.apache.click.examples.page.springsecurity;
 
 import org.apache.click.examples.page.BorderPage;
 
-import java.io.Serial;
+
 
 /**
  * Provides a Spring Security (Acegi) login page.
  */
 public class LoginPage extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
 }

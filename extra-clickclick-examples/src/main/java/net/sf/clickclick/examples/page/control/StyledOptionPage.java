@@ -12,12 +12,11 @@ import org.apache.click.control.Label;
 import org.apache.click.control.Reset;
 import org.apache.click.control.Select;
 
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
 public class StyledOptionPage extends BorderPage {
-  @Serial private static final long serialVersionUID = -8369112178777939611L;
+  private static final long serialVersionUID = -8369112178777939611L;
 
   public Form      form              = new Form();
   private final Grid     grid              = new Grid("grid");

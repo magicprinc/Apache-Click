@@ -13,11 +13,10 @@ import org.apache.click.control.Table;
 import org.apache.click.dataprovider.PagingDataProvider;
 import org.apache.click.extras.control.TableInlinePaginator;
 
-import java.io.Serial;
 import java.util.List;
 
 public class StatefulTableDemo extends BorderPage {
-  @Serial private static final long serialVersionUID = -3077994465944158299L;
+  private static final long serialVersionUID = -3077994465944158299L;
 
   private final ActionLink link = new ActionLink("link", "Load Table");
 
@@ -97,7 +96,7 @@ public class StatefulTableDemo extends BorderPage {
 
 
   private class TableAjaxBehavior extends JQBehavior {
-    @Serial private static final long serialVersionUID = -4306726090265011755L;
+    private static final long serialVersionUID = -4306726090265011755L;
 
     @Override public ActionResult onAction(Control source, JQEvent event) {
       JQTaconite actionResult = new JQTaconite();

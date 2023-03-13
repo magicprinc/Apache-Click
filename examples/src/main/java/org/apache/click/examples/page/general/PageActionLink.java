@@ -22,7 +22,7 @@ import org.apache.click.ActionResult;
 import org.apache.click.control.PageLink;
 import org.apache.click.examples.page.BorderPage;
 
-import java.io.Serial;
+
 
 /**
  * Provides a PageAction demo. The PageLink sets a PAGE_ACTION to the page method
@@ -31,7 +31,7 @@ import java.io.Serial;
  */
 public class PageActionLink extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private PageLink link = new PageLink("link", "Get Date", PageActionLink.class);
 

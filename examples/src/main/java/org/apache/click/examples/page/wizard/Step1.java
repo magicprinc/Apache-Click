@@ -29,7 +29,6 @@ import org.apache.click.examples.service.ClientService;
 import org.apache.click.extras.control.DateField;
 import org.apache.click.extras.control.EmailField;
 
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +39,7 @@ import java.util.List;
  */
 public class Step1 extends Step {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     // Variables --------------------------------------------------------------
 

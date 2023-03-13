@@ -4,7 +4,6 @@ import lombok.NonNull;
 import org.apache.click.ActionListener;
 import org.apache.click.Control;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 
@@ -14,7 +13,7 @@ import java.lang.reflect.Method;
  * [was deprecated] ActionListener only has a single method to implement, there is no need for an adaptor
  */
 public class ActionListenerAdaptor implements ActionListener, Serializable {
-  @Serial private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
   /** The target listener object. */
   final Object listener;

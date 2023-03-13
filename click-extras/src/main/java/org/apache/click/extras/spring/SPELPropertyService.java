@@ -3,7 +3,6 @@ package org.apache.click.extras.spring;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.val;
-import org.apache.click.service.PropertyService;
 import org.apache.click.service.PropertyServiceBase;
 import org.springframework.context.expression.MapAccessor;
 import org.springframework.expression.Expression;
@@ -42,7 +41,7 @@ public class SPELPropertyService extends PropertyServiceBase {
   protected Expression cacheOrParse (Object root, String name){
     return EXPRESSION_CACHE.asMap()
         .computeIfAbsent(
-            PropertyService.distinctClassName(root)+'#'+name,
+            distinctClassName(root)+'#'+name,
             k->new SpelExpressionParser(new SpelParserConfiguration(true, true)).parseExpression(name));
   }
 }

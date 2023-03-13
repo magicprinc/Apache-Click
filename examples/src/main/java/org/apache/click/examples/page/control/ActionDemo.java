@@ -24,7 +24,6 @@ import org.apache.click.control.ActionButton;
 import org.apache.click.control.ActionLink;
 import org.apache.click.examples.page.BorderPage;
 
-import java.io.Serial;
 import java.util.Date;
 
 /**
@@ -36,7 +35,7 @@ import java.util.Date;
  */
 public class ActionDemo extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private ActionLink link = new ActionLink("link");
     private ActionButton button = new ActionButton("button");
@@ -46,7 +45,7 @@ public class ActionDemo extends BorderPage {
         addControl(button);
 
         link.setActionListener(new ActionListener() {
-            @Serial private static final long serialVersionUID = 1L;
+            private static final long serialVersionUID = 1L;
 
             @Override public boolean onAction(Control source) {
                 String msg = source.getClass().getName() + ".onAction invoked at " + (new Date());

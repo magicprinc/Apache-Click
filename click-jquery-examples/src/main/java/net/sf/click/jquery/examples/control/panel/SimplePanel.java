@@ -5,7 +5,6 @@ import org.apache.click.control.Panel;
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
 
-import java.io.Serial;
 import java.net.MalformedURLException;
 
 /**
@@ -18,7 +17,7 @@ import java.net.MalformedURLException;
  * rendered in the order they were added.
  */
 public class SimplePanel extends Panel {
-  @Serial private static final long serialVersionUID = -403361130147505905L;
+  private static final long serialVersionUID = -403361130147505905L;
 
 
   /**

@@ -2,7 +2,7 @@ package org.apache.click.control;
 
 import org.apache.click.util.HtmlStringBuffer;
 
-import java.io.Serial;
+
 
 /**
  * Provides the default Table Paginator.
@@ -16,7 +16,7 @@ import java.io.Serial;
  * </table>
  */
 public class TablePaginator implements Renderable {
-  @Serial private static final long serialVersionUID = -7711015471890806538L;
+  private static final long serialVersionUID = -7711015471890806538L;
 
   /** The parent table to provide paginator for. */
   protected Table table;

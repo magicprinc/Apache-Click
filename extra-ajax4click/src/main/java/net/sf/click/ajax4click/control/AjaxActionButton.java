@@ -5,7 +5,7 @@ import org.apache.click.control.ActionButton;
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
 
-import java.io.Serial;
+
 
 /**
  * Provides a server-side Ajax enabled ActionButton.
@@ -14,7 +14,7 @@ import java.io.Serial;
  * Ajax functionality,it is up to you to add the necessary JavaScript.
  */
 public class AjaxActionButton extends ActionButton {
-  @Serial private static final long serialVersionUID = -8501591922825107238L;
+  private static final long serialVersionUID = -8501591922825107238L;
 
 
   /**

@@ -21,7 +21,7 @@ package org.apache.click.examples.page.panel;
 import org.apache.click.examples.control.ClientPanel;
 import org.apache.click.examples.page.BorderPage;
 
-import java.io.Serial;
+
 
 /**
  * Provides example usage of a reusable ClientPanel, which contains a Form for
@@ -29,7 +29,7 @@ import java.io.Serial;
  */
 public class ReusablePanelDemo extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private ClientPanel clientPanel = new ClientPanel("panel");
 

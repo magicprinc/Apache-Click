@@ -4,13 +4,13 @@ import org.apache.click.Context;
 import org.apache.click.Page;
 
 import java.io.IOException;
-import java.io.Serial;
+
 
 /**
  * Page that renders binary content.
  */
 public class BinaryPage extends Page {
-  @Serial private static final long serialVersionUID = -2139736468025117293L;
+  private static final long serialVersionUID = -2139736468025117293L;
 
   @Override public void onInit() {
     try {

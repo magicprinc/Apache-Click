@@ -20,13 +20,13 @@ package org.apache.click.examples.page.control;
 
 import org.apache.click.examples.page.BorderPage;
 
-import java.io.Serial;
+
 
 /**
  * Provides Menu control example documentation.
  */
 public class MenuDemo extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
 }

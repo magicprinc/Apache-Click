@@ -3,10 +3,10 @@ package net.sf.clickclick.examples.page.control;
 import net.sf.clickclick.control.menu.FlexiMenu;
 import net.sf.clickclick.examples.page.BorderPage;
 
-import java.io.Serial;
+
 
 public class MenuPage extends BorderPage {
-  @Serial private static final long serialVersionUID = -259565923640546691L;
+  private static final long serialVersionUID = -259565923640546691L;
 
   FlexiMenu horizontalMenu = new FlexiMenu("horizontalMenu");
 

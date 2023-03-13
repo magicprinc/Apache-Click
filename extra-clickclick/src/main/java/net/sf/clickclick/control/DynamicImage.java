@@ -6,7 +6,6 @@ import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
 import org.apache.commons.lang.StringUtils;
 
-import java.io.Serial;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -84,7 +83,7 @@ import java.util.Map.Entry;
  * @see DynamicImage
  */
 public class DynamicImage extends Image {
-  @Serial private static final long serialVersionUID = -9169134248378054470L;
+  private static final long serialVersionUID = -9169134248378054470L;
 
 
   /** The PNG constant "<tt>png</tt>". */

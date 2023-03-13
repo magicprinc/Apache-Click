@@ -5,13 +5,13 @@ import org.apache.click.control.Submit;
 import org.apache.click.control.TextField;
 import org.apache.click.examples.page.BorderPage;
 
-import java.io.Serial;
+
 
 /**
  * Provides an example of multiple Forms on one page using submit checks.
  */
 public class MultipleFormsDemo extends BorderPage {
-  @Serial private static final long serialVersionUID = -8820175176437158935L;
+  private static final long serialVersionUID = -8820175176437158935L;
 
   private final Form form1 = new Form("form1");
   private final Form form2 = new Form("form2");

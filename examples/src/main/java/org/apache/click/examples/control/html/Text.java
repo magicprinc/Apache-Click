@@ -21,14 +21,14 @@ package org.apache.click.examples.control.html;
 import org.apache.click.control.AbstractControl;
 import org.apache.click.util.HtmlStringBuffer;
 
-import java.io.Serial;
+
 
 /**
  * This control renders a string of text.
  */
 public class Text extends AbstractControl {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private Object text;
 

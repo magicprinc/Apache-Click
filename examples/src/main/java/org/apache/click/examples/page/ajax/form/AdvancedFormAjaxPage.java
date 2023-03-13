@@ -32,7 +32,6 @@ import org.apache.click.examples.page.BorderPage;
 import org.apache.click.extras.control.DateField;
 import org.apache.click.extras.control.IntegerField;
 
-import java.io.Serial;
 import java.util.HashMap;
 import java.util.List;
 
@@ -41,7 +40,7 @@ import java.util.List;
  */
 public class AdvancedFormAjaxPage extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private Form form = new Form("form");
 

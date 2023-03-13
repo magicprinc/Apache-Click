@@ -31,7 +31,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.io.Serial;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -738,7 +737,7 @@ public class MockContainer {
      */
     static class CleanRuntimeException extends RuntimeException {
         /** Serialization version indicator. */
-        @Serial private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
         /**
          * Default constructor.

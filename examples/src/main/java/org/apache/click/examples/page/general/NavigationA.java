@@ -4,13 +4,13 @@ import org.apache.click.Control;
 import org.apache.click.control.ActionLink;
 import org.apache.click.examples.page.BorderPage;
 
-import java.io.Serial;
+
 
 /**
  * Provides a navigation example Page demonstrating forward and redirect page navigation.
  */
 public class NavigationA extends BorderPage {
-  @Serial private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
   private final ActionLink forwardLink = new ActionLink("forwardLink", this, "onForwardClick");
   private final ActionLink forwardParamLink = new ActionLink("forwardParamLink", this, "onForwardParamClick");

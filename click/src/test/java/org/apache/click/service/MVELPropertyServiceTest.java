@@ -26,7 +26,7 @@ public class MVELPropertyServiceTest extends PropertyServiceTestCase {
 				}
 
 				total.incrementAndGet();
-				if (EXPRESSION_CACHE.asMap().containsKey(PropertyService.distinctClassName(root)+'#'+name)){
+				if (EXPRESSION_CACHE.asMap().containsKey(distinctClassName(root)+'#'+name)){
 					hit.incrementAndGet();
 				}
 				return super.cacheOrParse(root, name);
@@ -74,14 +74,14 @@ public class MVELPropertyServiceTest extends PropertyServiceTestCase {
 
 	public void testClassName2 () {
 		testName = new RuntimeException("testClassName2");
-		assertEquals("org.apache.click.service.MVELPropertyServiceTest", PropertyService.distinctClassName(this));
-		assertEquals("org.apache.click.service.MVELPropertyServiceTest", PropertyService.distinctClassName(new Demo(){}));// because org.apache.click.service.MVELPropertyServiceTest$1
-		assertEquals("org.apache.click.service.PropertyServiceTestCase$Demo", PropertyService.distinctClassName(new Demo()));
-		assertEquals("org.apache.click.service.PropertyServiceTestCase$Demo$Kaka", PropertyService.distinctClassName(new Demo.Kaka()));
-		assertEquals("java.lang.String", PropertyService.distinctClassName(""));
-		assertEquals("java.lang.Class", PropertyService.distinctClassName("".getClass()));
-		assertEquals("java.lang.Character$UnicodeBlock", PropertyService.distinctClassName(java.lang.Character.UnicodeBlock.LATIN_1_SUPPLEMENT));
-		assertTrue(PropertyService.distinctClassName((Runnable)()->{}).startsWith("org.apache.click.service.MVELPropertyServiceTest$$Lambda$"));
-
+    var ps = new MVELPropertyService();
+    assertEquals("org.apache.click.service.MVELPropertyServiceTest", ps.distinctClassName(this));
+		assertEquals("org.apache.click.service.MVELPropertyServiceTest", ps.distinctClassName(new Demo(){}));// because org.apache.click.service.MVELPropertyServiceTest$1
+		assertEquals("org.apache.click.service.PropertyServiceTestCase$Demo", ps.distinctClassName(new Demo()));
+		assertEquals("org.apache.click.service.PropertyServiceTestCase$Demo$Kaka", ps.distinctClassName(new Demo.Kaka()));
+		assertEquals("java.lang.String", ps.distinctClassName(""));
+		assertEquals("java.lang.Class", ps.distinctClassName("".getClass()));
+		assertEquals("java.lang.Character$UnicodeBlock", ps.distinctClassName(java.lang.Character.UnicodeBlock.LATIN_1_SUPPLEMENT));
+		assertTrue(ps.distinctClassName((Runnable)()->{}).startsWith("org.apache.click.service.MVELPropertyServiceTest$$Lambda$"));
 	}
 }

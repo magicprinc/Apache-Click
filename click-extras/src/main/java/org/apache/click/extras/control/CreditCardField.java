@@ -9,7 +9,6 @@ import org.apache.click.element.JsImport;
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
 
-import java.io.Serial;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -108,7 +107,7 @@ import java.util.List;
  *    href="http://www.w3.org/TR/html401/interact/forms.html#h-17.4">INPUT</a>
  */
 public class CreditCardField extends TextField {
-  @Serial private static final long serialVersionUID = -7111650188642458293L;
+  private static final long serialVersionUID = -7111650188642458293L;
 
   /** The Visa type credit card: "VISA". */
   public static final String VISA = "VISA";

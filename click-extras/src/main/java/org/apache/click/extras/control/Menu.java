@@ -19,7 +19,6 @@ import org.w3c.dom.NodeList;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import java.io.InputStream;
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -263,7 +262,7 @@ import java.util.StringTokenizer;
  * @see org.apache.click.extras.security.AccessController
  */
 public class Menu extends AbstractControl {
-  @Serial private static final long serialVersionUID = 2419684128531155382L;
+  private static final long serialVersionUID = 2419684128531155382L;
 
   /**
    * The menu configuration filename: &nbsp; "<tt>/WEB-INF/menu.xml</tt>".

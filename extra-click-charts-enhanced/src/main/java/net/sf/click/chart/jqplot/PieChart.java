@@ -4,7 +4,7 @@ import net.sf.click.chart.Data;
 import net.sf.click.chart.jqplot.Legend.Compass;
 import net.sf.click.chart.jqplot.renderer.PieRenderer;
 
-import java.io.Serial;
+
 
 /**
  * This class is an easy-tu-use wrapper to get a pie chart using
@@ -17,7 +17,7 @@ import java.io.Serial;
  *
  */
 public class PieChart extends JQPlotChart{
-	@Serial private static final long serialVersionUID = -2390089774792885463L;
+    private static final long serialVersionUID = -2390089774792885463L;
 
 	Series series = new Series();
 	PieRenderer pr = new PieRenderer( series );

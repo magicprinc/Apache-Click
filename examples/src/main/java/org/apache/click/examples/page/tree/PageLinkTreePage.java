@@ -32,7 +32,7 @@ import org.apache.click.extras.tree.TreeNode;
 import org.apache.click.util.HtmlStringBuffer;
 import org.apache.commons.lang.ClassUtils;
 
-import java.io.Serial;
+
 
 /**
  * Demonstrates how to customize the rendering of tree nodes.
@@ -41,7 +41,7 @@ import java.io.Serial;
  */
 public class PageLinkTreePage extends TreePage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     public static final String LINK_TREE_NODES_SESSION_KEY = "pageLinkTreeNodes";
 
@@ -54,7 +54,7 @@ public class PageLinkTreePage extends TreePage {
     protected Tree createTree() {
         return new Tree("tree") {
 
-            @Serial private static final long serialVersionUID = 1L;
+            private static final long serialVersionUID = 1L;
 
             @Override
             protected void renderValue(HtmlStringBuffer buffer, TreeNode treeNode) {

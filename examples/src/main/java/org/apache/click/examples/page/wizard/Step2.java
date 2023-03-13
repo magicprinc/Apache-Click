@@ -30,7 +30,6 @@ import org.apache.click.examples.domain.SystemCode;
 import org.apache.click.examples.service.ClientService;
 import org.apache.click.extras.control.IntegerField;
 
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,7 +40,7 @@ import java.util.List;
  */
 public class Step2 extends Step {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     // Variables --------------------------------------------------------------
 
@@ -192,7 +191,7 @@ public class Step2 extends Step {
      * Represents a Div HTML element.
      */
     static class Div extends AbstractContainer {
-        @Serial private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
         @Override
         public String getTag() {

@@ -9,7 +9,6 @@ import org.apache.click.element.JsScript;
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
 
-import java.io.Serial;
 import java.util.List;
 
 /**
@@ -59,7 +58,7 @@ import java.util.List;
  * This control based on the <a href="http://www.greywyvern.com/code/js/keyboard.html">Greywyvern</a> JavaScript library.
  */
 public class VirtualKeyboard extends TextField {
-  @Serial private static final long serialVersionUID = 6482610166429175955L;
+  private static final long serialVersionUID = 6482610166429175955L;
 
 
   /**

@@ -32,7 +32,6 @@ import org.apache.click.examples.page.EditCustomer;
 import org.apache.click.examples.service.CustomerService;
 import org.apache.click.extras.control.LinkDecorator;
 
-import java.io.Serial;
 import java.util.List;
 
 /**
@@ -43,7 +42,7 @@ import java.util.List;
  */
 public class AdvancedTable extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private Table table = new Table("table");
     private PageLink editLink = new PageLink("Edit", EditCustomer.class);
@@ -98,7 +97,7 @@ public class AdvancedTable extends BorderPage {
 
         table.setDataProvider(new DataProvider<Customer>() {
 
-            @Serial private static final long serialVersionUID = 1L;
+            private static final long serialVersionUID = 1L;
 
             @Override public List<Customer> getData() {
                 return getCustomerService().getCustomers();

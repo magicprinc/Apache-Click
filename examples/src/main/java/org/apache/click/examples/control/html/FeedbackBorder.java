@@ -22,7 +22,7 @@ import org.apache.click.Control;
 import org.apache.click.control.AbstractContainer;
 import org.apache.click.control.Field;
 
-import java.io.Serial;
+
 
 /**
  * This control provides feedback for a Field.
@@ -33,7 +33,7 @@ import java.io.Serial;
  */
 public class FeedbackBorder extends AbstractContainer {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     @Override public Control insert(Control control, int index) {
 

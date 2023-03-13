@@ -7,7 +7,6 @@ import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
 import org.apache.commons.lang.math.NumberUtils;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.Comparator;
@@ -180,7 +179,7 @@ import java.util.StringTokenizer;
  * @see Table
  */
 public class Column implements Serializable {
-  @Serial private static final long serialVersionUID = 7156325965121717980L;
+  private static final long serialVersionUID = 7156325965121717980L;
 
   /** The Column attributes Map. */
   protected Map<String, String> attributes;
@@ -1414,7 +1413,7 @@ public class Column implements Serializable {
    */
   @SuppressWarnings("unchecked")
   static class ColumnComparator implements Comparator, Serializable {
-    @Serial private static final long serialVersionUID = -6326631736346380017L;
+    private static final long serialVersionUID = -6326631736346380017L;
     /** The sort ascending flag. */
     protected int ascendingSort;
 

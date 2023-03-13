@@ -18,7 +18,7 @@ import org.apache.click.util.Bindable;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.Serial;
+
 
 /**
  * Provides an edit Customer Form example. The Customer business object
@@ -31,7 +31,7 @@ import java.io.Serial;
  */
 @Component
 public class EditCustomer extends BorderPage {
-  @Serial private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
   private final Form form = new Form("form");
   private final HiddenField referrerField = new HiddenField("referrer", String.class);

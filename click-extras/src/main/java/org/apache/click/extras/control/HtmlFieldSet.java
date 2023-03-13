@@ -6,7 +6,7 @@ import org.apache.click.control.Field;
 import org.apache.click.control.FieldSet;
 import org.apache.click.util.HtmlStringBuffer;
 
-import java.io.Serial;
+
 
 /**
  * Provides an HTML FieldSet container to create composite based fieldsets:
@@ -25,7 +25,7 @@ import java.io.Serial;
  * of how HtmlFieldSet is used to provide a custom layout.
  */
 public class HtmlFieldSet extends FieldSet {
-  @Serial private static final long serialVersionUID = 191411044724443587L;
+  private static final long serialVersionUID = 191411044724443587L;
 
 
   /**

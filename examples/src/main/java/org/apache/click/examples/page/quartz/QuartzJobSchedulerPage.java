@@ -37,7 +37,6 @@ import org.quartz.ee.servlet.QuartzInitializerListener;
 import org.quartz.impl.StdSchedulerFactory;
 
 import javax.servlet.ServletContext;
-import java.io.Serial;
 import java.util.Collections;
 import java.util.List;
 
@@ -46,7 +45,7 @@ import java.util.List;
  */
 public class QuartzJobSchedulerPage extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private static final String DATE_FORMAT = "{0,date,hh:mm a d MMM yy }";
 
@@ -131,7 +130,7 @@ public class QuartzJobSchedulerPage extends BorderPage {
         pauseLink.setAttribute("class", "actionIcon");
         pauseLink.setTitle("Pause Job");
         pauseLink.setActionListener(new ActionListener(){
-            @Serial private static final long serialVersionUID = 1L;
+            private static final long serialVersionUID = 1L;
 
             @Override public boolean onAction(Control source) {
                 String name = pauseLink.getValue();
@@ -145,7 +144,7 @@ public class QuartzJobSchedulerPage extends BorderPage {
         interruptLink.setAttribute("class", "actionIcon");
         interruptLink.setTitle("Interrupt Running Job");
         interruptLink.setActionListener(new ActionListener(){
-            @Serial private static final long serialVersionUID = 1L;
+            private static final long serialVersionUID = 1L;
 
             @Override public boolean onAction(Control source) {
                 String name = interruptLink.getValue();
@@ -162,7 +161,7 @@ public class QuartzJobSchedulerPage extends BorderPage {
         triggerLink.setAttribute("class", "actionIcon");
         triggerLink.setTitle("Trigger Job");
         triggerLink.setActionListener(new ActionListener(){
-            @Serial private static final long serialVersionUID = 1L;
+            private static final long serialVersionUID = 1L;
 
             @Override public boolean onAction(Control source) {
                 String name = triggerLink.getValue();
@@ -176,7 +175,7 @@ public class QuartzJobSchedulerPage extends BorderPage {
         resumeLink.setAttribute("class", "actionIcon");
         resumeLink.setTitle("Resume Job");
         resumeLink.setActionListener(new ActionListener(){
-            @Serial private static final long serialVersionUID = 1L;
+            private static final long serialVersionUID = 1L;
 
             @Override public boolean onAction(Control source) {
                 String name = resumeLink.getValue();
@@ -192,7 +191,7 @@ public class QuartzJobSchedulerPage extends BorderPage {
         String confirmMessage = getMessage("deleteConfirm", "Job");
         deleteLink.setAttribute("onclick", "return window.confirm('" + confirmMessage + "')");
         deleteLink.setActionListener(new ActionListener(){
-            @Serial private static final long serialVersionUID = 1L;
+            private static final long serialVersionUID = 1L;
 
             @Override public boolean onAction(Control source) {
                 String name = deleteLink.getValue();
@@ -257,7 +256,7 @@ public class QuartzJobSchedulerPage extends BorderPage {
         // Add Control Buttons.
 
         newJob.setActionListener(new ActionListener(){
-            @Serial private static final long serialVersionUID = 1L;
+            private static final long serialVersionUID = 1L;
 
             @Override public boolean onAction(Control source) {
                 setRedirect(QuartzJobAndTriggerPage.class);

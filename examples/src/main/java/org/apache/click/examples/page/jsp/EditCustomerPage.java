@@ -27,14 +27,14 @@ import org.apache.click.extras.control.DateField;
 import org.apache.click.extras.control.DoubleField;
 import org.apache.click.extras.control.EmailField;
 
-import java.io.Serial;
+
 
 /**
  * Demo a form submit using JSP as template.
  */
 public class EditCustomerPage extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private Form form = new Form("form");
 

@@ -29,7 +29,6 @@ import org.apache.click.examples.page.BorderPage;
 import org.apache.click.extras.cayenne.CayenneForm;
 import org.apache.click.extras.control.LinkDecorator;
 
-import java.io.Serial;
 import java.util.List;
 
 /**
@@ -45,7 +44,7 @@ import java.util.List;
  */
 public abstract class FormTablePage extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     protected CayenneForm form;
     protected Table table = new Table("table");

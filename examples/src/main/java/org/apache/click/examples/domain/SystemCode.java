@@ -20,13 +20,13 @@ package org.apache.click.examples.domain;
 
 import org.apache.click.examples.domain.auto._SystemCode;
 
-import java.io.Serial;
+
 
 /**
  * Provides an SystemCode entity class.
  */
 public class SystemCode extends _SystemCode {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
 }

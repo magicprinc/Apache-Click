@@ -10,7 +10,6 @@ import org.apache.click.util.ClickUtils;
 import org.apache.click.util.ContainerUtils;
 import org.apache.click.util.HtmlStringBuffer;
 
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -46,7 +45,7 @@ import java.util.Map;
  * {@link #bindRequestValue()}.
  */
 public abstract class AbstractContainerField extends Field implements Container {
-  @Serial private static final long serialVersionUID = -3944508748884626995L;
+  private static final long serialVersionUID = -3944508748884626995L;
 
   /** The list of controls (the sequential list of controls held by the container).
    * @see org.apache.click.control.Container#getControls()

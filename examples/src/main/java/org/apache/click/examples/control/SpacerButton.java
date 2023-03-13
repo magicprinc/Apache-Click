@@ -21,14 +21,14 @@ package org.apache.click.examples.control;
 import org.apache.click.control.Button;
 import org.apache.click.util.HtmlStringBuffer;
 
-import java.io.Serial;
+
 
 /**
  * Provides a button spacer control for adding spaces between buttons.
  */
 public class SpacerButton extends Button {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     public SpacerButton() {
         setName(String.valueOf(System.currentTimeMillis()));

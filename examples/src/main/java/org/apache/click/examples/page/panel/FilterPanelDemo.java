@@ -28,7 +28,6 @@ import org.apache.click.examples.service.CustomerService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.Serial;
 import java.util.Date;
 import java.util.List;
 
@@ -38,7 +37,7 @@ import java.util.List;
 @Component
 public class FilterPanelDemo extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private FilterPanel filterPanel = new FilterPanel("filterPanel");
     private Table table = new Table("table");

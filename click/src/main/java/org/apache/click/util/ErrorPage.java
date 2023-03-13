@@ -7,7 +7,7 @@ import org.apache.click.Context;
 import org.apache.click.Page;
 import org.apache.click.service.ConfigService;
 
-import java.io.Serial;
+
 
 /**
  * Provides the base error handling Page. The ErrorPage handles any
@@ -67,7 +67,7 @@ import java.io.Serial;
  * </ul>
  */
 public class ErrorPage extends Page {
-  @Serial private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
   /** The number of lines to display. */
   @Keep protected static final int NUMB_LINES = 8;

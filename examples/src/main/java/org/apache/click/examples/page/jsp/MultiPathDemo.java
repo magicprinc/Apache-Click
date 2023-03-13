@@ -22,14 +22,14 @@ import org.apache.click.control.ActionLink;
 import org.apache.click.control.PageLink;
 import org.apache.click.examples.page.BorderPage;
 
-import java.io.Serial;
+
 
 /**
  * Provides a multiple JSP page path example class.
  */
 public class MultiPathDemo extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private ActionLink changePath = new ActionLink("changePath", this, "changePath");
 

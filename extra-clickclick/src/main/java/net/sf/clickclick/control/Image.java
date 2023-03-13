@@ -5,7 +5,7 @@ import org.apache.click.control.AbstractControl;
 import org.apache.click.util.HtmlStringBuffer;
 import org.apache.commons.lang.StringUtils;
 
-import java.io.Serial;
+
 
 /**
  * Provides an Image control: &nbsp; &lt;img src='edit.gif'&gt;.
@@ -33,7 +33,7 @@ import java.io.Serial;
  * @see DynamicImage
  */
 public class Image extends AbstractControl {
-  @Serial private static final long serialVersionUID = -7207028082322068391L;
+  private static final long serialVersionUID = -7207028082322068391L;
 
   /** The Image src attribute. */
   protected String src;

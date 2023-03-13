@@ -22,7 +22,7 @@ import org.apache.cayenne.CayenneDataObject;
 import org.apache.cayenne.DataObjectUtils;
 import org.apache.cayenne.PersistenceState;
 
-import java.io.Serial;
+
 
 /**
  * Provides an base entity CayenneDataObject class with id getter and isNew
@@ -30,7 +30,7 @@ import java.io.Serial;
  */
 public class BaseEntity extends CayenneDataObject {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * Convenience method to get an id that may be used by the view. There is

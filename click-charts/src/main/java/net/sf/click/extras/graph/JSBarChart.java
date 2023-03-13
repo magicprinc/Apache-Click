@@ -5,7 +5,6 @@ import org.apache.click.Context;
 import org.apache.click.element.JsImport;
 import org.apache.click.util.ClickUtils;
 
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +23,7 @@ import java.util.List;
  * This control uses the <a href="http://www.walterzorn.com/jsgraphics">JSGraphics</a> library.
  */
 public class JSBarChart extends JSChart {
-  @Serial private static final long serialVersionUID = -4155467960901879481L;
+  private static final long serialVersionUID = -4155467960901879481L;
 
   /**
    * Create a bar chart with no name defined.

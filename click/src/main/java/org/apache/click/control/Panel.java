@@ -12,7 +12,6 @@ import org.apache.click.util.HtmlStringBuffer;
 import org.apache.click.util.SessionMap;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -221,7 +220,7 @@ import java.util.Map;
  * </ul>
  */
 public class Panel extends AbstractContainer {
-  @Serial private static final long serialVersionUID = 1644921050611399489L;
+  private static final long serialVersionUID = 1644921050611399489L;
 
   /** The panel disabled value. */
   protected boolean disabled;

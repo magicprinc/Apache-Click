@@ -33,7 +33,6 @@ import org.apache.click.extras.control.DateField;
 import org.apache.click.extras.control.EmailField;
 import org.apache.click.extras.control.PageSubmit;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashMap;
 
@@ -42,7 +41,7 @@ import java.util.HashMap;
  */
 public class FormProperties extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     /** Form options holder. */
     public static class Options implements Serializable {

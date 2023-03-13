@@ -5,7 +5,6 @@ import org.apache.click.Context;
 import org.apache.click.element.JsImport;
 import org.apache.click.util.ClickUtils;
 
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +22,7 @@ import java.util.List;
  * This control uses the <a href="http://www.walterzorn.com/jsgraphics">JSGraphics</a> library.
  */
 public class JSPieChart extends JSChart {
-  @Serial private static final long serialVersionUID = 7068788243174236654L;
+  private static final long serialVersionUID = 7068788243174236654L;
 
   /**
    * Create a PieChart Control with no name defined.

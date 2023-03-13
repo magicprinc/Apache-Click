@@ -27,7 +27,7 @@ import org.apache.click.examples.page.HomePage;
 import org.apache.click.extras.control.EmailField;
 import org.apache.click.extras.control.PageSubmit;
 
-import java.io.Serial;
+
 
 /**
  * Provides an example page using the custom RichTextArea control.
@@ -36,7 +36,7 @@ import java.io.Serial;
  */
 public class EmailForm extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private Form form = new Form("form");
 

@@ -8,7 +8,7 @@ import org.apache.click.control.Submit;
 import org.apache.click.examples.page.BorderPage;
 import org.apache.click.extras.control.PickList;
 
-import java.io.Serial;
+
 
 /**
  * Provides a Select example Page.
@@ -16,7 +16,7 @@ import java.io.Serial;
 @Slf4j
 public class PickListDemo extends BorderPage {
 
-  @Serial private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
   private final Form form = new Form("form");
 

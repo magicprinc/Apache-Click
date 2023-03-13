@@ -3,6 +3,7 @@ package org.apache.click.service;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.click.util.ClickUtils;
+import org.apache.commons.io.IOUtils;
 
 import javax.annotation.Nullable;
 import javax.servlet.ServletContext;
@@ -165,7 +166,7 @@ public class ClickResourceService implements ResourceService {
       inputStream = servletContext.getResourceAsStream(resourcePath);
 
       if (inputStream != null) {
-        return inputStream.readAllBytes();// IOUtils.toByteArray(inputStream);
+        return IOUtils.toByteArray(inputStream);
       } else {
         return null;
       }
@@ -190,7 +191,7 @@ public class ClickResourceService implements ResourceService {
     try {
 
       if (inputStream != null) {
-        return inputStream.readAllBytes();// IOUtils.toByteArray(inputStream);
+        return IOUtils.toByteArray(inputStream);
       } else {
         return null;
       }

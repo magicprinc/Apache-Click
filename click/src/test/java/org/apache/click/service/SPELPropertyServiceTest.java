@@ -16,14 +16,14 @@ public class SPELPropertyServiceTest extends PropertyServiceTestCase {
 		propertyService = new SPELPropertyService(){
 			@Override public Object getValue (Object source, String name) {
 				total.incrementAndGet();
-				if (EXPRESSION_CACHE.asMap().containsKey(PropertyService.distinctClassName(source)+'#'+name.trim())){
+				if (EXPRESSION_CACHE.asMap().containsKey(distinctClassName(source)+'#'+name.trim())){
 					hit.incrementAndGet();
 				}
 				return super.getValue(source, name);
 			}
 			@Override public void setValue (Object target, String name, Object value) {
 				total.incrementAndGet();
-				if (EXPRESSION_CACHE.asMap().containsKey(PropertyService.distinctClassName(target)+'#'+name.trim())){
+				if (EXPRESSION_CACHE.asMap().containsKey(distinctClassName(target)+'#'+name.trim())){
 					hit.incrementAndGet();
 				}
 				super.setValue(target, name, value);

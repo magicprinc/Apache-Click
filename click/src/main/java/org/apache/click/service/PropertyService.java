@@ -80,26 +80,6 @@ public interface PropertyService {
    */
   void setValue (Object target, String name, Object value);
 
-
-  static String distinctClassName (Object root){
-    var name = root.getClass().getName();
-    int i = name.lastIndexOf('$');
-    if (i<0){ return name;}
-
-    if (isNumber(name.substring(i + 1))){
-      return name.substring(0, i);// anonymous classes don't (usually) have properties
-    } else {
-      return name; //else: nested/local class Foo$Bar
-    }
-  }
-
-  private static boolean isNumber (String s){
-    for (int i=0, len=s.length(); i<len; i++){
-      if (!Character.isDigit(s.charAt(i)) ){ return false;}
-    }
-    return true;
-  }
-
   static PropertyService getPropertyService() {
     val cfg = Context.getThreadLocalContext().getConfigService();
 

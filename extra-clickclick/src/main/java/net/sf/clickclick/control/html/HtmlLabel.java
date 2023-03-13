@@ -7,7 +7,7 @@ import org.apache.click.control.Label;
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
 
-import java.io.Serial;
+
 
 /**
  * This control renders a <em>label</em> for a target field. If no label is
@@ -44,7 +44,7 @@ import java.io.Serial;
  * </div>
  */
 public class HtmlLabel extends Label {
-  @Serial private static final long serialVersionUID = 6336446084848781209L;
+  private static final long serialVersionUID = 6336446084848781209L;
 
   /** The target Field object. */
   protected Field target;

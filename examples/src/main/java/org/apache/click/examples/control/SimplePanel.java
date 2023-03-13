@@ -24,7 +24,6 @@ import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
 import org.apache.commons.lang.ClassUtils;
 
-import java.io.Serial;
 import java.net.MalformedURLException;
 
 /**
@@ -44,7 +43,7 @@ import java.net.MalformedURLException;
  */
 public class SimplePanel extends Panel {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * Default empty constructor.

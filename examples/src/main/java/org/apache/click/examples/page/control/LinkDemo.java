@@ -25,7 +25,6 @@ import org.apache.click.examples.page.HomePage;
 import org.apache.click.extras.control.ExternalLink;
 import org.apache.click.extras.control.PageButton;
 
-import java.io.Serial;
 import java.util.Date;
 
 /**
@@ -33,7 +32,7 @@ import java.util.Date;
  */
 public class LinkDemo extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private ActionLink actionLink = new ActionLink("ActionLink", this, "onLinkClick");
     private ActionLink disabledActionLink = new ActionLink("DisabledActionLink", this, "onLinkClick");

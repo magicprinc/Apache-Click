@@ -10,7 +10,6 @@ import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
 
 import javax.servlet.ServletContext;
-import java.io.Serial;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -268,7 +267,7 @@ import java.util.Map;
  * @see OptionGroup
  */
 public class Select extends Field {
-  @Serial private static final long serialVersionUID = -5733287670323168725L;
+  private static final long serialVersionUID = -5733287670323168725L;
 
   /**
    * The field validation JavaScript function template.

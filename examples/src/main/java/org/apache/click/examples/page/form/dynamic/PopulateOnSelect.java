@@ -30,7 +30,6 @@ import org.apache.click.extras.control.TabbedForm;
 import org.apache.click.util.ClickUtils;
 import org.apache.commons.lang.StringUtils;
 
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +40,7 @@ import java.util.Map;
  */
 public class PopulateOnSelect extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private static final String EASTERN_CAPE = "EC";
     private static final String FREE_STATE = "FS";

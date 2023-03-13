@@ -3,7 +3,6 @@ package net.sf.clickclick.control.breadcrumb;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.Serial;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -14,7 +13,7 @@ import java.util.Map;
  * first entry added will be the first entry being removed when necessary.
  */
 public class Trail<K, V> extends LinkedHashMap<K,V> {
-  @Serial private static final long serialVersionUID = -7601683307826837232L;
+  private static final long serialVersionUID = -7601683307826837232L;
 
   /** The breadcrumb control = the Trail's breadcrumb control. */
   @Getter @Setter private volatile transient Breadcrumb breadcrumb;

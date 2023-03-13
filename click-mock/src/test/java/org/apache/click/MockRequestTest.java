@@ -22,7 +22,7 @@ import junit.framework.TestCase;
 import org.apache.click.control.TextArea;
 import org.apache.click.servlet.MockRequest;
 
-import java.io.Serial;
+
 
 /**
  * Sanity tests for MockRequest.
@@ -49,7 +49,7 @@ public class MockRequestTest extends TestCase {
 
         // Registry a listener which must be invoked
         textArea.setActionListener(new ActionListener() {
-            @Serial private static final long serialVersionUID = 1L;
+            private static final long serialVersionUID = 1L;
 
             @Override public boolean onAction(Control source) {
                 // When action is invoked, set flag to true

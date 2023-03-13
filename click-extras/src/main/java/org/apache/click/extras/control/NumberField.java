@@ -6,7 +6,6 @@ import org.apache.click.element.Element;
 import org.apache.click.element.JsImport;
 import org.apache.click.util.ClickUtils;
 
-import java.io.Serial;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
@@ -84,7 +83,7 @@ import java.util.Locale;
  *    href="http://www.w3.org/TR/html401/interact/forms.html#h-17.4">INPUT</a>
  */
 public class NumberField extends TextField {
-  @Serial private static final long serialVersionUID = -6342953314617323112L;
+  private static final long serialVersionUID = -6342953314617323112L;
 
   /**
    * The field validation JavaScript function template.

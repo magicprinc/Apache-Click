@@ -1,6 +1,6 @@
 package org.apache.click.extras.tree;
 
-import java.io.Serial;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,7 +38,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * means a total of 2 <sup>64</sup> numbers can be generated.
  */
 public class TreeNode implements Serializable {
-  @Serial private static final long serialVersionUID = -5820771127721699500L;
+  private static final long serialVersionUID = -5820771127721699500L;
 
   /** Each node must have a unique id in the tree. If a node is not provided
    * an id, one is generated using the java.util.Random class.*/

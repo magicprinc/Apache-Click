@@ -20,7 +20,7 @@ package org.apache.click.examples.control.cayenne;
 
 import org.apache.click.extras.control.IntegerField;
 
-import java.io.Serial;
+
 
 /**
  * This IntegerField class preserves its value when it is copied from
@@ -28,7 +28,7 @@ import java.io.Serial;
  */
 public class CayenneIntegerField extends IntegerField {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * Construct a new field for the specified name and label.

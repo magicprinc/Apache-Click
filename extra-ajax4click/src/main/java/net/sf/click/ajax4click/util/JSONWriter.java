@@ -5,7 +5,6 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
-import java.io.Serial;
 import java.io.StringReader;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -391,14 +390,15 @@ public class JSONWriter {
   }
 
   private void indent(StringBuilder sb, int level) {
-    sb.append(" ".repeat(Math.max(0, level)));
+    for (int i = 0; i < level; i++)
+      sb.append(' ');
   }
 
   /**
    * Provides an unsynchronized Stack.
    */
   static class ListStack<E> extends ArrayList<E> {
-    @Serial private static final long serialVersionUID = -2082824836877291097L;
+    private static final long serialVersionUID = -2082824836877291097L;
 
 
     /**

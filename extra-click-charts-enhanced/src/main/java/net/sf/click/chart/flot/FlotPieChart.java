@@ -6,12 +6,11 @@ import org.apache.click.element.Element;
 import org.apache.click.element.JsImport;
 import org.apache.click.util.ClickUtils;
 
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
 public class FlotPieChart extends FlotChart {
-	@Serial private static final long serialVersionUID = -6708109225323883537L;
+    private static final long serialVersionUID = -6708109225323883537L;
 
 
 	public FlotPieChart() {
@@ -47,7 +46,7 @@ public class FlotPieChart extends FlotChart {
 	}//met
 
 	private static class PieDataSeries extends FlotDataSeries {
-		@Serial private static final long serialVersionUID = -6875727619356824407L;
+	    private static final long serialVersionUID = -6875727619356824407L;
 
 		public PieDataSeries(String label) {
 			super( label );

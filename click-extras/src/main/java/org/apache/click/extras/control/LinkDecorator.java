@@ -15,7 +15,6 @@ import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
 import org.apache.commons.lang.StringUtils;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
@@ -138,7 +137,7 @@ import java.util.Map;
  * @see org.apache.click.control.PageLink
  */
 public class LinkDecorator implements Decorator, Serializable {
-  @Serial private static final long serialVersionUID = 7170608863258436247L;
+  private static final long serialVersionUID = 7170608863258436247L;
 
   /** The row object identifier property. */
   protected String idProperty;
@@ -664,7 +663,7 @@ public class LinkDecorator implements Decorator, Serializable {
    * Add page number control for setting the table page number.
    */
   class PageNumberControl extends AbstractControl {
-    @Serial private static final long serialVersionUID = 9065022224869669409L;
+    private static final long serialVersionUID = 9065022224869669409L;
 
     /** The PageNumberControl's Table instance. */
     final Table table;

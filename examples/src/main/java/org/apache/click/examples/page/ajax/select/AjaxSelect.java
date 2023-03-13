@@ -34,7 +34,6 @@ import org.apache.click.util.ClickUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +44,7 @@ import java.util.Map;
 @Component
 public class AjaxSelect extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private Select customerSelect = new Select("customerSelect");
 

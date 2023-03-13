@@ -37,7 +37,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.Serial;
 import java.util.List;
 
 /**
@@ -46,7 +45,7 @@ import java.util.List;
 @Component
 public class ExcelExportPage extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     @Resource(name="customerService")
     private CustomerService customerService;

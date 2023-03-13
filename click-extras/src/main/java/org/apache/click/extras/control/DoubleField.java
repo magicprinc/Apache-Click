@@ -2,7 +2,6 @@ package org.apache.click.extras.control;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.io.Serial;
 import java.text.NumberFormat;
 import java.text.ParseException;
 
@@ -44,7 +43,7 @@ import java.text.ParseException;
  */
 public class DoubleField extends NumberField {
 
-  @Serial private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
   // ----------------------------------------------------------- Constructors
 

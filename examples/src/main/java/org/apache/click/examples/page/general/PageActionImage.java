@@ -27,7 +27,7 @@ import org.apache.commons.io.IOUtils;
 import javax.servlet.ServletContext;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serial;
+
 
 /**
  * This demo shows to invoke a PAGE_ACTION using an HTML <img> tag. The pageAction
@@ -35,7 +35,7 @@ import java.io.Serial;
  */
 public class PageActionImage extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * This page method is invoked from the <img> element and returns an ActionResult

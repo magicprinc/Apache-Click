@@ -11,10 +11,10 @@ import org.apache.click.extras.control.Menu;
 import org.apache.click.extras.control.MenuFactory;
 import org.apache.click.util.ClickUtils;
 
-import java.io.Serial;
+
 
 public class BorderPage extends Page {
-  @Serial private static final long serialVersionUID = -4223387575202278283L;
+  private static final long serialVersionUID = -4223387575202278283L;
 
   private final Menu rootMenu = new MenuFactory().getRootMenu(DesktopMenu.class);
 

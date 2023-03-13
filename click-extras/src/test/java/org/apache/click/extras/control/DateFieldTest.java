@@ -5,7 +5,6 @@ import org.apache.click.MockContext;
 import org.apache.click.servlet.MockRequest;
 import org.apache.commons.lang.StringUtils;
 
-import java.io.Serial;
 import java.util.Date;
 import java.util.Locale;
 
@@ -134,7 +133,7 @@ public class DateFieldTest extends TestCase {
   }
 
   public static class MyDateField extends DateField {
-    @Serial private static final long serialVersionUID = -9018676841770962557L;
+    private static final long serialVersionUID = -9018676841770962557L;
 
     public MyDateField(String name) {
       super(name);

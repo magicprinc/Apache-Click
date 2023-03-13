@@ -10,13 +10,13 @@ import net.sf.clickclick.examples.domain.Customer;
 import net.sf.clickclick.examples.page.BorderPage;
 import org.apache.click.dataprovider.DataProvider;
 
-import java.io.Serial;
+
 
 /**
  *
  */
 public class PagingRepeaterPage extends BorderPage {
-  @Serial private static final long serialVersionUID = -8419734930919832341L;
+  private static final long serialVersionUID = -8419734930919832341L;
 
   private Repeater repeater;
   private SimplePaginator paginator;

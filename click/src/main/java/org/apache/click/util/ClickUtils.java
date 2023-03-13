@@ -19,6 +19,7 @@
 package org.apache.click.util;
 
 import lombok.NonNull;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.click.ActionResult;
@@ -1948,10 +1949,11 @@ public class ClickUtils {
    * @param value the value to encode using "UTF-8"
    * @return an encoded URL string
    */
+  @SneakyThrows
   public static String encodeURL (@Nullable Object value) {
-    if (value == null) { return "";}
+    if (value == null){ return "";}
 
-    return URLEncoder.encode(value.toString(), UTF_8);
+    return URLEncoder.encode(value.toString(), "UTF-8");// TO DO Java 8: Charset since 10
   }
 
   /**
@@ -1966,10 +1968,11 @@ public class ClickUtils {
    * @param value the value to decode using "UTF-8"
    * @return an encoded URL string
    */
+  @SneakyThrows
   public static String decodeURL (@Nullable Object value) {
-    if (value == null) { return "";}
+    if (value == null){ return "";}
 
-    return URLDecoder.decode(value.toString(), UTF_8);
+    return URLDecoder.decode(value.toString(), "UTF-8");// TO DO Java 8: Charset since 10
   }
 
   /**
@@ -3145,9 +3148,9 @@ public class ClickUtils {
     try {
       method.setAccessible(true);
     } catch (Throwable ignore){
-      try {
-        method.trySetAccessible();
-      } catch (Throwable ignored){}
+//      try {
+//        method.trySetAccessible();
+//      } catch (Throwable ignored){}
     }
   }
 
@@ -3211,7 +3214,7 @@ public class ClickUtils {
 
   public static String trim (@Nullable Object o){
     return o == null ? ""
-        : o.toString().trim().strip();
+        : o.toString().trim()/*.strip()*/;
   }
 
   public static int len (@Nullable CharSequence str){

@@ -2,6 +2,8 @@ package org.apache.click.service;
 
 import junit.framework.TestCase;
 import lombok.Data;
+import lombok.Value;
+import lombok.experimental.Accessors;
 import lombok.val;
 import org.apache.click.util.ChildObject;
 import org.apache.click.util.ParentObject;
@@ -227,8 +229,9 @@ public abstract class PropertyServiceTestCase extends TestCase {
     assertEquals(17L, propertyService.getValue(map, "BAR.longValue"));
   }
 
-  public record MapHolder(Map<String,Object> rmap) {
-
+  @Value @Accessors(fluent = true)
+  public static class MapHolder {
+    Map<String,Object> rmap;
   }
 
   public static class MapInRecordHolder {

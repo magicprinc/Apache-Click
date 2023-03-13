@@ -2,6 +2,7 @@ package org.apache.velocity.tools.view;
 
 import org.apache.click.MockContext;
 import org.apache.commons.collections.ExtendedProperties;
+import org.apache.commons.io.IOUtils;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.runtime.RuntimeServices;
 import org.apache.velocity.runtime.resource.Resource;
@@ -34,7 +35,7 @@ public class WebappResourceLoaderTest {
     wrl.commonInit(rsvc, p);
     wrl.init(p);
     InputStream is = wrl.getResourceStream("test.txt");
-    byte[] b = is.readAllBytes();
+    byte[] b = IOUtils.toByteArray(is);
     assertEquals("Hello there!", new String(b, StandardCharsets.UTF_8));
     is.close();
 

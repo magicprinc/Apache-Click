@@ -7,7 +7,6 @@ import org.apache.click.control.Select;
 import org.apache.click.util.HtmlStringBuffer;
 import org.apache.commons.lang.StringUtils;
 
-import java.io.Serial;
 import java.text.Collator;
 import java.util.Comparator;
 import java.util.List;
@@ -42,7 +41,7 @@ import java.util.TreeSet;
  * <i>Obs.:</i> Especially practical for registration forms.
  */
 public class CountrySelect extends Select {
-  @Serial private static final long serialVersionUID = 7925476372212385309L;
+  private static final long serialVersionUID = 7925476372212385309L;
 
   /** The Select comparator locale.
    * Set the locale of this control to something else than the <code>Context</code> locale.

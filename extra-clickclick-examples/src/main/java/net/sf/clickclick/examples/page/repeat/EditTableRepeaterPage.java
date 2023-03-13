@@ -21,14 +21,13 @@ import org.apache.click.extras.control.DoubleField;
 import org.apache.click.extras.control.IntegerField;
 import org.apache.commons.lang.StringUtils;
 
-import java.io.Serial;
 import java.util.List;
 
 /**
  *
  */
 public class EditTableRepeaterPage extends BorderPage {
-  @Serial private static final long serialVersionUID = -969289669171816620L;
+  private static final long serialVersionUID = -969289669171816620L;
 
   private final Form form = new Form("form");
 

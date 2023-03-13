@@ -7,7 +7,6 @@ import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
 
 import javax.servlet.http.HttpSession;
-import java.io.Serial;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -23,7 +22,7 @@ import java.util.Set;
  * http://www.useit.com/alertbox/breadcrumbs.html.
  */
 public class Breadcrumb extends AbstractControl {
-  @Serial private static final long serialVersionUID = -7233634877909814929L;
+  private static final long serialVersionUID = -7233634877909814929L;
 
 
   /**

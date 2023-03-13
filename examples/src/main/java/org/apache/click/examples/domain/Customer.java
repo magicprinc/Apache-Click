@@ -20,13 +20,13 @@ package org.apache.click.examples.domain;
 
 import org.apache.click.examples.domain.auto._Customer;
 
-import java.io.Serial;
+
 
 /**
  * Provides an Customer entity class.
  */
 public class Customer extends _Customer {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
 }

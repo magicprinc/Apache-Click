@@ -20,13 +20,13 @@ package org.apache.click.examples.domain;
 
 import org.apache.click.examples.domain.auto._Student;
 
-import java.io.Serial;
+
 
 /**
  * Provides an Client entity class.
  */
 public class Student extends _Student {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
 }

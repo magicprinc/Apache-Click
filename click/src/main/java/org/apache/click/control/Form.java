@@ -20,7 +20,6 @@ import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -492,7 +491,7 @@ import java.util.UUID;
  @see Field
  @see Submit */
 public class Form extends AbstractContainer implements Stateful {
-  @Serial private static final long serialVersionUID = -5038737218349023962L;
+  private static final long serialVersionUID = -5038737218349023962L;
 
   /** The align left, form layout constant: &nbsp; <tt>"left"</tt>. */
   public static final String ALIGN_LEFT = "left";
@@ -3096,7 +3095,7 @@ public class Form extends AbstractContainer implements Stateful {
    incoming value. In addition, the field name cannot be changed once set.
    */
   private static class NonProcessedHiddenField extends HiddenField {
-    @Serial private static final long serialVersionUID = 5716774345794705088L;
+    private static final long serialVersionUID = 5716774345794705088L;
 
     /**
      Create a field with the given name and class.
@@ -3148,7 +3147,7 @@ public class Form extends AbstractContainer implements Stateful {
    is set.
    */
   private static class ImmutableHiddenField extends NonProcessedHiddenField {
-    @Serial private static final long serialVersionUID = 1588695221234483698L;
+    private static final long serialVersionUID = 1588695221234483698L;
 
     /**
      Create a field with the given name and value.

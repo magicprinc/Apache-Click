@@ -12,7 +12,6 @@ import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
 import org.apache.commons.lang.StringUtils;
 
-import java.io.Serial;
 import java.sql.Timestamp;
 import java.text.DateFormatSymbols;
 import java.text.ParseException;
@@ -151,7 +150,7 @@ import java.util.Locale;
  */
 @Slf4j
 public class DateField extends TextField {
-  @Serial private static final long serialVersionUID = -6403980682360664949L;
+  private static final long serialVersionUID = -6403980682360664949L;
 
   /** The DateField's date value. */
   protected Date date;

@@ -4,7 +4,6 @@ import org.apache.click.examples.domain.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.io.Serial;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -13,7 +12,7 @@ import java.util.Collections;
  * User class in the Spring Security UserDetails interface.
  */
 public class UserDetailsAdaptor implements UserDetails {
-  @Serial private static final long serialVersionUID = 4878947916871901019L;
+  private static final long serialVersionUID = 4878947916871901019L;
 
   private final User user;
 

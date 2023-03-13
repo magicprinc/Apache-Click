@@ -20,13 +20,13 @@ package org.apache.click.examples.domain;
 
 import org.apache.click.examples.domain.auto._User;
 
-import java.io.Serial;
+
 
 /**
  * Provides an User entity class.
  */
 public class User extends _User {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
 }

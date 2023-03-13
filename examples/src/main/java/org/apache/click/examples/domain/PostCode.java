@@ -20,13 +20,13 @@ package org.apache.click.examples.domain;
 
 import org.apache.click.examples.domain.auto._PostCode;
 
-import java.io.Serial;
+
 
 /**
  * Provides an Client entity class.
  */
 public class PostCode extends _PostCode {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
 }

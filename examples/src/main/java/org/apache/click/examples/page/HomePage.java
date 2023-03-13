@@ -18,14 +18,14 @@
  */
 package org.apache.click.examples.page;
 
-import java.io.Serial;
+
 
 /**
  * Provides the applications home page.
  */
 public class HomePage extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     public HomePage() {
         getModel().put("title", "Click Examples");

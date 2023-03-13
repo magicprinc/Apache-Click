@@ -21,14 +21,14 @@ package org.apache.click.examples.page.springsecurity;
 import org.apache.click.examples.page.BorderPage;
 import org.apache.click.examples.page.springsecurity.secure.SecurePage;
 
-import java.io.Serial;
+
 
 /**
  * Provides a Spring Security (ACEGI) logout page.
  */
 public class LogoutPage extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     @Override
     public boolean onSecurityCheck() {

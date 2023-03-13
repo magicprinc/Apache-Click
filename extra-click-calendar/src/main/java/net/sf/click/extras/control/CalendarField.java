@@ -9,7 +9,6 @@ import org.apache.click.extras.control.DateField;
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
 
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -103,7 +102,7 @@ import java.util.Locale;
  * to the <tt>click/jscalendar</tt> web directory on application startup.
  */
 public class CalendarField extends DateField {
-  @Serial private static final long serialVersionUID = 356365683714310724L;
+  private static final long serialVersionUID = 356365683714310724L;
 
 
   /** The default date format: <tt>dd MMM yyyy</tt>. */

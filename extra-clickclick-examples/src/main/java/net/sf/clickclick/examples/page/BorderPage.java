@@ -8,13 +8,13 @@ import org.apache.click.Page;
 import org.apache.click.extras.control.Menu;
 import org.apache.click.util.ClickUtils;
 
-import java.io.Serial;
+
 
 /**
  *
  */
 public class BorderPage extends Page {
-  @Serial private static final long serialVersionUID = -440182563202305511L;
+  private static final long serialVersionUID = -440182563202305511L;
 
   public final Menu rootMenu = MenuBuilder.getMenus();
 

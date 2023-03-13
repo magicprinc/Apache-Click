@@ -10,7 +10,6 @@ import org.apache.click.element.JsImport;
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
 
-import java.io.Serial;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
@@ -78,7 +77,7 @@ import java.util.regex.Pattern;
  * <a target="_blank" href="http://www.dhtmlgoodies.com/index.html?whichScript=submitted-color-picker">www.dhtmlgoodies.com</a>.
  */
 public class ColorPicker extends Field {
-  @Serial private static final long serialVersionUID = -4211759105079211998L;
+  private static final long serialVersionUID = -4211759105079211998L;
 
   /** The color validation hexadecimal pattern. */
   static final Pattern HEX_PATTERN = Pattern.compile("#[a-fA-F0-9]{3}([a-fA-F0-9]{3})?");

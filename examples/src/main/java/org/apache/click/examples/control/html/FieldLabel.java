@@ -23,14 +23,14 @@ import org.apache.click.control.Field;
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
 
-import java.io.Serial;
+
 
 /**
  * This control associates an HTML <em>label</em> with a target field.
  */
 public class FieldLabel extends AbstractControl {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private Field target;
 

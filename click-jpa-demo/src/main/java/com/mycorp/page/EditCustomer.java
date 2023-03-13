@@ -16,10 +16,10 @@ import org.apache.click.extras.control.EmailField;
 import org.apache.click.extras.control.IntegerField;
 import org.apache.click.util.Bindable;
 
-import java.io.Serial;
+
 
 public class EditCustomer extends BorderPage {
-  @Serial private static final long serialVersionUID = 7494162676914271159L;
+  private static final long serialVersionUID = 7494162676914271159L;
 
   // Public controls are automatically added to the page
   @Bindable public Form form = new Form("form");

@@ -41,7 +41,6 @@ import org.apache.click.extras.control.TabbedForm;
 import org.apache.click.extras.control.TelephoneField;
 import org.apache.click.util.ContainerUtils;
 
-import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -49,7 +48,7 @@ import java.io.Serializable;
  */
 public class TabbedFormDemo extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private TabbedForm form = new TabbedForm("form");
     private RadioGroup paymentGroup = new RadioGroup("paymentOption", true);

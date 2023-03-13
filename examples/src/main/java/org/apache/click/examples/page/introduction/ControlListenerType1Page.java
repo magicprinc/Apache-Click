@@ -21,7 +21,7 @@ package org.apache.click.examples.page.introduction;
 import org.apache.click.control.ActionLink;
 import org.apache.click.examples.page.BorderPage;
 
-import java.io.Serial;
+
 
 /**
  * Provides a control listener example Page using the runtime binding of the
@@ -33,7 +33,7 @@ import java.io.Serial;
  */
 public class ControlListenerType1Page extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     /* Set the listener to this object's "onLinkClick" method. */
     private ActionLink myLink = new ActionLink("myLink", this, "onLinkClick");

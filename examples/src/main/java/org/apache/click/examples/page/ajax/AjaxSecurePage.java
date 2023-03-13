@@ -25,7 +25,7 @@ import org.apache.click.control.ActionLink;
 import org.apache.click.examples.page.BorderPage;
 import org.apache.click.util.ClickUtils;
 
-import java.io.Serial;
+
 
 /**
  * Provides an <tt>onSecurityCheck</tt> example secure Page for handling Ajax
@@ -35,7 +35,7 @@ import java.io.Serial;
  */
 public class AjaxSecurePage extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private ActionLink secureLinkWithRedirect = new ActionLink("secureLinkWithRedirect");
     private ActionLink secureLinkWithMessage = new ActionLink("secureLinkWithMessage");

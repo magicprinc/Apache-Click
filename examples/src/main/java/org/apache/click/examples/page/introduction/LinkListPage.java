@@ -23,7 +23,6 @@ import org.apache.click.Control;
 import org.apache.click.control.ActionLink;
 import org.apache.click.examples.page.BorderPage;
 
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +31,7 @@ import java.util.List;
  */
 public class LinkListPage extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     /* List of ActionLinks. */
     private List links = new ArrayList();

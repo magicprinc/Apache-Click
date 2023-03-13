@@ -1,6 +1,6 @@
 package org.apache.click.examples.domain.auto;
 
-import java.io.Serial;
+
 import java.util.List;
 
 /**
@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class _Address extends org.apache.click.examples.domain.BaseEntity {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     public static final String LINE1_PROPERTY = "line1";
     public static final String LINE2_PROPERTY = "line2";

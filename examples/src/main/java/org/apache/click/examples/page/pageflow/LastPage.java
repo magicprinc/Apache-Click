@@ -26,7 +26,7 @@ import org.apache.click.examples.service.CustomerService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.Serial;
+
 
 /**
  * Provides the last page of a multi page work flow.
@@ -34,7 +34,7 @@ import java.io.Serial;
 @Component
 public class LastPage extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     @Resource(name="bookingService")
     private BookingService bookingService;

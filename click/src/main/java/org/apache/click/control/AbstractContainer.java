@@ -23,7 +23,6 @@ import org.apache.click.util.ClickUtils;
 import org.apache.click.util.ContainerUtils;
 import org.apache.click.util.HtmlStringBuffer;
 
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,9 +48,8 @@ import java.util.Map;
 public abstract class AbstractContainer extends AbstractControl implements
     Container {
 
-    // Constants --------------------------------------------------------------
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     // Instance Variables -----------------------------------------------------
 

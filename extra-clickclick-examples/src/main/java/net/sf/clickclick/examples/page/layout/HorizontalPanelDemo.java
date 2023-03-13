@@ -10,10 +10,10 @@ import org.apache.click.control.TextField;
 import org.apache.click.extras.control.HtmlForm;
 import org.apache.click.extras.control.IntegerField;
 
-import java.io.Serial;
+
 
 public class HorizontalPanelDemo extends BorderPage {
-  @Serial private static final long serialVersionUID = 5470033727110522618L;
+  private static final long serialVersionUID = 5470033727110522618L;
 
   private final HtmlForm form = new HtmlForm("form");
 

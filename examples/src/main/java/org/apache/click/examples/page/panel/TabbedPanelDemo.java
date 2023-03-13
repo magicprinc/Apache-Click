@@ -26,7 +26,6 @@ import org.apache.click.extras.panel.TabbedPanel;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.Serial;
 import java.util.List;
 
 /**
@@ -35,7 +34,7 @@ import java.util.List;
 @Component
 public class TabbedPanelDemo extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private TabbedPanel tabbedPanel = new TabbedPanel("tabbedPanel");
     private List<Customer> customers;

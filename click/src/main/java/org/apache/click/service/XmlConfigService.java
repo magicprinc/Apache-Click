@@ -3,6 +3,8 @@ package org.apache.click.service;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Value;
+import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.click.Context;
@@ -2055,7 +2057,11 @@ public class XmlConfigService implements ConfigService, EntityResolver {
     }
   }
 
-  record Property(String name, String value) {}
+  @Value @Accessors(fluent = true)
+  public static class Property {
+    String name;
+    String value;
+  }
 
 
   /** Cache of resource bundle and locales which were not found, with support for multiple class loaders. */

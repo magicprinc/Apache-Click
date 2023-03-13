@@ -3,7 +3,6 @@ package org.apache.click.control;
 import lombok.val;
 import org.apache.click.util.HtmlStringBuffer;
 
-import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -80,7 +79,7 @@ import java.io.Serializable;
  * @see OptionGroup
  */
 public class Option implements Serializable {
-  @Serial private static final long serialVersionUID = -7212239592323960704L;
+  private static final long serialVersionUID = -7212239592323960704L;
 
   /** The empty select empty option. */
   public static final Option EMPTY_OPTION = new Option("", "");

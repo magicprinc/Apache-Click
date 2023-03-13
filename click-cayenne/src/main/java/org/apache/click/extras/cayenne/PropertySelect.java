@@ -16,7 +16,6 @@ import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
 import org.apache.commons.lang.StringUtils;
 
-import java.io.Serial;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
@@ -110,7 +109,7 @@ import static org.apache.click.util.ClickUtils.GET_GETTER;
  * @see QuerySelect
  */
 public class PropertySelect extends Select {
-  @Serial private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
   // Instance Variables -----------------------------------------------------
 

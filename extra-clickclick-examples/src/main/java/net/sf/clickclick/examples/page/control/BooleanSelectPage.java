@@ -9,11 +9,10 @@ import org.apache.click.control.Select;
 import org.apache.click.control.Submit;
 import org.apache.click.extras.control.PageSubmit;
 
-import java.io.Serial;
 import java.util.Locale;
 
 public class BooleanSelectPage extends BorderPage {
-  @Serial private static final long serialVersionUID = -909157006568352034L;
+  private static final long serialVersionUID = -909157006568352034L;
 
   public Form           locForm    = new Form();
   public Form           form       = new Form();

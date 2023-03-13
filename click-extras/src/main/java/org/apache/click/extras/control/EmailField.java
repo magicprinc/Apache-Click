@@ -6,7 +6,6 @@ import org.apache.click.element.Element;
 import org.apache.click.element.JsImport;
 import org.apache.click.util.ClickUtils;
 
-import java.io.Serial;
 import java.text.MessageFormat;
 import java.util.List;
 
@@ -43,7 +42,7 @@ import java.util.List;
  *    href="http://www.w3.org/TR/html401/interact/forms.html#h-17.4">INPUT</a>
  */
 public class EmailField extends TextField {
-  @Serial private static final long serialVersionUID = -2751803758752916099L;
+  private static final long serialVersionUID = -2751803758752916099L;
 
   /**
    * The field validation JavaScript function template.

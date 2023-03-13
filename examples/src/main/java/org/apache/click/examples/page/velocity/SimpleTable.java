@@ -21,7 +21,6 @@ package org.apache.click.examples.page.velocity;
 import org.apache.click.Page;
 import org.apache.click.examples.page.BorderPage;
 
-import java.io.Serial;
 import java.util.TreeMap;
 
 /**
@@ -29,7 +28,7 @@ import java.util.TreeMap;
  */
 public class SimpleTable extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * @see Page#onRender()

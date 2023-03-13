@@ -15,7 +15,6 @@ import org.w3c.dom.NodeList;
 
 import javax.servlet.ServletContext;
 import java.io.InputStream;
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Map;
@@ -127,7 +126,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @see Menu
  */
 public class MenuFactory implements Serializable {
-  @Serial private static final long serialVersionUID = 1823013139251272272L;
+  private static final long serialVersionUID = 1823013139251272272L;
 
   /**
    * The default root menu name: &nbsp; "<tt>rootMenu</tt>".

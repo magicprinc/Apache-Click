@@ -13,7 +13,6 @@ import org.apache.click.service.PropertyService;
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
 
-import java.io.Serial;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -90,7 +89,7 @@ import java.util.Map;
  * @see PropertySelect
  */
 public class QuerySelect extends Select {
-  @Serial private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
   /** The option label rendering decorator. */
   protected Decorator decorator;

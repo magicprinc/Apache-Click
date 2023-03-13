@@ -8,7 +8,6 @@ import org.apache.click.service.PropertyService;
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
 
-import java.io.Serial;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -77,7 +76,7 @@ import java.util.Map;
  * @see Radio
  */
 public class RadioGroup extends Field {
-  @Serial private static final long serialVersionUID = -2948831296931107461L;
+  private static final long serialVersionUID = -2948831296931107461L;
 
   /**
    * The field validation JavaScript function template.

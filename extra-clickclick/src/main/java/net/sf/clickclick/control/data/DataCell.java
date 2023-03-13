@@ -2,15 +2,14 @@ package net.sf.clickclick.control.data;
 
 import net.sf.clickclick.control.html.table.Cell;
 
-import java.io.Serial;
+
 
 /**
  *
  */
 public class DataCell extends Cell {
-  @Serial private static final long serialVersionUID = -8867577629030108304L;
+  private static final long serialVersionUID = -8867577629030108304L;
 
-  // -------------------------------------------------------------- Variables
 
   protected DataControl dataControl;
 

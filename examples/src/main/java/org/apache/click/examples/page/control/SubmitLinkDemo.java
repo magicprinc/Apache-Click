@@ -7,14 +7,13 @@ import org.apache.click.control.TextField;
 import org.apache.click.examples.page.BorderPage;
 import org.apache.click.extras.control.SubmitLink;
 
-import java.io.Serial;
 import java.util.Date;
 
 /**
  * This example demonstrates how to use a SubmitLink control together with the Form control.
  */
 public class SubmitLinkDemo extends BorderPage {
-  @Serial private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
 
   public SubmitLinkDemo() {

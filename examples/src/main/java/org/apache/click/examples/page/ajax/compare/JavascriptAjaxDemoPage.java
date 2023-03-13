@@ -24,14 +24,14 @@ import org.apache.click.ajax.DefaultAjaxBehavior;
 import org.apache.click.control.ActionLink;
 import org.apache.click.examples.page.BorderPage;
 
-import java.io.Serial;
+
 
 /**
  * An Ajax example using JavaScript instead of a library such as jQuery, Prototype etc.
  */
 public class JavascriptAjaxDemoPage extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private ActionLink link = new ActionLink("link", "Make Ajax Request");
 

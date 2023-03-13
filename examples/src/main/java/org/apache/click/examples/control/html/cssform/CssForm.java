@@ -21,7 +21,6 @@ package org.apache.click.examples.control.html.cssform;
 import org.apache.click.element.CssImport;
 import org.apache.click.extras.control.HtmlForm;
 
-import java.io.Serial;
 import java.util.List;
 
 /**
@@ -29,7 +28,7 @@ import java.util.List;
  */
 public class CssForm extends HtmlForm {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     public CssForm(String name) {
         super(name);

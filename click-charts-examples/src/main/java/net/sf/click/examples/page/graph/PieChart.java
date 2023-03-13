@@ -5,13 +5,13 @@ import net.sf.click.examples.page.BorderPage;
 import net.sf.click.extras.graph.JSChart;
 import net.sf.click.extras.graph.JSPieChart;
 
-import java.io.Serial;
+
 
 /**
  * Example usage of the JSPieChart.
  */
 public class PieChart extends BorderPage {
-  @Serial private static final long serialVersionUID = 5535695657993103994L;
+  private static final long serialVersionUID = 5535695657993103994L;
 
   @Getter(onMethod_={@Override}) public final JSChart chart = new JSPieChart("chart", "Pie Graph");
 

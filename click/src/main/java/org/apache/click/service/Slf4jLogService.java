@@ -8,7 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
-import java.util.Objects;
+
+import static org.apache.click.util.ClickUtils.trim;
 
 /**
  * Provides a
@@ -93,12 +94,12 @@ public class Slf4jLogService implements LogService {
   @Override public void onInit (@NonNull ServletContext servletContext) throws Exception {
     String loggerName = getName();
 
-    servletContextName = Objects.requireNonNullElse(servletContext.getServletContextName(), "").trim();
+    servletContextName = trim(servletContext.getServletContextName());
     if (servletContextName.length()>0) {
       loggerName = loggerName+"."+servletContextName;
     }
 
-    contextPath = Objects.requireNonNullElse(servletContext.getContextPath(), "").trim();
+    contextPath = trim(servletContext.getContextPath());
     if (contextPath.length()>0) {
       loggerName = loggerName+"@"+contextPath;
     }

@@ -23,7 +23,6 @@ import org.apache.click.element.Element;
 import org.apache.click.element.JsImport;
 import org.apache.click.examples.page.BorderPage;
 
-import java.io.Serial;
 import java.util.List;
 
 /**
@@ -37,7 +36,7 @@ import java.util.List;
  */
 public class PageImportsExample extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     public PageImportsExample() {
         // Indicate that Controls should not import their head elements

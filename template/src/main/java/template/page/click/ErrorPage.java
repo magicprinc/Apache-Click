@@ -4,11 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.click.extras.control.Menu;
 import org.apache.click.extras.control.MenuFactory;
 
-import java.io.Serial;
+
 
 @Slf4j
 public class ErrorPage extends org.apache.click.util.ErrorPage {
-  @Serial private static final long serialVersionUID = 2323819756383921509L;
+  private static final long serialVersionUID = 2323819756383921509L;
 
   public String title = "Error Page";
 

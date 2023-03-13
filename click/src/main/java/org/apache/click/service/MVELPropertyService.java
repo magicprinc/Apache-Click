@@ -34,7 +34,7 @@ public class MVELPropertyService extends PropertyServiceBase {
   protected Serializable cacheOrParse (Object root, String name){
     return EXPRESSION_CACHE.asMap()
         .computeIfAbsent(
-            PropertyService.distinctClassName(root)+'#'+name,
+            distinctClassName(root)+'#'+name,
             s->MVEL.compileExpression(name));
   }
 

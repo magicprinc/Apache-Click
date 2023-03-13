@@ -8,7 +8,7 @@ import org.apache.click.Context;
 import org.apache.click.control.AbstractLink;
 import org.apache.click.util.HtmlStringBuffer;
 
-import java.io.Serial;
+
 
 /**
  * Provides an External Link control: &nbsp; &lt;a href="" &gt;&lt;/a&gt;.
@@ -27,7 +27,7 @@ import java.io.Serial;
  *    href="http://www.w3.org/TR/html401/struct/links.html#h-12.2">A Links</a>
  */
 public class ExternalLink extends AbstractLink {
-  @Serial private static final long serialVersionUID = 3746134117554034349L;
+  private static final long serialVersionUID = 3746134117554034349L;
 
   /** The target path.
    Set the link href target path */

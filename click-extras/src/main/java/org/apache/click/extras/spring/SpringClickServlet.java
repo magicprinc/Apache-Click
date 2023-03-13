@@ -12,7 +12,6 @@ import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletRequest;
 import java.beans.Introspector;
-import java.io.Serial;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -312,7 +311,7 @@ import java.util.Set;
  * @see PageScopeResolver
  */
 public class SpringClickServlet extends ClickServlet {
-  @Serial private static final long serialVersionUID = -735025234764027175L;
+  private static final long serialVersionUID = -735025234764027175L;
 
   /**
    * The Servlet initialization parameter name for the option to have the

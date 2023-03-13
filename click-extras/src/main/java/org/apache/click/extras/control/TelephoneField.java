@@ -20,7 +20,7 @@ package org.apache.click.extras.control;
 
 import org.apache.click.control.TextField;
 
-import java.io.Serial;
+
 
 /**
  * Provides a Telephone Field control: &nbsp; &lt;input type='text'&gt;.
@@ -60,7 +60,7 @@ import java.io.Serial;
  */
 public class TelephoneField extends TextField {
 
-  @Serial private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
 
   /**

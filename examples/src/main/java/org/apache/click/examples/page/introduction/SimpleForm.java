@@ -5,7 +5,7 @@ import org.apache.click.control.Submit;
 import org.apache.click.control.TextField;
 import org.apache.click.examples.page.BorderPage;
 
-import java.io.Serial;
+
 
 /**
  * Provides a simple Form example Page.
@@ -18,7 +18,7 @@ import java.io.Serial;
  * is clicked.
  */
 public class SimpleForm extends BorderPage {
-  @Serial private static final long serialVersionUID = -8294087090143874857L;
+  private static final long serialVersionUID = -8294087090143874857L;
 
   private final Form form = new Form("form");
 

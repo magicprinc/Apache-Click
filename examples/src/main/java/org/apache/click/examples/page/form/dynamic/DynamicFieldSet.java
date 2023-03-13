@@ -30,14 +30,14 @@ import org.apache.click.extras.control.EmailField;
 import org.apache.click.extras.control.IntegerField;
 import org.apache.click.util.ClickUtils;
 
-import java.io.Serial;
+
 
 /**
  * Demonstrates dynamic Form behavior.
  */
 public class DynamicFieldSet extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private Form form = new Form("dynamicForm");
 
@@ -97,7 +97,7 @@ public class DynamicFieldSet extends BorderPage {
         }
 
         submit.setActionListener(new ActionListener() {
-            @Serial private static final long serialVersionUID = 1L;
+            private static final long serialVersionUID = 1L;
 
             @Override public boolean onAction(Control source) {
                 if (form.isValid()) {

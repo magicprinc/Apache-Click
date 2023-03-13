@@ -46,7 +46,6 @@ import org.apache.click.util.ContainerUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
@@ -56,7 +55,7 @@ import java.util.List;
 @Component
 public class ExtraControlsForm extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     /** Form options holder. */
     public static class Options implements Serializable {

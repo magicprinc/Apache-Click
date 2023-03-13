@@ -22,14 +22,14 @@ import org.apache.click.Page;
 import org.apache.click.examples.domain.User;
 import org.apache.click.examples.page.BorderPage;
 
-import java.io.Serial;
+
 
 /**
  * Provides an user session logout Page.
  */
 public class Logout extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * @see Page#onInit()

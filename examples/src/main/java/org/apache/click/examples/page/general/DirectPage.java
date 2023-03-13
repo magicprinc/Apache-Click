@@ -10,9 +10,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.io.Serial;
 import java.io.UncheckedIOException;
-import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.*;
@@ -21,7 +20,7 @@ import static java.nio.charset.StandardCharsets.*;
  * Provides an example direct <tt>HttpServletResponse</tt> handling.
  */
 public class DirectPage extends Page {
-  @Serial private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
   /**
    * Render the Java source file as "text/plain".
@@ -52,7 +51,7 @@ public class DirectPage extends Page {
       if (getContext().hasRequestParameter("more")){
         writer.println("#\n# More:\n#\n");
         writer.println(System.getProperty("user.dir"));// ~ C:\opt\github\click
-        writer.println(Path.of(".").toAbsolutePath());// ~ C:\Users\magic\.gradle\daemon\7.6\.
+        writer.println(Paths.get(".").toAbsolutePath());// ~ C:\Users\magic\.gradle\daemon\7.6\.
 
         System.getProperties().entrySet().stream()
             .map(ClickUtils::<Map.Entry<String,String>>castUnsafe)

@@ -32,7 +32,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.Serial;
+
 
 /**
  * Provides a user authentication login Page.
@@ -40,7 +40,7 @@ import java.io.Serial;
 @Component
 public class Login extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
     private Form form = new Form("form");
     private HiddenField redirectField = new HiddenField("redirect", String.class);
 

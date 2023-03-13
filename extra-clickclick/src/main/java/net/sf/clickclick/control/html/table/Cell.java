@@ -6,13 +6,13 @@ import org.apache.click.control.AbstractContainer;
 import org.apache.click.control.AbstractControl;
 import org.apache.click.util.HtmlStringBuffer;
 
-import java.io.Serial;
+
 
 /**
  * Provide a table Cell control: <tt>&lt;td&gt;</tt> .
  */
 public class Cell extends AbstractContainer {
-  @Serial private static final long serialVersionUID = 6470577767114403302L;
+  private static final long serialVersionUID = 6470577767114403302L;
 
 
   /**

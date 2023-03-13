@@ -13,11 +13,10 @@ import org.apache.click.control.TextField;
 import org.apache.click.dataprovider.DataProvider;
 import org.apache.click.extras.control.SubmitLink;
 
-import java.io.Serial;
 import java.util.List;
 
 public class RepeatFormPage extends AbstractRepeatPage {
-  @Serial private static final long serialVersionUID = -377446102701393830L;
+  private static final long serialVersionUID = -377446102701393830L;
 
 
   @Override

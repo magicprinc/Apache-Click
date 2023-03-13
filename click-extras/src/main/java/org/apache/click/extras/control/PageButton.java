@@ -22,7 +22,7 @@ import org.apache.click.Page;
 import org.apache.click.control.PageLink;
 import org.apache.click.util.HtmlStringBuffer;
 
-import java.io.Serial;
+
 
 /**
  * Provides a Page link Button control: &nbsp; &lt;input type='button'&gt;.
@@ -63,7 +63,7 @@ import java.io.Serial;
  */
 public class PageButton extends PageLink {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     // ----------------------------------------------------------- Constructors
 

@@ -22,14 +22,14 @@ import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.Serial;
+
 
 /**
  * Provides a Spring Security (ACEGI) enabled account creation page.
  */
 @Component
 public class CreateAccountPage extends BorderPage {
-  @Serial private static final long serialVersionUID = -723735445289269858L;
+  private static final long serialVersionUID = -723735445289269858L;
 
   private final Form form = new Form("form");
   private final TextField fullNameField = new TextField(User.FULLNAME_PROPERTY, "Full Name", true);

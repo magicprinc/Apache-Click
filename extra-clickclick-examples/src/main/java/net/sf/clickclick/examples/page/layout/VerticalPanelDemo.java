@@ -13,10 +13,10 @@ import org.apache.click.extras.control.HtmlForm;
 import org.apache.click.extras.control.IntegerField;
 import org.apache.click.util.HtmlStringBuffer;
 
-import java.io.Serial;
+
 
 public class VerticalPanelDemo extends BorderPage {
-  @Serial private static final long serialVersionUID = -2425148036118986768L;
+  private static final long serialVersionUID = -2425148036118986768L;
 
   private final HtmlForm form = new HtmlForm("form");
 
@@ -73,7 +73,7 @@ public class VerticalPanelDemo extends BorderPage {
   }
 
   static class FieldLabelCombo extends AbstractControl {
-    @Serial private static final long serialVersionUID = -8140884658901043978L;
+    private static final long serialVersionUID = -8140884658901043978L;
 
     private final Field field;
     private final HtmlLabel label;

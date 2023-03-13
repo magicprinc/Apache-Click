@@ -39,7 +39,6 @@ import org.apache.click.extras.control.DateField;
 import org.apache.click.extras.control.LinkDecorator;
 import org.apache.click.extras.control.TableInlinePaginator;
 
-import java.io.Serial;
 import java.util.List;
 
 /**
@@ -47,7 +46,7 @@ import java.util.List;
  */
 public class SearchTablePage extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private Form form = new Form("form");
     private Table table = new Table("table");

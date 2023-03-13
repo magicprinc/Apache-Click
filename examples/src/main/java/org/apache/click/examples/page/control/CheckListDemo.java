@@ -21,7 +21,6 @@ import org.apache.click.examples.page.HomePage;
 import org.apache.click.extras.control.CheckList;
 import org.apache.click.extras.control.PageSubmit;
 
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -31,7 +30,7 @@ import java.util.List;
  */
 public class CheckListDemo extends BorderPage{
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private static final List<Option> STANDARD_OPTIONS;
     private static final List<Option> SORTABLE_OPTIONS = new ArrayList<Option>();

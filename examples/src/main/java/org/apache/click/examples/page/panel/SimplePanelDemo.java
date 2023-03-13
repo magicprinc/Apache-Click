@@ -21,14 +21,14 @@ package org.apache.click.examples.page.panel;
 import org.apache.click.control.Panel;
 import org.apache.click.examples.page.BorderPage;
 
-import java.io.Serial;
+
 
 /**
  * Provides a simple Panel demonstration.
  */
 public class SimplePanelDemo extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private Panel panel = new Panel("panel", "/panel/simple-panel.htm");
 

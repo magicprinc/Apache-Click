@@ -23,14 +23,14 @@ import org.apache.click.control.Column;
 import org.apache.click.control.Panel;
 import org.apache.click.util.HtmlStringBuffer;
 
-import java.io.Serial;
+
 
 /**
  * Provides a custom Column that wraps a Panel for display in a Table.
  */
 public class PanelColumn extends Column {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private final Panel panel;
 

@@ -28,7 +28,6 @@ import org.apache.click.examples.service.CustomerService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.Serial;
 import java.util.List;
 
 /**
@@ -41,7 +40,7 @@ import java.util.List;
 @Component
 public class ActionTable extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private  ActionLink viewLink = new ActionLink("viewLink", this, "onViewClick");
     private  PageLink editLink = new PageLink("editLink", EditCustomer.class);

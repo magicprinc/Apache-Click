@@ -28,7 +28,6 @@ import org.apache.click.util.HtmlStringBuffer;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.Serial;
 import java.text.MessageFormat;
 import java.util.List;
 
@@ -38,7 +37,7 @@ import java.util.List;
 @Component
 public class TableFooter extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private Table table;
 
@@ -49,7 +48,7 @@ public class TableFooter extends BorderPage {
 
     public TableFooter() {
         table = new Table("table") {
-            @Serial private static final long serialVersionUID = 1L;
+            private static final long serialVersionUID = 1L;
 
             @Override
             public void renderFooterRow(HtmlStringBuffer buffer) {

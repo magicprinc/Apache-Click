@@ -35,14 +35,14 @@ import org.quartz.ee.servlet.QuartzInitializerListener;
 import org.quartz.impl.StdSchedulerFactory;
 
 import javax.servlet.ServletContext;
-import java.io.Serial;
+
 
 /**
  * Provides a Quartz Job and Simple Trigger edit page.
  */
 public class QuartzJobAndTriggerPage extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private Form form = new Form("form");
     private TextField nameField = new TextField("name", true);
@@ -107,7 +107,7 @@ public class QuartzJobAndTriggerPage extends BorderPage {
 
         Submit saveSubmit = new Submit("Save");
         saveSubmit.setActionListener(new ActionListener(){
-            @Serial private static final long serialVersionUID = 1L;
+            private static final long serialVersionUID = 1L;
 
             @Override public boolean onAction(Control source) {
                 return onSaveClick();
@@ -117,7 +117,7 @@ public class QuartzJobAndTriggerPage extends BorderPage {
 
         Submit cancelSubmit = new Submit("Cancel");
         cancelSubmit.setActionListener(new ActionListener(){
-            @Serial private static final long serialVersionUID = 1L;
+            private static final long serialVersionUID = 1L;
 
             @Override public boolean onAction(Control source) {
                 setRedirect(QuartzJobSchedulerPage.class);

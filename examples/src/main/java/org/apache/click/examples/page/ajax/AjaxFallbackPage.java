@@ -25,7 +25,7 @@ import org.apache.click.ajax.DefaultAjaxBehavior;
 import org.apache.click.control.ActionLink;
 import org.apache.click.examples.page.BorderPage;
 
-import java.io.Serial;
+
 
 /**
  * Demonstrates how to handle an AJAX request and fallback to a non-AJAX request
@@ -33,7 +33,7 @@ import java.io.Serial;
  */
 public class AjaxFallbackPage extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private ActionLink link = new ActionLink("link", "here");
 

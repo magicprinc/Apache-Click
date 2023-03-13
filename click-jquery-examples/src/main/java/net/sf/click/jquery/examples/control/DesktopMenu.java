@@ -9,7 +9,6 @@ import org.apache.click.element.JsScript;
 import org.apache.click.extras.control.Menu;
 import org.apache.click.util.HtmlStringBuffer;
 
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +17,7 @@ import java.util.List;
  *
  */
 public class DesktopMenu extends Menu {
-  @Serial private static final long serialVersionUID = 7125842095383261701L;
+  private static final long serialVersionUID = 7125842095383261701L;
 
 
   protected String cssImport = "/click-jquery/example/desktopmenu/desktopmenu.css";

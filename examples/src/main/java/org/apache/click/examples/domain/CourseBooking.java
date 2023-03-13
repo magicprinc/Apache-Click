@@ -20,13 +20,13 @@ package org.apache.click.examples.domain;
 
 import org.apache.click.examples.domain.auto._CourseBooking;
 
-import java.io.Serial;
+
 
 /**
  * Provides an Course Booking entity class.
  */
 public class CourseBooking extends _CourseBooking {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
 }

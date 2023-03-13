@@ -20,7 +20,6 @@ package org.apache.click.examples.page.jsp;
 
 import org.apache.click.Page;
 
-import java.io.Serial;
 import java.util.Date;
 
 /**
@@ -29,7 +28,7 @@ import java.util.Date;
  */
 public class HelloWorld extends Page {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     public HelloWorld() {
         addModel("time", new Date());

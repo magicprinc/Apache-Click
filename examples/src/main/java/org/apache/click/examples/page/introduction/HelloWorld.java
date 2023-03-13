@@ -20,7 +20,6 @@ package org.apache.click.examples.page.introduction;
 
 import org.apache.click.examples.page.BorderPage;
 
-import java.io.Serial;
 import java.util.Date;
 
 /**
@@ -32,7 +31,7 @@ import java.util.Date;
  */
 public class HelloWorld extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private Date time = new Date();
 

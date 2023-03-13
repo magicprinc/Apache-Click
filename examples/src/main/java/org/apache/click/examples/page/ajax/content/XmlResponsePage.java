@@ -24,14 +24,14 @@ import org.apache.click.ajax.DefaultAjaxBehavior;
 import org.apache.click.control.ActionLink;
 import org.apache.click.examples.page.BorderPage;
 
-import java.io.Serial;
+
 
 /**
  * Demonstrates how an ActionResult can return an XML response.
  */
 public class XmlResponsePage extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private ActionLink link = new ActionLink("link", "here");
 

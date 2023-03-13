@@ -29,7 +29,6 @@ import org.apache.click.extras.tree.Tree;
 import org.apache.click.extras.tree.TreeListener;
 import org.apache.click.extras.tree.TreeNode;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +38,7 @@ import java.util.List;
  */
 public class AdvancedTreePage extends BorderPage implements TreeListener {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     public static final String TREE_NODES_SESSION_KEY = "advancedTreeNodes";
 
@@ -254,7 +253,7 @@ public class AdvancedTreePage extends BorderPage implements TreeListener {
 
     /** Form options holder. */
     public static class TreeOptions implements Serializable {
-        @Serial private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
         boolean javascriptEnabled= false;
         boolean rootNodeDisplayed = false;
     }

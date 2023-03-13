@@ -30,7 +30,6 @@ import org.apache.click.examples.page.BorderPage;
 import org.apache.click.examples.service.CustomerService;
 import org.apache.click.extras.control.TableInlinePaginator;
 
-import java.io.Serial;
 import java.util.List;
 
 /**
@@ -38,7 +37,7 @@ import java.util.List;
  */
 public class TableStyles extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private Form form = new Form("form");
     private Table table = new Table("table");

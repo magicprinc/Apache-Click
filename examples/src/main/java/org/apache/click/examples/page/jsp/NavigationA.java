@@ -21,7 +21,7 @@ package org.apache.click.examples.page.jsp;
 import org.apache.click.control.ActionLink;
 import org.apache.click.examples.page.BorderPage;
 
-import java.io.Serial;
+
 
 /**
  * Provides an navigation example Page demonstrating forward and redirect
@@ -29,7 +29,7 @@ import java.io.Serial;
  */
 public class NavigationA extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private ActionLink forwardLink = new ActionLink("forwardLink", this, "onForwardClick");
     private ActionLink forwardParamLink = new ActionLink("forwardParamLink", this, "onForwardParamClick");

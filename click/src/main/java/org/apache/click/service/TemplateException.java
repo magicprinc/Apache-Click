@@ -4,7 +4,7 @@ import org.apache.commons.lang.StringUtils;
 
 import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.io.Serial;
+
 
 /**
  * Provides a template exception class for use by the template service. This is
@@ -12,7 +12,7 @@ import java.io.Serial;
  * such as line and column where error occurred.
  */
 public class TemplateException extends Exception {
-  @Serial private static final long serialVersionUID = 7843729461356696583L;
+  private static final long serialVersionUID = 7843729461356696583L;
 
   /** The template column number where this exception occurred. */
   private int columnNumber;

@@ -6,12 +6,10 @@ import org.apache.click.util.ClickUtils;
 import org.apache.click.util.ContainerUtils;
 import org.apache.click.util.HtmlStringBuffer;
 
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Provides a FieldSet container control: &nbsp; &lt;fieldset&gt;.
@@ -78,7 +76,7 @@ import java.util.Objects;
  *    href="http://www.w3.org/TR/html401/interact/forms.html#h-17.10">FIELDSET</a>
  */
 public class FieldSet extends Field implements Container {
-  @Serial private static final long serialVersionUID = 2099721243731800869L;
+  private static final long serialVersionUID = 2099721243731800869L;
 
   /** The list of controls. */
   protected List<Control> controls;
@@ -932,7 +930,7 @@ public class FieldSet extends Field implements Container {
         buffer.elementStart("legend");
         if (hasLegendAttributes()) {
           Object legendId = getLegendAttributes().get("id");
-          buffer.appendAttribute("id", Objects.requireNonNullElseGet(legendId, ()->getId() + "-legend"));
+          buffer.appendAttribute("id", legendId != null ? legendId : getId() + "-legend");
           buffer.appendAttributes(getLegendAttributes());
         } else {
           buffer.appendAttribute("id", getId() + "-legend");

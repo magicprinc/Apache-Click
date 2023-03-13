@@ -25,14 +25,14 @@ import org.apache.click.control.TextField;
 import org.apache.click.extras.control.DateField;
 import org.apache.click.extras.control.DoubleField;
 
-import java.io.Serial;
+
 
 /**
  * Provides a reusable Panel to capture Client details.
  */
 public class ClientPanel extends Panel {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private Form form = new Form("form");
 

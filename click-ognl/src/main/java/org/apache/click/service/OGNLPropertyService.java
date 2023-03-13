@@ -44,7 +44,7 @@ public class OGNLPropertyService extends PropertyServiceBase {
   }
 
   private Node cacheOrParse (Object root, String name) {
-    return EXPRESSION_CACHE.asMap().computeIfAbsent(PropertyService.distinctClassName(root)+'#'+name,
+    return EXPRESSION_CACHE.asMap().computeIfAbsent(distinctClassName(root)+'#'+name,
         k -> ognlParseExpression(name));
   }
 

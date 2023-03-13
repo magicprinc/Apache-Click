@@ -25,14 +25,14 @@ import org.apache.click.control.Form;
 import org.apache.click.control.Submit;
 import org.apache.click.examples.control.SimplePanel;
 
-import java.io.Serial;
+
 
 /**
  * Provides common functionality for each step in the wizard.
  */
 public abstract class Step extends SimplePanel {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     // Variables --------------------------------------------------------------
 

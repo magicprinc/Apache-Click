@@ -31,14 +31,14 @@ import org.apache.click.extras.control.EmailField;
 import org.apache.click.extras.control.PageSubmit;
 import org.apache.click.extras.control.TelephoneField;
 
-import java.io.Serial;
+
 
 /**
  * Provides Form layout examples using the Form and FieldSet controls.
  */
 public class FormLayout extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private Form form1 = new Form("form1");
     private Form form2 = new Form("form2");

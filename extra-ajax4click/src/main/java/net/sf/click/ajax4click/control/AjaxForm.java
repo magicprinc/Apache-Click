@@ -9,7 +9,6 @@ import org.apache.click.element.JsScript;
 import org.apache.click.util.HtmlStringBuffer;
 import org.apache.commons.lang.StringUtils;
 
-import java.io.Serial;
 import java.util.List;
 
 /**
@@ -66,7 +65,7 @@ import java.util.List;
  * } </pre>
  */
 public class AjaxForm extends Form {
-  @Serial private static final long serialVersionUID = 7206688366093594607L;
+  private static final long serialVersionUID = 7206688366093594607L;
 
   /** The JavaScript focus function HEAD element. */
   protected JsScript focusScript;

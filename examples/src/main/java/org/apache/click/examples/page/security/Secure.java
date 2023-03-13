@@ -21,7 +21,7 @@ package org.apache.click.examples.page.security;
 import org.apache.click.Page;
 import org.apache.click.examples.page.BorderPage;
 
-import java.io.Serial;
+
 
 /**
  * Provides an <tt>onSecurityCheck</tt> example secure Page, which other secure
@@ -29,7 +29,7 @@ import java.io.Serial;
  */
 public class Secure extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * @see Page#onSecurityCheck()

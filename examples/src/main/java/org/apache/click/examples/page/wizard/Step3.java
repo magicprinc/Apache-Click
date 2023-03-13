@@ -22,7 +22,7 @@ import org.apache.click.Context;
 import org.apache.click.examples.domain.Client;
 import org.apache.click.examples.service.ClientService;
 
-import java.io.Serial;
+
 
 /**
  * This step asks for confirmation on the client information added through the
@@ -35,7 +35,7 @@ import java.io.Serial;
  */
 public class Step3 extends Step {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     // Variables --------------------------------------------------------------
 

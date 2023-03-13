@@ -40,7 +40,6 @@ import org.apache.click.util.ContainerUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.Serial;
 import java.util.List;
 
 /**
@@ -52,7 +51,7 @@ public class EditTable extends BorderPage {
 
     public static final String OBJECT_ID = "id";
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private Form form = new Form("form");
     private Table table = new Table("table");

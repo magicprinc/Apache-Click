@@ -6,7 +6,7 @@ import org.apache.click.Context;
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
 
-import java.io.Serial;
+
 
 /**
  * Provides a Radio control: &nbsp; &lt;input type='radio'&gt;.
@@ -30,7 +30,7 @@ import java.io.Serial;
  * @see RadioGroup
  */
 public class Radio extends Field {
-  @Serial private static final long serialVersionUID = -7877719030618088607L;
+  private static final long serialVersionUID = -7877719030618088607L;
 
   /** The field checked value. true if the radio is checked, or false otherwise */
   @Getter @Setter protected boolean checked;

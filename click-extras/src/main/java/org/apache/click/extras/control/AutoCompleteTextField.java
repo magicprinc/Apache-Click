@@ -15,7 +15,6 @@ import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
 import org.apache.commons.lang.StringUtils;
 
-import java.io.Serial;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,7 +69,7 @@ import java.util.Map.Entry;
  *    href="http://www.w3.org/TR/html401/interact/forms.html#h-17.4">INPUT</a>
  */
 public abstract class AutoCompleteTextField extends TextField {
-  @Serial private static final long serialVersionUID = 7930934302698242297L;
+  private static final long serialVersionUID = 7930934302698242297L;
 
   /**
    * The JavaScript 'script.aculo.us' Autocompleter initialization options,

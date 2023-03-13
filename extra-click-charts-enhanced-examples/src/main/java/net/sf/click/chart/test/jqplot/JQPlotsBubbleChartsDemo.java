@@ -9,14 +9,13 @@ import net.sf.click.chart.jqplot.Series;
 import net.sf.click.chart.jqplot.renderer.BubbleRenderer;
 import net.sf.click.chart.test.BorderPage;
 
-import java.io.Serial;
 import java.util.concurrent.ThreadLocalRandom;
 
 /*
 
  */
 public class JQPlotsBubbleChartsDemo extends BorderPage {
-	@Serial private static final long serialVersionUID = -5466784369082249346L;
+    private static final long serialVersionUID = -5466784369082249346L;
 
 	public final String title = "JQPlots Bubble Charts Demo Page";
 

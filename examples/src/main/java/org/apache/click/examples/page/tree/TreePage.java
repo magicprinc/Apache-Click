@@ -22,14 +22,14 @@ import org.apache.click.examples.page.BorderPage;
 import org.apache.click.extras.tree.Tree;
 import org.apache.click.extras.tree.TreeNode;
 
-import java.io.Serial;
+
 
 /**
  * Example usage of the {@link Tree} control.
  */
 public class TreePage extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     public static final String TREE_NODES_SESSION_KEY = "treeNodes";
 

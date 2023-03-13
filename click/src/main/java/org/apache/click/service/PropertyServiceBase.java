@@ -167,6 +167,26 @@ public abstract class PropertyServiceBase implements PropertyService {
     return returnValue;
   }
 
+
+  protected String distinctClassName (Object root){
+    var name = root.getClass().getName();
+    int i = name.lastIndexOf('$');
+    if (i<0){ return name;}// normal class: org.example.Foo
+
+    if (isNumber(name.substring(i + 1))){
+      return name.substring(0, i);// anonymous classes don't (usually) have properties
+    } else {
+      return name; //else: nested/local class Foo$Bar
+    }
+  }
+
+  private static boolean isNumber (String s){
+    for (int i=0, len=s.length(); i<len; i++){
+      if (!Character.isDigit(s.charAt(i)) ){ return false;}
+    }
+    return true;
+  }
+
   /** <a href="http://www.javaspecialists.eu/archive/Issue134.html">
    See DRY Performance article by Kirk Pepperdine.</a> */
   protected static final class CacheKey {

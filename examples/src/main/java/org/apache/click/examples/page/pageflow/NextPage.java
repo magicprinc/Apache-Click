@@ -29,7 +29,7 @@ import org.apache.click.examples.service.CustomerService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.Serial;
+
 
 /**
  * Provides the next page of a multi page work flow.
@@ -37,7 +37,7 @@ import java.io.Serial;
 @Component
 public class NextPage extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private Form form = new Form("form");
     private HiddenField courseField;

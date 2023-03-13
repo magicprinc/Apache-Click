@@ -11,7 +11,6 @@ import org.apache.click.util.HtmlStringBuffer;
 import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.Serial;
 import java.util.List;
 import java.util.Set;
 
@@ -86,7 +85,7 @@ import java.util.Set;
  * </ul>
  */
 public class SubmitLink extends ActionLink {
-  @Serial private static final long serialVersionUID = 6227351843582847924L;
+  private static final long serialVersionUID = 6227351843582847924L;
 
   /** The SubmitLink parent Form. */
   private Form form;

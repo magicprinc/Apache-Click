@@ -31,7 +31,6 @@ import org.apache.click.util.HtmlStringBuffer;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.Serial;
 import java.util.List;
 
 /**
@@ -44,7 +43,7 @@ import java.util.List;
 @Component
 public class SelectPostCode extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     /** Reference to the table. */
     private Table table = new Table("table");
@@ -63,7 +62,7 @@ public class SelectPostCode extends BorderPage {
         Column action = new Column("action");
         LinkDecorator decorator = new LinkDecorator(table, selectState, "postCode") {
 
-            @Serial private static final long serialVersionUID = 1L;
+            private static final long serialVersionUID = 1L;
 
             /**
              * Override default implementation to send parameters

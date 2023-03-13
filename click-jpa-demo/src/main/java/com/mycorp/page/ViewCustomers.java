@@ -10,11 +10,10 @@ import org.apache.click.control.Table;
 import org.apache.click.extras.control.LinkDecorator;
 import org.apache.click.util.Bindable;
 
-import java.io.Serial;
 import java.util.List;
 
 public class ViewCustomers extends BorderPage {
-	@Serial private static final long serialVersionUID = -8820573903081328643L;
+    private static final long serialVersionUID = -8820573903081328643L;
 
 	@Bindable public Table table = new Table();
 	@Bindable public PageLink editLink = new PageLink("Edit", EditCustomer.class);

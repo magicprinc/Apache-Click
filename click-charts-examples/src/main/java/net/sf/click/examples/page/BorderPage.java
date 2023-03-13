@@ -6,11 +6,10 @@ import org.apache.click.extras.control.Menu;
 import org.apache.click.extras.control.MenuFactory;
 import org.apache.click.util.ClickUtils;
 
-import java.io.Serial;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class BorderPage extends Page {
-  @Serial private static final long serialVersionUID = 3721746656550335085L;
+  private static final long serialVersionUID = 3721746656550335085L;
 
   private final Menu rootMenu = new MenuFactory().getRootMenu();
 
@@ -49,12 +48,12 @@ public class BorderPage extends Page {
   }
 
   protected void fillChartWithDataSeries (){
-    var r = new Random();
-    int bars = r.nextInt(5, 20);
+    var r = ThreadLocalRandom.current();
+    int bars = r.nextInt(20)+5;
 
     getChart().addPoint("x", 5);
     for (int i=0; i<bars; i++){
-      getChart().addPoint(Integer.toHexString(i), r.nextInt(-10, 99));
+      getChart().addPoint(Integer.toHexString(i), r.nextInt(110)-10);
     }
   }
 }

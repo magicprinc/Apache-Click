@@ -20,14 +20,14 @@ package org.apache.click.examples.domain;
 
 import org.apache.click.examples.domain.auto._Client;
 
-import java.io.Serial;
+
 
 /**
  * Provides an Client entity class.
  */
 public class Client extends _Client {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     public String getName() {
         return getFirstName() + " " + getLastName();

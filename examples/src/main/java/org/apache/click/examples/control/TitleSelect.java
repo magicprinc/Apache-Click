@@ -20,7 +20,6 @@ package org.apache.click.examples.control;
 
 import org.apache.click.control.Select;
 
-import java.io.Serial;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -36,7 +35,7 @@ import java.util.Map;
  */
 public class TitleSelect extends Select {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     static final Map<String, String> OPTIONS = new LinkedHashMap<String, String>();
 

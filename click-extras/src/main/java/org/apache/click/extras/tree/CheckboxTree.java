@@ -10,7 +10,6 @@ import org.apache.click.util.ContainerUtils;
 import org.apache.click.util.HtmlStringBuffer;
 import org.apache.commons.lang.ArrayUtils;
 
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -108,7 +107,7 @@ import java.util.Set;
  * @see Tree
  */
 public class CheckboxTree extends Tree {
-  @Serial private static final long serialVersionUID = -126999161409734779L;
+  private static final long serialVersionUID = -126999161409734779L;
 
   /**
    * Determines if the checkboxes of child nodes should also be
@@ -686,7 +685,7 @@ public class CheckboxTree extends Tree {
    * This class implements a session based javascript handler.
    */
   protected class CheckboxSessionHandler extends SessionHandler {
-    @Serial private static final long serialVersionUID = 5054303129127430916L;
+    private static final long serialVersionUID = 5054303129127430916L;
 
 
     /**
@@ -719,7 +718,7 @@ public class CheckboxTree extends Tree {
    * This class implements a session based javascript handler.
    */
   protected class CheckboxCookieHandler extends CookieHandler {
-    @Serial private static final long serialVersionUID = -7200080278250812359L;
+    private static final long serialVersionUID = -7200080278250812359L;
 
 
     /**

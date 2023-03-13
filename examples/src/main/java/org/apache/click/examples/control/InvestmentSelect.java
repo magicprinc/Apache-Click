@@ -22,7 +22,6 @@ import org.apache.click.control.Option;
 import org.apache.click.control.OptionGroup;
 import org.apache.click.control.Select;
 
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +39,7 @@ import java.util.List;
 @SuppressWarnings("unchecked")
 public class InvestmentSelect extends Select {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     static final List INVESTMENT_OPTIONS = new ArrayList();
 

@@ -24,12 +24,11 @@ import org.apache.click.control.Panel;
 import org.apache.click.examples.domain.Customer;
 import org.apache.click.util.HtmlStringBuffer;
 
-import java.io.Serial;
 import java.util.Map;
 
 public class CustomerPanel extends Panel {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private Customer customer;
 

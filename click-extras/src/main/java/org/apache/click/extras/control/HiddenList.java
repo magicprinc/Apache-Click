@@ -4,7 +4,6 @@ import org.apache.click.Context;
 import org.apache.click.control.Field;
 import org.apache.click.util.HtmlStringBuffer;
 
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -35,7 +34,7 @@ import java.util.List;
  * &lt;input type="hidden" name="customerId" id="form-customerId_2" value="678"/&gt; </pre>
  */
 public class HiddenList extends Field {
-  @Serial private static final long serialVersionUID = 3886989373361066580L;
+  private static final long serialVersionUID = 3886989373361066580L;
 
   /** The hidden values. */
   protected List<String> valueObject;

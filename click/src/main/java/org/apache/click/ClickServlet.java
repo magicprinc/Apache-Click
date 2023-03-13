@@ -27,7 +27,6 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.Serial;
 import java.io.Writer;
 import java.lang.reflect.Field;
 import java.util.Collections;
@@ -85,7 +84,7 @@ import java.util.TreeMap;
  * ServletContext using the key {@value org.apache.click.service.ConfigService#CONTEXT_NAME}.
  */
 public class ClickServlet extends HttpServlet {
-  @Serial private static final long serialVersionUID = -2529351634349647916L;
+  private static final long serialVersionUID = -2529351634349647916L;
 
   /**
    * The <tt>mock page reference</tt> request attribute: key: &nbsp;

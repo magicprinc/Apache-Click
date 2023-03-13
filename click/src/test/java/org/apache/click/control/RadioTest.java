@@ -24,7 +24,7 @@ import org.apache.click.Control;
 import org.apache.click.MockContext;
 import org.apache.click.servlet.MockRequest;
 
-import java.io.Serial;
+
 
 /**
  * Test Radio behavior.
@@ -226,7 +226,7 @@ public class RadioTest extends TestCase {
     }
 
     static class Listener implements ActionListener {
-        @Serial private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
         public boolean fired;
 

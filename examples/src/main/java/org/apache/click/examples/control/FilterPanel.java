@@ -22,7 +22,6 @@ import org.apache.click.control.Form;
 import org.apache.click.control.Panel;
 import org.apache.click.extras.control.DateField;
 
-import java.io.Serial;
 import java.util.Date;
 
 /**
@@ -30,7 +29,7 @@ import java.util.Date;
  */
 public class FilterPanel extends Panel {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private Form filterForm = new Form("filterForm");
     private DateField startDate = new DateField("startDate");

@@ -9,7 +9,6 @@ import org.apache.click.element.JsImport;
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
 
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,7 +41,7 @@ import java.util.StringTokenizer;
  * <span class="blue">$jsElements</span> in the page template.
  */
 public class TabbedCayenneForm extends CayenneForm {
-  @Serial private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
   // Instance Variables -----------------------------------------------------
 

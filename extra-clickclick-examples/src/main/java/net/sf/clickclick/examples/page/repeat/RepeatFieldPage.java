@@ -12,11 +12,10 @@ import org.apache.click.control.TextField;
 import org.apache.click.dataprovider.DataProvider;
 import org.apache.click.extras.control.HtmlFieldSet;
 
-import java.io.Serial;
 import java.util.List;
 
 public class RepeatFieldPage extends AbstractRepeatPage {
-  @Serial private static final long serialVersionUID = -2081859227611880152L;
+  private static final long serialVersionUID = -2081859227611880152L;
 
   private static final String BOOK_KEY = "book";
 

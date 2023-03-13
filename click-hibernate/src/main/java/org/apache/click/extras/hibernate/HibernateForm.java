@@ -15,7 +15,6 @@ import org.hibernate.Transaction;
 import org.hibernate.metadata.ClassMetadata;
 import org.hibernate.type.Type;
 
-import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -106,7 +105,7 @@ import java.io.Serializable;
  * @see SessionFilter
  */
 public class HibernateForm extends Form {
-  @Serial private static final long serialVersionUID = -7134198516606088333L;
+  private static final long serialVersionUID = -7134198516606088333L;
 
   /** The form value object classname parameter name. */
   protected static final String FO_CLASS = "FO_CLASS";

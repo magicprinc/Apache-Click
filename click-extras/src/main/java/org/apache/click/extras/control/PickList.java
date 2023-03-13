@@ -15,7 +15,6 @@ import org.apache.click.util.ClickUtils;
 import org.apache.click.util.Format;
 import org.apache.click.util.HtmlStringBuffer;
 
-import java.io.Serial;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -162,7 +161,7 @@ import java.util.Map;
  * <span class="blue">$jsElements</span> in the page template.
  */
 public class PickList extends Field {
-  @Serial private static final long serialVersionUID = -9091934269284343720L;
+  private static final long serialVersionUID = -9091934269284343720L;
 
   /**
    * The field validation JavaScript function template.

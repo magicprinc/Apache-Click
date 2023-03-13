@@ -30,14 +30,14 @@ import org.apache.click.extras.control.EmailField;
 import org.apache.click.extras.control.IntegerField;
 import org.apache.click.extras.control.PageSubmit;
 
-import java.io.Serial;
+
 
 /**
  * Provides a Velocity Macro example.
  */
 public class VelocityMacro extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private Form form = new Form("form");
 

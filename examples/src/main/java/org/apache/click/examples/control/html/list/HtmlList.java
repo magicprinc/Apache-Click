@@ -21,7 +21,6 @@ package org.apache.click.examples.control.html.list;
 import org.apache.click.Control;
 import org.apache.click.control.AbstractContainer;
 
-import java.io.Serial;
 import java.util.List;
 
 /**
@@ -29,7 +28,7 @@ import java.util.List;
  */
 public class HtmlList extends AbstractContainer {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     public static final int UNORDERED_LIST = 0;
 

@@ -27,7 +27,6 @@ import org.apache.click.examples.service.CustomerService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.Serial;
 import java.util.List;
 
 /**
@@ -36,7 +35,7 @@ import java.util.List;
 @Component
 public class TableSorting extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     @Resource(name="customerService")
     private CustomerService customerService;

@@ -1,5 +1,6 @@
 package org.apache.click.extras.control;
 
+import com.google.common.collect.ImmutableMap;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.click.MockContext;
@@ -270,7 +271,7 @@ public class NumberFieldTest {
     MyObj obj = new MyObj();
 
     final String expr = "obj.bigDecimalField = bigValue; obj.bigIntegerField = bigValue";
-    MVEL.eval(expr, Map.of("obj", obj, "bigValue", bigValue));
+    MVEL.eval(expr, ImmutableMap.of("obj", obj, "bigValue", bigValue));
 
     assertEquals(bigValue, obj.bigIntegerField.toString());
     assertEquals(bigValue, obj.bigDecimalField.toString());
@@ -278,7 +279,7 @@ public class NumberFieldTest {
     obj.bigDecimalField = new BigDecimal(Long.parseLong(bigValue));
     assertEquals(bigValue, obj.bigDecimalField.toString());
 
-    MVEL.eval(expr, Map.of("obj", obj, "bigValue", Long.valueOf(bigValue)));
+    MVEL.eval(expr, ImmutableMap.of("obj", obj, "bigValue", Long.valueOf(bigValue)));
 
     assertEquals(bigValue, obj.bigIntegerField.toString());
     if (isTestHard()){
@@ -292,12 +293,12 @@ public class NumberFieldTest {
     MyObj obj = new MyObj();
     final String expr = "obj.bigDecimalField = bigValue";
 
-    MVEL.eval(expr, Map.of("obj", obj, "bigValue", bigValue));
+    MVEL.eval(expr, ImmutableMap.of("obj", obj, "bigValue", bigValue));
     assertEquals(bigValue, obj.bigDecimalField.toString());// OK
 
     assertEquals(bigValue, new BigDecimal(Long.valueOf(bigValue).toString()).toString());
 
-    MVEL.eval(expr, Map.of("obj", obj, "bigValue", Long.valueOf(bigValue)));
+    MVEL.eval(expr, ImmutableMap.of("obj", obj, "bigValue", Long.valueOf(bigValue)));
     if (isTestHard()){
       assertEquals(bigValue, obj.bigDecimalField.toString());// Failure todo MVEL bug: https://github.com/mvel/mvel/issues/313
       // Expected :999999999999999999

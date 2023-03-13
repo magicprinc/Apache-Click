@@ -20,13 +20,13 @@ package org.apache.click.examples.domain;
 
 import org.apache.click.examples.domain.auto._Address;
 
-import java.io.Serial;
+
 
 /**
  * Provides an Address entity class.
  */
 public class Address extends _Address {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
 }

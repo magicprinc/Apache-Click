@@ -36,14 +36,14 @@ import org.apache.click.extras.control.IntegerField;
 import org.apache.click.extras.control.PageSubmit;
 import org.apache.click.util.ContainerUtils;
 
-import java.io.Serial;
+
 
 /**
  * Provides a form FieldSet example.
  */
 public class FieldSetDemo extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private Form form = new Form("form");
 

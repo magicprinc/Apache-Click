@@ -10,7 +10,6 @@ import org.apache.click.util.PageImports;
 import org.apache.commons.lang.StringUtils;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -129,7 +128,7 @@ import java.util.Map;
  */
 @Slf4j
 public class Page implements Serializable {
-  @Serial private static final long serialVersionUID = 7870291259863448620L;
+  private static final long serialVersionUID = 7870291259863448620L;
 
 
   /**

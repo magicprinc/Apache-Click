@@ -24,7 +24,6 @@ import org.apache.click.element.JsImport;
 import org.apache.click.element.JsScript;
 import org.apache.click.examples.page.BorderPage;
 
-import java.io.Serial;
 import java.util.HashMap;
 import java.util.List;
 
@@ -34,7 +33,7 @@ import java.util.List;
  */
 public class AccordionPage extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     @Override
     public List<Element> getHeadElements() {

@@ -5,10 +5,10 @@ import net.sf.click.jquery.examples.page.BorderPage;
 import org.apache.click.extras.security.AccessController;
 import org.apache.click.extras.security.RoleAccessController;
 
-import java.io.Serial;
+
 
 public class SuperfishMenuPage extends BorderPage {
-  @Serial private static final long serialVersionUID = 6358836315945270560L;
+  private static final long serialVersionUID = 6358836315945270560L;
 
   final JQMenu horizontalMenu = new JQMenu("horizontalMenu");
   final JQMenu verticalMenu = new JQMenu("verticalMenu");

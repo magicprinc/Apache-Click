@@ -16,7 +16,6 @@ import org.apache.click.util.ContainerUtils;
 import org.apache.click.util.HtmlStringBuffer;
 import org.apache.commons.lang.StringUtils;
 
-import java.io.Serial;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -157,7 +156,7 @@ import java.util.Map;
  * automatically rollback any uncommitted changes at the end of each request.
  */
 public class CayenneForm extends Form {
-  @Serial private static final long serialVersionUID = 1;
+  private static final long serialVersionUID = 1;
 
   /** The form data object classname parameter name. */
   public static final String FO_CLASS = "FO_CLASS";

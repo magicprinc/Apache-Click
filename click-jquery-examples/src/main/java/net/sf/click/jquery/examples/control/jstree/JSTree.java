@@ -23,7 +23,6 @@ import org.apache.click.element.JsImport;
 import org.apache.click.element.JsScript;
 import org.apache.click.util.HtmlStringBuffer;
 
-import java.io.Serial;
 import java.util.HashMap;
 import java.util.List;
 
@@ -31,7 +30,7 @@ import java.util.List;
  *
  */
 public class JSTree extends AbstractControl {
-  @Serial private static final long serialVersionUID = 4574117635576609335L;
+  private static final long serialVersionUID = 4574117635576609335L;
 
 
   public static final String CALLBACK = "callback";

@@ -27,14 +27,14 @@ import org.apache.click.examples.page.BorderPage;
 import org.apache.click.examples.page.HomePage;
 import org.apache.click.extras.control.PageSubmit;
 
-import java.io.Serial;
+
 
 /**
  * Provides File Upload example using the FileField control.
  */
 public class FileUpload extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private Form form = new Form("form");
 

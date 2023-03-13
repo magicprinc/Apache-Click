@@ -9,7 +9,6 @@ import org.apache.click.service.PropertyService;
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
 
-import java.io.Serial;
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Map;
@@ -18,7 +17,7 @@ import java.util.Map;
  *
  */
 public class DataControl extends AbstractControl {
-  @Serial private static final long serialVersionUID = 4755193707349840170L;
+  private static final long serialVersionUID = 4755193707349840170L;
 
   protected Object dataSource;
 

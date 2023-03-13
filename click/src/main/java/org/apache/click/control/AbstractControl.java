@@ -16,7 +16,6 @@ import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
 
 import javax.servlet.ServletContext;
-import java.io.Serial;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -115,7 +114,7 @@ import java.util.StringTokenizer;
  * <a href="../../../../../user-guide/html/ch03s04.html#message-resolution">user guide</a>.
  */
 public abstract class AbstractControl implements Control {
-  @Serial private static final long serialVersionUID = -1566821515049341251L;
+  private static final long serialVersionUID = -1566821515049341251L;
 
   /** The control's action listener.
 

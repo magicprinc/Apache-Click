@@ -8,10 +8,10 @@ import org.apache.click.control.Submit;
 import org.apache.click.control.TextField;
 import org.apache.click.extras.control.HtmlForm;
 
-import java.io.Serial;
+
 
 public class GridLayoutDemo extends BorderPage {
-  @Serial private static final long serialVersionUID = -6551708475309691074L;
+  private static final long serialVersionUID = -6551708475309691074L;
 
   private HtmlForm form;
 

@@ -20,13 +20,13 @@ package org.apache.click.examples.page.springsecurity;
 
 import org.apache.click.examples.page.BorderPage;
 
-import java.io.Serial;
+
 
 /**
  * Provides a Security Not Authorized message display page.
  */
 public class NotAuthorizedPage extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
 }

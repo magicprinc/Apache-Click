@@ -32,7 +32,7 @@ import org.apache.click.extras.control.EmailField;
 import org.apache.click.extras.control.IntegerField;
 import org.apache.click.extras.control.PageSubmit;
 
-import java.io.Serial;
+
 
 /**
  * This page demonstrates how to programmatically layout a form using
@@ -40,7 +40,7 @@ import java.io.Serial;
  */
 public class ContactDetailsPage extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private CssForm form;
 

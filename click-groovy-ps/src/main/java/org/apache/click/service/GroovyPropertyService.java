@@ -13,6 +13,8 @@ import java.math.BigDecimal;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 
+import static org.apache.click.util.ClickUtils.trim;
+
 /**
  * Provides a <a href="https://groovy-lang.org/">Groovy</a> based property services.
  * <br>See <a href="https://docs.groovy-lang.org/latest/html/documentation/guide-integrating.html">Integrating Groovy in a Java application</a>
@@ -70,7 +72,7 @@ public class GroovyPropertyService extends PropertyServiceBase {
    * @param newValue the property value to set
    */
   @Override public void setValue (Object target, String propertyName, Object newValue){
-    val bc = cachedOrNew(propertyName.trim().strip());
+    BiConsumer<Object,Object> bc = cachedOrNew(trim(propertyName));
 
     try {
       bc.accept(target, newValue);

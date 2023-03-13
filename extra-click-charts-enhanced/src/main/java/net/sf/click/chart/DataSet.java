@@ -1,11 +1,11 @@
 package net.sf.click.chart;
 
-import java.io.Serial;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public abstract class DataSet extends ArrayList<Data<?,?>> {
-	@Serial private static final long serialVersionUID = 2922020687950828807L;
+	private static final long serialVersionUID = 2922020687950828807L;
 
 	public DataSet(){
 	}//met

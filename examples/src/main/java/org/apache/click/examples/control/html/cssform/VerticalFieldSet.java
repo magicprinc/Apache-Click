@@ -26,7 +26,7 @@ import org.apache.click.examples.control.html.list.HtmlList;
 import org.apache.click.examples.control.html.list.ListItem;
 import org.apache.click.extras.control.HtmlFieldSet;
 
-import java.io.Serial;
+
 
 /**
  * A custom FieldSet that renders its fields vertically using an HtmlList
@@ -34,7 +34,7 @@ import java.io.Serial;
  */
 public class VerticalFieldSet extends HtmlFieldSet {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private HtmlList htmlList = new HtmlList();
 

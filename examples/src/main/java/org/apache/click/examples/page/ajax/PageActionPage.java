@@ -22,7 +22,7 @@ import org.apache.click.ActionResult;
 import org.apache.click.control.ActionLink;
 import org.apache.click.examples.page.BorderPage;
 
-import java.io.Serial;
+
 
 /**
  * Demonstrates how a Page Action can be used to handle an AJAX request.
@@ -40,7 +40,7 @@ import java.io.Serial;
  */
 public class PageActionPage extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     public PageActionPage() {
         ActionLink link = new ActionLink("link", "here");

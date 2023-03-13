@@ -1,6 +1,6 @@
 package org.apache.click.util;
 
-import java.io.Serial;
+
 import java.io.Serializable;
 
 /**
@@ -43,7 +43,7 @@ import java.io.Serializable;
  * @see SessionMap
  */
 public class FlashAttribute implements Serializable {
-  @Serial private static final long serialVersionUID = 5607837929201234313L;
+  private static final long serialVersionUID = 5607837929201234313L;
 
   /** The session attribute value. */
   protected Object value;

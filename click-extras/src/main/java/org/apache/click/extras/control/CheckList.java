@@ -17,7 +17,6 @@ import org.apache.click.util.HtmlStringBuffer;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 
-import java.io.Serial;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -164,7 +163,7 @@ import java.util.Map;
  * @see org.apache.click.control.Option
  */
 public class CheckList extends Field {
-  @Serial private static final long serialVersionUID = -7446014399691373231L;
+  private static final long serialVersionUID = -7446014399691373231L;
 
   /** The style class which is always set on this element (checkList). */
   protected static final String STYLE_CLASS = "checkList";

@@ -7,7 +7,6 @@ import org.apache.click.element.Element;
 import org.apache.click.element.JsImport;
 import org.apache.click.util.ClickUtils;
 
-import java.io.Serial;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -68,7 +67,7 @@ import java.util.regex.Pattern;
  *    href="http://www.w3.org/TR/html401/interact/forms.html#h-17.4">INPUT</a>
  */
 public class RegexField extends TextField {
-  @Serial private static final long serialVersionUID = 5979864052470141400L;
+  private static final long serialVersionUID = 5979864052470141400L;
 
   /**
    * The field validation JavaScript function template.

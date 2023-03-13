@@ -23,14 +23,14 @@ import org.apache.click.control.ImageSubmit;
 import org.apache.click.control.Label;
 import org.apache.click.examples.page.BorderPage;
 
-import java.io.Serial;
+
 
 /**
  * Provides an ImageSubmit control example.
  */
 public class ImageDemo extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private ImageSubmit colorSubmit;
 

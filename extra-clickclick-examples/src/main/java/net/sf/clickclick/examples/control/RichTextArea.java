@@ -6,7 +6,6 @@ import org.apache.click.element.JsImport;
 import org.apache.click.element.JsScript;
 import org.apache.click.util.HtmlStringBuffer;
 
-import java.io.Serial;
 import java.util.List;
 
 /**
@@ -20,7 +19,7 @@ import java.util.List;
  * @see TextArea
  */
 public class RichTextArea extends TextArea {
-  @Serial private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
   public static final String THEME_SIMPLE = "simple";
 

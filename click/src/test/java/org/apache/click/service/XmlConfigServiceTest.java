@@ -20,7 +20,6 @@ import org.apache.click.util.Format;
 import javax.servlet.ServletContext;
 import java.io.File;
 import java.io.PrintStream;
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -585,7 +584,7 @@ public class XmlConfigServiceTest extends TestCase {
   }
 
   static public class MyControl extends AbstractControl {
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     @Override
     public void onDeploy(ServletContext servletContext) {

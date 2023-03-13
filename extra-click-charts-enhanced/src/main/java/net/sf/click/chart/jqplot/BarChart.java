@@ -4,7 +4,7 @@ import net.sf.click.chart.Data;
 import net.sf.click.chart.jqplot.renderer.BarRenderer;
 import net.sf.click.chart.jqplot.renderer.CategoryAxisRenderer;
 
-import java.io.Serial;
+
 
 /**
  * This class is an easy-tu-use wrapper to get a bar chart using
@@ -17,7 +17,7 @@ import java.io.Serial;
  *
  */
 public class BarChart extends JQPlotChart{
-	@Serial private static final long serialVersionUID = 3351284859908519781L;
+    private static final long serialVersionUID = 3351284859908519781L;
 
 	private final Series series = new Series();
 	private final BarRenderer br = new BarRenderer( series );

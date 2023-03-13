@@ -30,14 +30,14 @@ import org.apache.click.examples.page.BorderPage;
 import org.apache.click.extras.control.DoubleField;
 import org.apache.click.util.ClickUtils;
 
-import java.io.Serial;
+
 
 /**
  * Demonstrates dynamic Form behavior using a Select control.
  */
 public class DynamicSelect extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private Form form = new Form("dynamicForm");
 
@@ -91,7 +91,7 @@ public class DynamicSelect extends BorderPage {
         }
 
         submit.setActionListener(new ActionListener() {
-            @Serial private static final long serialVersionUID = 1L;
+            private static final long serialVersionUID = 1L;
 
             @Override public boolean onAction(Control source) {
                 if (form.isValid()) {

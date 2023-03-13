@@ -24,14 +24,14 @@ import org.apache.click.control.TextField;
 import org.apache.click.examples.page.BorderPage;
 import org.apache.click.examples.page.HomePage;
 
-import java.io.Serial;
+
 
 /**
  * Provides an example of a flash session attribute.
  */
 public class FlashPage extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private Form form = new Form("form");
 

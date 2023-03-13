@@ -2,7 +2,6 @@ package org.apache.click.control;
 
 import org.apache.click.util.HtmlStringBuffer;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +22,7 @@ import java.util.List;
  @see Select
  @see Option */
 public class OptionGroup implements Serializable {
-  @Serial private static final long serialVersionUID = -5230003770456184292L;
+  private static final long serialVersionUID = -5230003770456184292L;
 
   /** The label for the OptionGroup. */
   protected final String label;

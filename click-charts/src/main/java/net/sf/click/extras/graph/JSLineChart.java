@@ -5,7 +5,6 @@ import org.apache.click.Context;
 import org.apache.click.element.JsImport;
 import org.apache.click.util.ClickUtils;
 
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +23,7 @@ import java.util.List;
  * This control uses the <a href="http://www.walterzorn.com/jsgraphics">JSGraphics</a> library.
  */
 public class JSLineChart extends JSChart {
-  @Serial private static final long serialVersionUID = -8193246280314625136L;
+  private static final long serialVersionUID = -8193246280314625136L;
 
   /**
    * Create a line chart with no name defined.

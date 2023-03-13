@@ -25,14 +25,14 @@ import org.apache.click.examples.page.HomePage;
 import org.apache.click.extras.control.PageSubmit;
 import org.apache.click.extras.control.RegexField;
 
-import java.io.Serial;
+
 
 /**
  * Provides a form RegexField example.
  */
 public class RegexDemo extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private Form form = new Form("form");
 

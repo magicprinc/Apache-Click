@@ -13,8 +13,6 @@ import org.apache.click.util.ContainerUtils;
 import org.apache.click.util.HtmlStringBuffer;
 import org.apache.commons.lang.StringUtils;
 
-import java.io.Serial;
-
 import static org.apache.click.util.ClickUtils.len;
 
 /**
@@ -170,7 +168,7 @@ import static org.apache.click.util.ClickUtils.len;
  * </dl>
  */
 public abstract class Field extends AbstractControl implements Stateful {
-  @Serial private static final long serialVersionUID = 2196415359858221925L;
+  private static final long serialVersionUID = 2196415359858221925L;
 
   /** The Field disabled value. */
   protected boolean disabled;

@@ -11,13 +11,13 @@ import net.sf.clickclick.control.html.table.HtmlTable;
 import net.sf.clickclick.control.html.table.Row;
 import net.sf.clickclick.examples.page.BorderPage;
 
-import java.io.Serial;
+
 
 /**
  *
  */
 public class HtmlBasicsPage extends BorderPage {
-  @Serial private static final long serialVersionUID = -3170453776998174837L;
+  private static final long serialVersionUID = -3170453776998174837L;
 
   private Div div;
   private Span span;

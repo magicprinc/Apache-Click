@@ -30,7 +30,6 @@ import org.apache.click.element.JsScript;
 import org.apache.click.examples.page.BorderPage;
 import org.apache.click.util.ClickUtils;
 
-import java.io.Serial;
 import java.util.List;
 import java.util.Map;
 
@@ -39,7 +38,7 @@ import java.util.Map;
  */
 public class PageHeadDemo extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private ActionLink link;
     private Field field;

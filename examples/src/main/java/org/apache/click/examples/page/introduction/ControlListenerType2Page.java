@@ -23,7 +23,7 @@ import org.apache.click.Control;
 import org.apache.click.control.ActionLink;
 import org.apache.click.examples.page.BorderPage;
 
-import java.io.Serial;
+
 
 /**
  * Provides a control listener example Page using the compile time binding of
@@ -35,7 +35,7 @@ import java.io.Serial;
  */
 public class ControlListenerType2Page extends BorderPage {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
      private ActionLink myLink = new ActionLink("myLink");
 
@@ -48,7 +48,7 @@ public class ControlListenerType2Page extends BorderPage {
         addControl(myLink);
 
         myLink.setActionListener(new ActionListener() {
-            @Serial private static final long serialVersionUID = 1L;
+            private static final long serialVersionUID = 1L;
 
             @Override public boolean onAction(Control control) {
                  String msg = "ControlListenerPage#" + hashCode()

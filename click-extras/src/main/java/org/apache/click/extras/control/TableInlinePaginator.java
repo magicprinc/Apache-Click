@@ -8,7 +8,6 @@ import org.apache.click.control.Table;
 import org.apache.click.control.TablePaginator;
 import org.apache.click.util.HtmlStringBuffer;
 
-import java.io.Serial;
 import java.util.Map;
 
 /**
@@ -23,11 +22,11 @@ import java.util.Map;
  * </table>
  */
 public class TableInlinePaginator extends TablePaginator {
-  @Serial private static final long serialVersionUID = 5320840429968221445L;
+  private static final long serialVersionUID = 5320840429968221445L;
 
   /** Private Control which handles resource bundle properties. */
   private final AbstractControl paginatorMessages = new AbstractControl(){
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
     /**
      * Messages are defined in the resource bundle:
      * <tt>org/apache/click/extras/control/TableInlinePaginator.properties</tt>.

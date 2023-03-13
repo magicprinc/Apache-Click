@@ -13,7 +13,6 @@ import org.apache.click.util.ActionListenerAdaptor;
 import org.apache.click.util.ClickUtils;
 import org.apache.commons.lang.math.NumberUtils;
 
-import java.io.Serial;
 import java.util.List;
 
 /**
@@ -123,7 +122,7 @@ import java.util.List;
  * &lt;/html&gt; </pre>
  */
 public class TabbedPanel extends Panel implements Stateful {
-  @Serial private static final long serialVersionUID = -623038215750858480L;
+  private static final long serialVersionUID = -623038215750858480L;
 
   /** The currently active panel. */
   protected Panel activePanel;

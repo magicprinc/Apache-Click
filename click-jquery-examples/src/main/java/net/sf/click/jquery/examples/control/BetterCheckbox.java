@@ -4,7 +4,7 @@ import org.apache.click.Context;
 import org.apache.click.control.Checkbox;
 import org.apache.click.util.HtmlStringBuffer;
 
-import java.io.Serial;
+
 
 /**
  * BetterCheckbox is different from Checkbox in the following ways.
@@ -19,7 +19,7 @@ import java.io.Serial;
  * enabled automatically. This behavior isn't supported by the default Checkbox.
  */
 public class BetterCheckbox extends Checkbox {
-  @Serial private static final long serialVersionUID = 2164603967901746163L;
+  private static final long serialVersionUID = 2164603967901746163L;
 
 
   public BetterCheckbox(String name) {

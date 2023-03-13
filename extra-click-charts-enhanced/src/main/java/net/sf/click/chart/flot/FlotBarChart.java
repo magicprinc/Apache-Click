@@ -6,12 +6,11 @@ import org.apache.click.element.Element;
 import org.apache.click.element.JsImport;
 import org.apache.click.util.ClickUtils;
 
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
 public class FlotBarChart extends FlotChart{
-	@Serial private static final long serialVersionUID = 1081619562311039492L;
+	private static final long serialVersionUID = 1081619562311039492L;
 
 
 	public FlotBarChart() {

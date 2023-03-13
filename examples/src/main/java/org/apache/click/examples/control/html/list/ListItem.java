@@ -20,14 +20,14 @@ package org.apache.click.examples.control.html.list;
 
 import org.apache.click.control.AbstractContainer;
 
-import java.io.Serial;
+
 
 /**
  * This control provides HTML listitem for ordered and unordered lists.
  */
 public class ListItem extends AbstractContainer {
 
-    @Serial private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     public ListItem() {
     }

@@ -5,7 +5,6 @@ import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
 
 import java.io.IOException;
-import java.io.Serial;
 import java.io.Serializable;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -69,7 +68,7 @@ import java.util.Date;
  *    href="http://www.w3.org/TR/html401/interact/forms.html#h-17.4">INPUT</a>
  */
 public class HiddenField extends Field {
-  @Serial private static final long serialVersionUID = -11951594609124299L;
+  private static final long serialVersionUID = -11951594609124299L;
 
   /** The field value Object. */
   protected Object valueObject;
