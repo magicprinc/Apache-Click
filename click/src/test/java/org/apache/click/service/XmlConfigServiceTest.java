@@ -648,6 +648,7 @@ public class XmlConfigServiceTest extends TestCase {
 
 
   public void testMessagesMap () {
+    Locale.setDefault(new Locale("ru", "RU"));
     XmlConfigService.clearMessagesMapCache();
     var context = MockContext.initContext();
 
