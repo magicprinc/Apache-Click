@@ -1,5 +1,6 @@
 Welcome to Click
 ================
+[![Java CI with Gradle](https://github.com/magicprinc/Apache-Click/actions/workflows/gradle.yml/badge.svg)](https://github.com/magicprinc/Apache-Click/actions/workflows/gradle.yml)
 
 Apache Click™ is a modern JEE web application framework, providing a natural rich client style programming model.
 Apache Click is designed to be very easy to learn and use, with developers getting up and running within a day.
