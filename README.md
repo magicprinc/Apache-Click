@@ -109,7 +109,7 @@ Further information on building Click is available here:
    `documentation/docs/developer-guide/building.html`
 
 
-## 2022-2023 Gradle build, Java 17, upgraded dependencies 
+## 2022-2023 Gradle build, Java 17, upgraded dependencies
 
 Main site
 
@@ -137,17 +137,17 @@ GitHub
 
 Run examples
 
-💡 If you have *gradle* installed, you can use command `gradle` otherwise use `gradlew` in project's root folder.               
+💡 If you have *gradle* installed, you can use command `gradle` otherwise use `gradlew` in project's root folder.
 
-💡 You will probably need to stop gradle's daemon, to successfully start next example: 
-`gradle --stop`  
+💡 You will probably need to stop gradle's daemon, to successfully start next example:
+`gradle --stop`
 
-- $ `gradle :examples:clean :examples:tomcatRunWar --stacktrace --info --warning-mode all`
-- $ `gradle :extra-clickclick-examples:clean :extra-clickclick-examples:tomcatRunWar --stacktrace --info --warning-mode all`
-- $ `gradle :click-charts-examples:clean :click-charts-examples:tomcatRunWar --stacktrace --info --warning-mode all`
-- $ `gradle :click-jquery-examples:clean :click-jquery-examples:tomcatRunWar --stacktrace --info --warning-mode all`
-- $ `gradle :extra-ajax4click-examples:clean :extra-ajax4click-examples:tomcatRunWar --stacktrace --info --warning-mode all`
-- $ `gradle :extra-click-calendar-examples:clean :extra-click-calendar-examples:tomcatRunWar --stacktrace --info --warning-mode all`
-- $ `gradle :extra-click-charts-enhanced-examples:clean :extra-click-charts-enhanced-examples:tomcatRunWar --stacktrace --info --warning-mode all`
+- $ `gradle :examples:clean :examples:tomcatRunWar --stacktrace --info --warning-mode all --continue`
+- $ `gradle :extra-clickclick-examples:clean :extra-clickclick-examples:tomcatRunWar --stacktrace --info --warning-mode all --continue`
+- $ `gradle :click-charts-examples:clean :click-charts-examples:tomcatRunWar --stacktrace --info --warning-mode all --continue`
+- $ `gradle :click-jquery-examples:clean :click-jquery-examples:tomcatRunWar --stacktrace --info --warning-mode all --continue`
+- $ `gradle :extra-ajax4click-examples:clean :extra-ajax4click-examples:tomcatRunWar --stacktrace --info --warning-mode all --continue`
+- $ `gradle :extra-click-calendar-examples:clean :extra-click-calendar-examples:tomcatRunWar --stacktrace --info --warning-mode all --continue`
+- $ `gradle :extra-click-charts-enhanced-examples:clean :extra-click-charts-enhanced-examples:tomcatRunWar --stacktrace --info --warning-mode all --continue`
 
 (see also https://docs.gradle.org/current/userguide/command_line_interface.html)
