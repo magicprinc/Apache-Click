@@ -13,35 +13,41 @@ repositories {
   mavenCentral()
 }
 
-sourceCompatibility = 17
-
-//javadoc {
-//  options.encoding = 'UTF-8'
-//  options.addBooleanOption('html5', true)
-//}
+javadoc {
+  options.encoding = 'UTF-8'
+  options.addBooleanOption('html5', true)
+}
 
 tasks.withType(JavaCompile).configureEach {
   options.encoding = 'UTF-8'
   options.compilerArgs.addAll(['-Xlint:all', '-parameters', '-g', '-Xmaxwarns', '999'])
-  options.release.set(17) // javac --release 7..18+
-  options.deprecation = false // todo step2: deprecated
+  sourceCompatibility = 17 // for the IDE support
+  targetCompatibility = 8
+  options.release.set(8) // javac --release 7..18+
+  options.deprecation = true
+
+  javaCompiler.set( javaToolchains.compilerFor {
+    languageVersion = JavaLanguageVersion.of(17)
+  })
 
   options.errorprone {
     enabled = true
     disableWarningsInGeneratedCode = true
-    excludedPaths = ".*/build/gen.*/.*"
-    //disable("ParameterName") disable("UnusedVariable") errorproneArgs = ["--illegal-access=warn"]
+    excludedPaths = ".*/(build/gen|test).*/.*"
+    disable("MissingSummary")
+    disable("ParameterName")
+    disable("UnusedVariable")
+    errorproneArgs = ["--illegal-access=warn"]
   }
 }
-
+// https://docs.gradle.org/current/userguide/publishing_maven.html
 publishing {
-  publications { // artifactId = folder name
+  publications { // artifactId == folder name
     maven(MavenPublication) {
       from components.java
     }
   }
 }
-// https://docs.gradle.org/current/userguide/publishing_maven.html
 java {
   withSourcesJar()
 //  withJavadocJar()
@@ -49,10 +55,12 @@ java {
 
 dependencies {
   errorprone "com.google.errorprone:error_prone_core:latest.release"
-  // https://javadoc.io/doc/com.google.errorprone/error_prone_annotations/latest/index.html
-  implementation("com.google.errorprone:error_prone_annotations:latest.release")
-  // https://javadoc.io/doc/com.google.code.findbugs/jsr305/latest/index.html  [x] remove? jsr305→jsr308 ^ Nope! This is THE WINNER!
-  implementation("com.google.code.findbugs:jsr305:latest.release")
+  implementation("com.google.errorprone:error_prone_annotations:latest.release")// https://javadoc.io/doc/com.google.errorprone/error_prone_annotations/latest/index.html
+  implementation("com.google.code.findbugs:jsr305:latest.release")// https://javadoc.io/doc/com.google.code.findbugs/jsr305/latest/index.html [i] jsr305→jsr308
+
+  // Java 8 support
+  annotationProcessor 'com.github.bsideup.jabel:jabel-javac-plugin:latest.release' // 0.4.2
+  compileOnly 'com.github.bsideup.jabel:jabel-javac-plugin:latest.release'
 
   implementation 'javax.servlet:servlet-api:2.5'
 
@@ -60,14 +68,13 @@ dependencies {
   implementation 'com.google.guava:guava:31.1-jre'
   implementation 'org.mvel:mvel2:latest.release'// 2.4.14
 
-  implementation("com.github.ben-manes.caffeine:caffeine:latest.release")
+  implementation("com.github.ben-manes.caffeine:caffeine:2.+")
 
 
   implementation 'commons-lang:commons-lang:2.+'
   //implementation 'commons-io:commons-io:2.+'
   implementation 'commons-fileupload:commons-fileupload:1.3.+'
   //implementation 'commons-codec:commons-codec:1.+'
-  //implementation 'org.apache.velocity:velocity:1.+'
 
   def springVersion = '3.2.18.RELEASE'
   implementation("org.springframework:spring-core:${springVersion}", "org.springframework:spring-context:${springVersion}")
@@ -98,17 +105,20 @@ idea {
 
 test {
   useJUnit()
-  maxHeapSize = "500m"
+  testLogging {
+    events "passed", "skipped", "failed"
+    showStandardStreams = true // show standard out & err of the test JVM on the console
+    showExceptions = true
+    exceptionFormat = 'full'
+  }
   enableAssertions = true
-
-  testLogging.showStandardStreams = true // show standard out & err of the test JVM on the console
+  maxHeapSize = "500m"
 
   System.setProperty("slf4j.detectLoggerNameMismatch", "true")
   System.setProperty("file.encoding", "UTF-8")
   System.setProperty("user.language", "en")
   Locale.setDefault(new Locale("en", "US"));
 }
-
 lombok {
   version = "latest.release"
 }
