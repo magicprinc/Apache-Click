@@ -103,6 +103,7 @@ vite.generated.ts
 
 ### VAADIN
 generated/
+generated_tests/
 *.generated.*
 
 ### Apache Ignite ###
