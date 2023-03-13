@@ -45,7 +45,7 @@ dependencies {
   implementation 'com.google.guava:guava:31.1-jre'
   implementation 'org.mvel:mvel2:latest.release'// 2.4.14
 
-  implementation("com.github.ben-manes.caffeine:caffeine:latest.release")
+  implementation("com.github.ben-manes.caffeine:caffeine:2.+")
 
   implementation 'org.apache.commons:commons-lang3:3.+'
   implementation 'commons-lang:commons-lang:2.+'
