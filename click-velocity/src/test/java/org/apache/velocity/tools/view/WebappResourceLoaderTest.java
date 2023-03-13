@@ -45,7 +45,8 @@ public class WebappResourceLoaderTest {
     var e2 = assertThrows(ResourceNotFoundException.class, ()->wrl.getResourceStream("::/\\"));
     assertEquals("org.apache.velocity.exception.ResourceNotFoundException: WebappResourceLoader: Resource '::/\\' not found.", e2.toString());
 
-    assertEquals("file:////test.txt", wrl.getCachedFile("/", "test.txt").toURI().toString());
+    // file:////test.txt (windows) -or- file:/test.txt (github: linux?)
+    assertEquals("file:/test.txt", wrl.getCachedFile("/", "test.txt").toURI().toString().replace("////", "/"));
     assertEquals("/test.txt", wrl.getCachedFile("", "test.txt").toString().replace('\\','/'));
 
     Resource fileResource = mock(Resource.class);
