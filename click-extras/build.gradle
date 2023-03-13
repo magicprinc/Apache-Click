@@ -88,6 +88,11 @@ idea {
   }
 }
 
+compileTestJava {
+  sourceCompatibility = 17
+  targetCompatibility = 8
+}
+
 test {
   useJUnit()
   testLogging {
