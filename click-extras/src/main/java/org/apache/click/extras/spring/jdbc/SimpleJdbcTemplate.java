@@ -38,6 +38,7 @@ import java.util.Map;
  * {@link org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate}. The JdbcTemplate and
  * NamedParameterJdbcTemplate now provide all the functionality of the SimpleJdbcTemplate.
  */
+@SuppressWarnings("unused")
 public class SimpleJdbcTemplate implements SimpleJdbcOperations {
 
 	/** The NamedParameterJdbcTemplate that we are wrapping */
@@ -88,31 +89,31 @@ public class SimpleJdbcTemplate implements SimpleJdbcOperations {
 
 
 	@Override public int queryForInt(String sql, Map<String, ?> args) throws DataAccessException {
-		return getNamedParameterJdbcOperations().queryForInt(sql, args);
+		return getNamedParameterJdbcOperations().queryForObject(sql, args, Integer.class);
 	}
 
 	@Override public int queryForInt(String sql, SqlParameterSource args) throws DataAccessException {
-		return getNamedParameterJdbcOperations().queryForInt(sql, args);
+		return getNamedParameterJdbcOperations().queryForObject(sql, args, Integer.class);
 	}
 
 	@Override public int queryForInt(String sql, Object... args) throws DataAccessException {
 		return (ObjectUtils.isEmpty(args) ?
-					getJdbcOperations().queryForInt(sql) :
-					getJdbcOperations().queryForInt(sql, getArguments(args)));
+					getJdbcOperations().queryForObject(sql, Integer.class) :
+					getJdbcOperations().queryForObject(sql, getArguments(args), Integer.class));
 	}
 
 	@Override public long queryForLong(String sql, Map<String, ?> args) throws DataAccessException {
-		return getNamedParameterJdbcOperations().queryForLong(sql, args);
+		return getNamedParameterJdbcOperations().queryForObject(sql, args, Long.class);
 	}
 
 	@Override public long queryForLong(String sql, SqlParameterSource args) throws DataAccessException {
-		return getNamedParameterJdbcOperations().queryForLong(sql, args);
+		return getNamedParameterJdbcOperations().queryForObject(sql, args, Long.class);
 	}
 
 	@Override public long queryForLong(String sql, Object... args) throws DataAccessException {
 		return (ObjectUtils.isEmpty(args) ?
-					getJdbcOperations().queryForLong(sql) :
-					getJdbcOperations().queryForLong(sql, getArguments(args)));
+					getJdbcOperations().queryForObject(sql, Long.class) :
+					getJdbcOperations().queryForObject(sql, getArguments(args), Long.class));
 	}
 
 	@Override public <T> T queryForObject(String sql, Class<T> requiredType, Map<String, ?> args) throws DataAccessException {
