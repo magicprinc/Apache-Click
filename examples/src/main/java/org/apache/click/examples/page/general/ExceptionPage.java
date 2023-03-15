@@ -27,9 +27,7 @@ public class ExceptionPage extends BorderPage {
     addControl(brokenContentLink);
   }
 
-  // Event Handlers ---------------------------------------------------------
-
-  @SuppressWarnings("null")
+  @SuppressWarnings({"null", "DataFlowIssue", "ReturnValueIgnored", "ResultOfMethodCallIgnored"})
   public boolean onNullPointerClick() {
     Object object = null;
     object.hashCode();
