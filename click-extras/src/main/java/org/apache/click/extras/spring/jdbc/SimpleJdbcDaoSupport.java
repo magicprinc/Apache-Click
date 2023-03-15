@@ -20,6 +20,7 @@ public class SimpleJdbcDaoSupport extends NamedParameterJdbcDaoSupport {
 
 	/** Create a SimpleJdbcTemplate based on the configured JdbcTemplate. */
 	@Override protected void initTemplateConfig() {
+    super.initTemplateConfig();
 		simpleJdbcTemplate = new SimpleJdbcTemplate(getNamedParameterJdbcTemplate());
 	}
 
