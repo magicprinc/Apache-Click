@@ -2,6 +2,7 @@ package org.apache.click.extras.spring.jdbc;
 
 import org.junit.Test;
 import org.mockito.AdditionalMatchers;
+import org.mockito.ArgumentMatcher;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
@@ -10,6 +11,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.*;
 
+/**
+ @see org.mockito.Answers
+ @see org.mockito.internal.stubbing.answers.AnswersWithDelay
+ @see AdditionalMatchers
+ @see org.mockito.Mockito#argThat(ArgumentMatcher)
+ */
 public class SimpleJdbcDaoSupportTest {
 
   @Test public void _main () {
