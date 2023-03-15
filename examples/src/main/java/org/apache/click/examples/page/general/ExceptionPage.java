@@ -32,7 +32,7 @@ public class ExceptionPage extends BorderPage {
   @SuppressWarnings("null")
   public boolean onNullPointerClick() {
     Object object = null;
-    var unused = object.hashCode();
+    object.hashCode();
     return true;
   }
 

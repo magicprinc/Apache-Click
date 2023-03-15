@@ -1,10 +1,10 @@
 package org.apache.click.examples.page.introduction;
 
+import lombok.var;
 import org.apache.click.control.Form;
 import org.apache.click.control.Submit;
 import org.apache.click.control.TextField;
 import org.apache.click.examples.page.BorderPage;
-
 
 
 /**

@@ -1,5 +1,6 @@
 package org.apache.click.examples.page.control;
 
+import lombok.var;
 import org.apache.click.ActionListener;
 import org.apache.click.control.FieldSet;
 import org.apache.click.control.Form;

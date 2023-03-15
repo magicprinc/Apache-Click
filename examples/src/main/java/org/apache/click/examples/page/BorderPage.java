@@ -24,7 +24,8 @@ public class BorderPage extends Page {
   private transient Menu rootMenu;
 
   static {
-    System.out.println("\n\n****************************** BORDER PAGE INIT: "+System.getProperty("java.version")+"\n\n");
+    System.out.println("\n\n\n****************************** BORDER PAGE INIT: "+System.getProperty("java.version")
+      +" "+Runtime.class.getPackage().getImplementationVersion()  +"\n\n\n");
 
   }
 
