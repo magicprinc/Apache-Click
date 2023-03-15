@@ -57,13 +57,12 @@ dependencies {
 
   implementation 'javax.servlet:servlet-api:2.5'
 
-  def springVersion = '5.+'
+  def springVersion = '3.2.18.RELEASE'
   implementation("org.springframework:spring-core:${springVersion}", "org.springframework:spring-context:${springVersion}")
   implementation("org.springframework:spring-context-support:${springVersion}", "org.springframework:spring-web:${springVersion}")
   implementation("org.springframework:spring-jdbc:${springVersion}", "org.springframework:spring-tx:${springVersion}")
-  implementation("org.springframework.security:spring-security-core:5.+",
-      "org.springframework.security:spring-security-web:5.+", "org.springframework.security:spring-security-config:5.+")
-  implementation "org.apache.velocity:velocity:1.+"
+  implementation("org.springframework.security:spring-security-core:3.2.10.RELEASE",
+    "org.springframework.security:spring-security-web:3.2.10.RELEASE", "org.springframework.security:spring-security-config:3.2.10.RELEASE")
 
 
   implementation project(':click')
@@ -97,7 +96,6 @@ dependencies {
 
   testImplementation 'junit:junit:4.+'
   testImplementation 'org.mockito:mockito-inline:+'
-
 
   testImplementation project(':click-mock')
 

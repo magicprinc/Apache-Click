@@ -39,12 +39,12 @@ dependencies {
 
   implementation 'javax.servlet:servlet-api:2.5'
 
-  def springVersion = '3.+'
+  def springVersion = '3.2.18.RELEASE'
   implementation("org.springframework:spring-core:${springVersion}", "org.springframework:spring-context:${springVersion}")
   implementation("org.springframework:spring-context-support:${springVersion}", "org.springframework:spring-web:${springVersion}")
   implementation("org.springframework:spring-jdbc:${springVersion}", "org.springframework:spring-tx:${springVersion}")
-  implementation("org.springframework.security:spring-security-core:${springVersion}",
-      "org.springframework.security:spring-security-web:${springVersion}", "org.springframework.security:spring-security-config:${springVersion}")
+  implementation("org.springframework.security:spring-security-core:3.2.10.RELEASE",
+    "org.springframework.security:spring-security-web:3.2.10.RELEASE", "org.springframework.security:spring-security-config:3.2.10.RELEASE")
 
 
   implementation project(':click')
