@@ -96,7 +96,6 @@ dependencies {
   testImplementation project(path: ':click-extras')
   testImplementation project(':click-velocity')
 }
-
 // https://tomgregory.com/how-to-exclude-gradle-dependencies/
 configurations.all { // .implementation
   exclude group: "velocity", module: "velocity" // 1.3 they come from somewhere..
@@ -110,11 +109,6 @@ idea {
   }
 }
 
-compileTestJava {
-  sourceCompatibility = 17
-  targetCompatibility = 8
-}
-
 test {
   useJUnit()
   testLogging {
@@ -126,9 +120,12 @@ test {
   enableAssertions = true
   maxHeapSize = "500m"
 
-  System.setProperty("slf4j.detectLoggerNameMismatch", "true")
-  System.setProperty("file.encoding", "UTF-8")
-  System.setProperty("user.language", "en")
+  sourceCompatibility = 17
+  targetCompatibility = 8
+
+  systemProperty("slf4j.detectLoggerNameMismatch", "true")
+  systemProperty("file.encoding", "UTF-8")
+  systemProperty("user.language", "en")
   Locale.setDefault(new Locale("en", "US"));
 }
 lombok {
