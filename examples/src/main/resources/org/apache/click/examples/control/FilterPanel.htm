@@ -1,9 +1,9 @@
 
 <div style="margin-bottom:12px;">
 #if ($this.selected)
- <img id="filterImg" src="$context/assets/images/twistie-down.png"/>
+ <img id="filterImg" src="$context/click/images/twistie-down.png"/>
 #else
- <img id="filterImg" src="$context/assets/images/twistie-up.png"/>
+ <img id="filterImg" src="$context/click/images/twistie-up.png"/>
 #end
  <a id="filterLink" href="#" onclick="onFilterTwistieClick()" style="text-decoration:none;">Date Filter</a>
 </div>
@@ -35,11 +35,11 @@ function onFilterTwistieClick() {
 	var filterDiv = document.getElementById("filterDiv");
 
    	if (filterDiv.style.display == "none") {
-   		document.getElementById("filterImg").src = "$context/images/twistie-down.png";
+   		document.getElementById("filterImg").src = "$context/click/images/twistie-down.png";
    		filterDiv.style.display = "block";
 
    	} else {
-   		document.getElementById("filterImg").src = "$context/images/twistie-up.png";
+   		document.getElementById("filterImg").src = "$context/click/images/twistie-up.png";
    		filterDiv.style.display = "none";
    }
 }
