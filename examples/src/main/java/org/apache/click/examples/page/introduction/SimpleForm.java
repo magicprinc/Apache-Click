@@ -1,6 +1,5 @@
 package org.apache.click.examples.page.introduction;
 
-import lombok.var;
 import org.apache.click.control.Form;
 import org.apache.click.control.Submit;
 import org.apache.click.control.TextField;
@@ -26,7 +25,7 @@ public class SimpleForm extends BorderPage {
   public SimpleForm() {
     addControl(form);
 
-    var tf = new TextField("name", true);
+    TextField tf = new TextField("name", true);
     tf.setTitle("Enter anything or your name");
     tf.setHelp("This is help message ;-)");
     form.add(tf);

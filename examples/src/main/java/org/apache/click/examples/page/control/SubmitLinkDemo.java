@@ -1,7 +1,7 @@
 package org.apache.click.examples.page.control;
 
-import lombok.var;
 import org.apache.click.ActionListener;
+import org.apache.click.control.Field;
 import org.apache.click.control.FieldSet;
 import org.apache.click.control.Form;
 import org.apache.click.control.TextField;
@@ -73,7 +73,7 @@ public class SubmitLinkDemo extends BorderPage {
     // The Parametrized SubmitLink action listener
     paramLink.setActionListener((ActionListener) source->{
       String demo2Msg = paramLink.getName() + ".onAction invoked at " + new Date();
-      var f = fieldSet.getField("name");
+      Field f = fieldSet.getField("name");
       demo2Msg += "<br>Parameters:" + paramLink.getParameters()+"<br>source:"+source.getName()+'/'+source.getId()+'/'+source.getClass().getSimpleName()+
           ". FieldSet:"+ f.getName()+"="+f.getValueObject();
       addModel("demo2Msg", demo2Msg);
