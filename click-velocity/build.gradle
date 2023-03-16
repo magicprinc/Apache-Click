@@ -3,9 +3,9 @@ plugins {
   id 'idea'
   id 'maven-publish'
 
-  id("io.freefair.lombok")   version "latest.release" // id 'io.franzbecker.gradle-lombok' version 'latest.release'
-  id("name.remal.sonarlint") version "latest.release" // https://github.com/remal-gradle-plugins/sonarlint + https://lift.sonatype.com/
-  id("net.ltgt.errorprone")  version "latest.release" // https://errorprone.info/
+  id("io.freefair.lombok")   version "6.+" // id 'io.franzbecker.gradle-lombok' version 'latest.release'
+  id("name.remal.sonarlint") version "3.0.+" // https://github.com/remal-gradle-plugins/sonarlint + https://lift.sonatype.com/
+  id("net.ltgt.errorprone")  version "3.0.+" // https://errorprone.info/
 }
 
 repositories {
