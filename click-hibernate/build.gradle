@@ -62,12 +62,8 @@ dependencies {
 
   implementation libs.servletApi
 
-  def springVersion = '3.2.18.RELEASE'
-  implementation("org.springframework:spring-core:${springVersion}", "org.springframework:spring-context:${springVersion}")
-  implementation("org.springframework:spring-context-support:${springVersion}", "org.springframework:spring-web:${springVersion}")
-  implementation("org.springframework:spring-jdbc:${springVersion}", "org.springframework:spring-tx:${springVersion}")
-  implementation("org.springframework.security:spring-security-core:3.2.10.RELEASE",
-      "org.springframework.security:spring-security-web:3.2.10.RELEASE", "org.springframework.security:spring-security-config:3.2.10.RELEASE")
+  implementation libs.bundles.spring
+  implementation libs.bundles.springSecurity
 
   implementation project(':click')
 
@@ -77,7 +73,6 @@ dependencies {
   //*** TEST TEST TEST
 
   testImplementation libs.bundles.junit
-
 
   testRuntimeOnly 'org.slf4j:slf4j-simple:1.7.+'
 
@@ -102,9 +97,9 @@ test {
   enableAssertions = true
   maxHeapSize = "500m"
 
-  System.setProperty("slf4j.detectLoggerNameMismatch", "true")
-  System.setProperty("file.encoding", "UTF-8")
-  System.setProperty("user.language", "en")
+  systemProperty("slf4j.detectLoggerNameMismatch", "true")
+  systemProperty("file.encoding", "UTF-8")
+  systemProperty("user.language", "en")
   Locale.setDefault(new Locale("en", "US"));
 }
 lombok {

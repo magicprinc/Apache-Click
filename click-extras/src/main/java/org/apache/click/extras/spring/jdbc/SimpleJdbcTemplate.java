@@ -7,7 +7,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.util.ObjectUtils;
 
 import javax.sql.DataSource;
@@ -31,7 +30,6 @@ import java.util.Map;
  * @author Juergen Hoeller
  * @author Thomas Risberg
  * @since 2.0
- * @see ParameterizedRowMapper
  * @see SimpleJdbcDaoSupport
  * @see org.springframework.jdbc.core.JdbcTemplate
  * deprecated since Spring 3.1 in favor of {@link org.springframework.jdbc.core.JdbcTemplate} and

@@ -7,10 +7,21 @@ rootProject.name = 'click'
 dependencyResolutionManagement {
   versionCatalogs {
     libs {
-      version('springVersion', "3.+")
+      version('springVersion', "4.3.+")
+      version('securityVersion', "4.2.+")
       version("tomcatVersion", "8.0.+")
 
-      library("spring-code", "org.springframework", "spring-core").versionRef("springVersion")
+
+      library("spring-core", "org.springframework", "spring-core").versionRef("springVersion")
+      library("spring-context", "org.springframework", "spring-context").versionRef("springVersion")
+      library("spring-context-support", "org.springframework", "spring-context-support").versionRef("springVersion")
+      library("spring-web", "org.springframework", "spring-web").versionRef("springVersion")
+      library("spring-jdbc", "org.springframework", "spring-jdbc").versionRef("springVersion")
+      library("spring-tx", "org.springframework", "spring-tx").versionRef("springVersion")
+
+      library("spring-security-core", "org.springframework.security", "spring-security-core").versionRef("securityVersion")
+      library("spring-security-web", "org.springframework.security", "spring-security-web").versionRef("securityVersion")
+      library("spring-security-config", "org.springframework.security", "spring-security-config").versionRef("securityVersion")
 
       library("junit", "junit", "junit").version("4.+")
       library("mockito", "org.mockito", "mockito-inline").version("latest.release")
@@ -21,8 +32,9 @@ dependencyResolutionManagement {
       library("tomcat-juli",   "org.apache.tomcat.embed", "tomcat-embed-logging-juli").versionRef("tomcatVersion")
       library("tomcat-jasper", "org.apache.tomcat.embed", "tomcat-embed-jasper").versionRef("tomcatVersion")
 
-      //*** bundles ***
-      bundle("spring", ["spring-code"])
+      //*** libs.bundles ***
+      bundle("spring", ["spring-core", "spring-context", "spring-context-support", "spring-web", "spring-jdbc", "spring-tx"])
+      bundle("springSecurity", ["spring-security-core", "spring-security-web", "spring-security-config"])
       bundle("tomcat", ["tomcat-core", "tomcat-juli", "tomcat-jasper"])
       bundle("junit", ["junit", "mockito"])
 

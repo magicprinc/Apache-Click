@@ -61,14 +61,12 @@ dependencies {
 
   implementation libs.servletApi
 
-  implementation 'org.freemarker:freemarker:2.3.+'
+  api 'org.freemarker:freemarker:2.3.+'
 
   implementation project(':click')
 
   // for Spring Integration
-  def springVersion = '3.2.18.RELEASE'
-  implementation("org.springframework:spring-core:${springVersion}", "org.springframework:spring-context:${springVersion}")
-  implementation("org.springframework:spring-context-support:${springVersion}", "org.springframework:spring-web:${springVersion}")
+  implementation libs.bundles.spring
 
   //*** TEST TEST TEST ***
 
@@ -98,9 +96,9 @@ test {
   enableAssertions = true
   maxHeapSize = "500m"
 
-  System.setProperty("slf4j.detectLoggerNameMismatch", "true")
-  System.setProperty("file.encoding", "UTF-8")
-  System.setProperty("user.language", "en")
+  systemProperty("slf4j.detectLoggerNameMismatch", "true")
+  systemProperty("file.encoding", "UTF-8")
+  systemProperty("user.language", "en")
   Locale.setDefault(new Locale("en", "US"));
 }
 lombok {
