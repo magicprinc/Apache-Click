@@ -4,9 +4,9 @@ plugins {
   id 'application'
   id 'idea'
 
-  id("io.freefair.lombok")   version "6.+" // id 'io.franzbecker.gradle-lombok' version 'latest.release'
-  id("name.remal.sonarlint") version "3.0.+" // https://github.com/remal-gradle-plugins/sonarlint + https://lift.sonatype.com/
-  id("net.ltgt.errorprone")  version "3.0.+" // https://errorprone.info/
+  alias(libs.plugins.lombok)
+  alias(libs.plugins.sonarLint)
+  alias(libs.plugins.errorProne)
 }
 
 repositories {

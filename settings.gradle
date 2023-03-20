@@ -3,6 +3,24 @@
 
 rootProject.name = 'click'
 
+// https://docs.gradle.org/current/userguide/platforms.html
+dependencyResolutionManagement {
+  versionCatalogs {
+    libs {
+      version('spring-version', "3.+")
+
+      library("spring-code", "org.springframework", "spring-core").versionRef("spring-version")
+
+      bundle("spring", ["spring-code"])
+
+      //*** libs.plugins ***
+      plugin("lombok", "io.freefair.lombok").version("6.+") //old: id 'io.franzbecker.gradle-lombok' version 'latest.release'
+      plugin("sonarLint", "name.remal.sonarlint").version("3.0.+") // https://github.com/remal-gradle-plugins/sonarlint + https://lift.sonatype.com/ + https://www.sonarsource.com/products/sonarlint/
+      plugin("errorProne", "net.ltgt.errorprone").version("3.0.+") // https://errorprone.info/ + https://github.com/tbroyer/gradle-errorprone-plugin
+    }
+  }
+}
+
 include 'click'
 include 'click-cayenne'
 include 'click-extras'
