@@ -60,7 +60,7 @@ dependencies {
   annotationProcessor 'com.github.bsideup.jabel:jabel-javac-plugin:latest.release' // 0.4.2
   compileOnly 'com.github.bsideup.jabel:jabel-javac-plugin:latest.release'
 
-  implementation 'javax.servlet:servlet-api:2.5'
+  implementation libs.servletApi
 
   def springVersion = '3.2.18.RELEASE'
   implementation("org.springframework:spring-core:${springVersion}", "org.springframework:spring-context:${springVersion}")
