@@ -66,11 +66,7 @@ dependencies {
   testImplementation project(':click-mock')
 
 
-  // https://github.com/bmuschko/gradle-tomcat-plugin + alias(libs.plugins.tomcat)
-  def tomcatVersion = '8.0.+'
-  tomcat "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}",
-      "org.apache.tomcat.embed:tomcat-embed-logging-juli:${tomcatVersion}",
-      "org.apache.tomcat.embed:tomcat-embed-jasper:${tomcatVersion}"
+  tomcat libs.bundles.tomcat // https://github.com/bmuschko/gradle-tomcat-plugin + alias(libs.plugins.tomcat)
 }
 // https://tomgregory.com/how-to-exclude-gradle-dependencies/
 configurations.all { // .implementation

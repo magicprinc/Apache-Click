@@ -7,11 +7,20 @@ rootProject.name = 'click'
 dependencyResolutionManagement {
   versionCatalogs {
     libs {
-      version('spring-version', "3.+")
+      version('springVersion', "3.+")
+      version("tomcatVersion", "8.0.+")
 
-      library("spring-code", "org.springframework", "spring-core").versionRef("spring-version")
+      library("spring-code", "org.springframework", "spring-core").versionRef("springVersion")
 
+
+      library("tomcat-core",   "org.apache.tomcat.embed", "tomcat-embed-core").versionRef("tomcatVersion")
+      library("tomcat-juli",   "org.apache.tomcat.embed", "tomcat-embed-logging-juli").versionRef("tomcatVersion")
+      library("tomcat-jasper", "org.apache.tomcat.embed", "tomcat-embed-jasper").versionRef("tomcatVersion")
+
+      //*** bundles ***
       bundle("spring", ["spring-code"])
+
+      bundle("tomcat", ["tomcat-core", "tomcat-juli", "tomcat-jasper"])
 
       //*** libs.plugins ***
       plugin("lombok", "io.freefair.lombok").version("6.+") //old: id 'io.franzbecker.gradle-lombok' version 'latest.release'
@@ -20,7 +29,6 @@ dependencyResolutionManagement {
 
       plugin("tomcat", "com.bmuschko.tomcat").version("2.+") // https://github.com/bmuschko/gradle-tomcat-plugin + https://plugins.gradle.org/plugin/com.bmuschko.tomcat
       //^?or:  id("org.gretty") version "4.0.+" // https://gretty-gradle-plugin.github.io/gretty-doc/
-
     }
   }
 }
