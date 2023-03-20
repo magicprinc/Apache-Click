@@ -5,8 +5,7 @@ plugins {
   id 'idea'
   id 'maven-publish'
 
-  // https://github.com/bmuschko/gradle-tomcat-plugin
-  id "com.bmuschko.tomcat" version "latest.release"
+  alias(libs.plugins.tomcat)
 
   alias(libs.plugins.lombok)
   alias(libs.plugins.sonarLint)
@@ -66,7 +65,7 @@ dependencies {
   testImplementation project(':click-mock')
 
 
-  // https://github.com/bmuschko/gradle-tomcat-plugin + id "com.bmuschko.tomcat" version "latest.release"
+  // https://github.com/bmuschko/gradle-tomcat-plugin + alias(libs.plugins.tomcat)
   def tomcatVersion = '8.0.+'
   tomcat "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}",
       "org.apache.tomcat.embed:tomcat-embed-logging-juli:${tomcatVersion}",
