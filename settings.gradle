@@ -12,6 +12,8 @@ dependencyResolutionManagement {
 
       library("spring-code", "org.springframework", "spring-core").versionRef("springVersion")
 
+      library("junit", "junit", "junit").version("4.+")
+      library("mockito", "org.mockito", "mockito-inline").version("latest.release")
 
       library("tomcat-core",   "org.apache.tomcat.embed", "tomcat-embed-core").versionRef("tomcatVersion")
       library("tomcat-juli",   "org.apache.tomcat.embed", "tomcat-embed-logging-juli").versionRef("tomcatVersion")
@@ -19,8 +21,8 @@ dependencyResolutionManagement {
 
       //*** bundles ***
       bundle("spring", ["spring-code"])
-
       bundle("tomcat", ["tomcat-core", "tomcat-juli", "tomcat-jasper"])
+      bundle("junit", ["junit", "mockito"])
 
       //*** libs.plugins ***
       plugin("lombok", "io.freefair.lombok").version("6.+") //old: id 'io.franzbecker.gradle-lombok' version 'latest.release'

@@ -85,8 +85,7 @@ dependencies {
 
   //*** TEST TEST TEST
 
-  testImplementation 'junit:junit:4.+'
-  testImplementation 'org.mockito:mockito-inline:latest.release'
+  testImplementation libs.bundles.junit
 
   testRuntimeOnly 'org.slf4j:slf4j-simple:1.7.+'
 

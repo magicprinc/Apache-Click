@@ -60,8 +60,8 @@ dependencies {
 
   //*** TEST TEST TEST
 
-  testImplementation 'junit:junit:4.+'
-  testImplementation 'org.mockito:mockito-inline:+'
+  testImplementation libs.bundles.junit
+
 
   testImplementation project(':click-mock')
 
