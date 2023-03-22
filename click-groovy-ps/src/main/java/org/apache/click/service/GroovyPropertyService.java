@@ -41,6 +41,7 @@ public class GroovyPropertyService extends PropertyServiceBase {
 
     val groovyCompilerConfiguration = new CompilerConfiguration();
     groovyCompilerConfiguration.setSourceEncoding("UTF-8");
+    // groovyCompilerConfiguration.addCompilationCustomizers(new ASTTransformationCustomizer(CompileStatic.class));
     groovyCompilerConfiguration.setScriptBaseClass(BiConsumerScript.class.getName());// to make Script implement BiConsumer
 
     return new GroovyShell(binding, groovyCompilerConfiguration);
