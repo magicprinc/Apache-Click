@@ -52,7 +52,7 @@ public class GroovyPropertyService extends PropertyServiceBase {
     return EXPRESSION_CACHE.asMap()
       .computeIfAbsent(propertyName, p->{
         val groovyScript =
-          "@Override void accept (Object t, Object v){\n"+
+          "@Override void accept (t, v){\n"+
           "  t."+ p +" = v\n"+
           '}';
 
