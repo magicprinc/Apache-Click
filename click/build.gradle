@@ -133,3 +133,10 @@ lombok {
 sonarLint {
   ignoreFailures = true
 }
+
+tasks.withType(AbstractArchiveTask).tap {
+  configureEach {
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+  }
+}
