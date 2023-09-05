@@ -1685,9 +1685,11 @@ public class ClickUtils {
    * @param targetDir target directory where to deploy the files to. In most cases this
    * is only the reserved directory <code>click</code>
    */
-  public static void deployFileList(ServletContext servletContext,
-      Class<? extends Control> controlClass, String targetDir) {
-
+  public static void deployFileList (
+    ServletContext servletContext,
+    Class<? extends Control> controlClass,
+    String targetDir
+  ){
     String packageName = ClassUtils.getPackageName(controlClass);
     packageName = StringUtils.replaceChars(packageName, '.', '/');
     packageName = "/" + packageName;
@@ -1696,12 +1698,12 @@ public class ClickUtils {
     ConfigService configService = getConfigService(servletContext);
     LogService logService = configService.getLogService();
     String descriptorFile = packageName + "/" + controlName + ".files";
-    logService.debug("Use deployment descriptor file:" + descriptorFile);
+    logService.debug("Use deployment descriptor file: {}", descriptorFile);
 
     try {
       InputStream is = getResourceAsStream(descriptorFile, ClickUtils.class);
       val fileList = IOUtils.readLines(is, UTF_8);
-      if (fileList == null || fileList.isEmpty()) {
+      if (fileList == null || fileList.isEmpty()){
         logService.info("there are no files to deploy for control " + controlClass.getName());
         return;
       }
@@ -1726,9 +1728,8 @@ public class ClickUtils {
         deployFile(servletContext, source, targetDirName);
       }
 
-    } catch (IOException e) {
-      String msg = "error occurred getting resource " + descriptorFile + ", error " + e;
-      logService.warn(msg);
+    } catch (Exception e){// was IOException
+      logService.warn("error occurred getting resource "+ descriptorFile, e);
     }
   }
 
