@@ -51,6 +51,7 @@ dependencyResolutionManagement {
 
       plugin("tomcat", "com.bmuschko.tomcat").version("2.+") // https://github.com/bmuschko/gradle-tomcat-plugin + https://plugins.gradle.org/plugin/com.bmuschko.tomcat
       //^?or:  id("org.gretty") version "4.0.+" // https://gretty-gradle-plugin.github.io/gretty-doc/
+      plugin("palantirGitVersion", 'com.palantir.git-version').version('latest.release')// https://github.com/palantir/gradle-git-version
     }
   }
 }

@@ -6,7 +6,21 @@ plugins {
   alias(libs.plugins.lombok)
   alias(libs.plugins.sonarLint)
   alias(libs.plugins.errorProne)
+  alias(libs.plugins.palantirGitVersion)
 }
+
+if (System.getProperty("version") != null){// явно задали в cmd line: -Dversion=3.14 !-Pversion игнорится
+  version = System.getProperty("version").trim()
+} else {
+  try {
+    String gitTag = versionDetails().lastTag.trim().toLowerCase()
+    version = gitTag.startsWith("v") ? gitTag.substring(1) : gitTag
+    println "[GIT ] ${gitVersion()} - ${versionDetails()}"
+  } catch (Throwable ignore){}// NPE if no tag
+}//else: without version || version from gradle.properties || -Pversion=
+if (version == null || "unspecified" == version.toString())
+  version = 'SNAPSHOT'
+println "[INFO] ${project.group}:${project.name}:$version  =>  ${project.archivesBaseName} # JVM: ${System.getProperty("java.version")} Gradle: ${gradle.gradleVersion}"
 
 repositories {
   mavenLocal()
