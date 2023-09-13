@@ -102,7 +102,7 @@ idea {
 }
 
 test {
-  useJUnit()
+  useJUnitPlatform()
   testLogging {
     events "passed", "skipped", "failed"
     showStandardStreams = true // show standard out & err of the test JVM on the console
