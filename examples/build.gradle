@@ -31,22 +31,15 @@ repositories {
 
 tasks.withType(JavaCompile).configureEach {
   options.encoding = 'UTF-8'
-  options.compilerArgs.addAll(['-Xlint:all', '-parameters', '-g', '-Xmaxwarns', '999'])
-
-  sourceCompatibility = 17 // for the IDE support
-  targetCompatibility = 8
-  options.release.set(8) // javac --release 7..18+
+  options.compilerArgs.addAll(['-Xlint:all,-serial', '-parameters', '-g', '-Xmaxwarns', '999'])
+  options.release.set(17) // javac --release 7..21+
   options.deprecation = true
-  javaCompiler.set( javaToolchains.compilerFor {
-    languageVersion = JavaLanguageVersion.of(17)
-  })
 
   options.errorprone {
     enabled = true
     disableWarningsInGeneratedCode = true
     excludedPaths = ".*/(generated|test).*/.*"
     disable("MissingSummary")
-    disable("ParameterName")
     disable("UnusedVariable")
     errorproneArgs = ["--illegal-access=warn"]
   }
@@ -54,9 +47,6 @@ tasks.withType(JavaCompile).configureEach {
 
 dependencies {
   errorprone "com.google.errorprone:error_prone_core:latest.release"
-  // Java 8 support
-  annotationProcessor 'com.github.bsideup.jabel:jabel-javac-plugin:latest.release' // 0.4.2
-  compileOnly 'com.github.bsideup.jabel:jabel-javac-plugin:latest.release'
 
   implementation("javax.annotation:javax.annotation-api:1.3.+") // @Resource
 
@@ -88,7 +78,6 @@ dependencies {
 
   testImplementation libs.bundles.junit
 
-
   testImplementation project(':click-mock')
 
   tomcat libs.bundles.tomcat // https://github.com/bmuschko/gradle-tomcat-plugin + alias(libs.plugins.tomcat)
@@ -100,7 +89,7 @@ dependencies {
   }
 }
 // https://tomgregory.com/how-to-exclude-gradle-dependencies/
-configurations.all { // .implementation
+configurations.configureEach { // .implementation
   exclude group: 'velocity', module: 'velocity' // 1.3
   exclude group: "commons-logging", module: "commons-logging"
 }
@@ -128,9 +117,5 @@ test {
   systemProperty("user.language", "en")
   Locale.setDefault(new Locale("en", "US"));
 }
-lombok {
-  version = "latest.release"
-}
-sonarLint {
-  ignoreFailures = true
-}
+lombok { version = "latest.release"; }
+sonarLint { ignoreFailures = true; }

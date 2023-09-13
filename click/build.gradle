@@ -20,22 +20,15 @@ javadoc {
 
 tasks.withType(JavaCompile).configureEach {
   options.encoding = 'UTF-8'
-  options.compilerArgs.addAll(['-Xlint:all', '-parameters', '-g', '-Xmaxwarns', '999'])
-
-  sourceCompatibility = 17 // for the IDE support
-  targetCompatibility = 8
-  options.release.set(8) // javac --release 7..18+
+  options.compilerArgs.addAll(['-Xlint:all,-serial', '-parameters', '-g', '-Xmaxwarns', '999'])
+  options.release.set(17) // javac --release 7..21+
   options.deprecation = true
-  javaCompiler.set( javaToolchains.compilerFor {
-    languageVersion = JavaLanguageVersion.of(17)
-  })
 
   options.errorprone {
     enabled = true
     disableWarningsInGeneratedCode = true
     excludedPaths = ".*/(generated|test).*/.*"
     disable("MissingSummary")
-    disable("ParameterName")
     disable("UnusedVariable")
     errorproneArgs = ["--illegal-access=warn"]
   }
@@ -59,29 +52,21 @@ dependencies {
   api("com.google.errorprone:error_prone_annotations:latest.release")// https://javadoc.io/doc/com.google.errorprone/error_prone_annotations/latest/index.html
   //implementation("javax.annotation:javax.annotation-api:latest.release")
 
-  // Java 8 support
-  annotationProcessor 'com.github.bsideup.jabel:jabel-javac-plugin:latest.release' // 0.4.2
-  compileOnly 'com.github.bsideup.jabel:jabel-javac-plugin:latest.release'
-
   implementation libs.servletApi
 
-  api('org.slf4j:slf4j-api:1.7.+',"org.slf4j:jcl-over-slf4j:1.7.+","org.slf4j:log4j-over-slf4j:1.7.+")
+  api('org.slf4j:slf4j-api:1.7.+',
+    "org.slf4j:jcl-over-slf4j:1.7.+",
+    "org.slf4j:log4j-over-slf4j:1.7.+")
 
   api 'org.mvel:mvel2:latest.release'// 2.4.14
-  api("com.github.ben-manes.caffeine:caffeine:2.+")
-  api('com.google.guava:guava:31.1-jre'){
-    exclude group: 'com.google.auto.value', module: 'auto-value-annotations'
-  }
-  implementation 'org.mvel:mvel2:latest.release'// 2.4.14
-  implementation("com.github.ben-manes.caffeine:caffeine:2.+") // 3.x requires Java 11+
+  api("com.github.ben-manes.caffeine:caffeine:latest.release")
+  api('com.google.guava:guava:latest.release')
 
   api 'org.apache.commons:commons-lang3:3.+'
   api('commons-lang:commons-lang:2.+')
   api 'commons-io:commons-io:2.+'
   api('commons-collections:commons-collections:3.+')
-  api('commons-fileupload:commons-fileupload:1.3.+'){
-    exclude group: "commons-io", module: "commons-io"
-  }
+  api('commons-fileupload:commons-fileupload:1.3.+')
 
   //*** TEST TEST TEST
 
@@ -96,7 +81,7 @@ dependencies {
   testImplementation project(':click-velocity')
 }
 // https://tomgregory.com/how-to-exclude-gradle-dependencies/
-configurations.all { // .implementation
+configurations.configureEach { // .implementation
   exclude group: "velocity", module: "velocity" // 1.3 they come from somewhere..
   exclude group: "commons-logging", module: "commons-logging"
 }
@@ -119,24 +104,15 @@ test {
   enableAssertions = true
   maxHeapSize = "500m"
 
-  sourceCompatibility = 17
-  targetCompatibility = 8
-
   systemProperty("slf4j.detectLoggerNameMismatch", "true")
   systemProperty("file.encoding", "UTF-8")
   systemProperty("user.language", "en")
   Locale.setDefault(new Locale("en", "US"));
 }
-lombok {
-  version = "latest.release"
-}
-sonarLint {
-  ignoreFailures = true
-}
+lombok { version = "latest.release"; }
+sonarLint { ignoreFailures = true; }
 
-tasks.withType(AbstractArchiveTask).tap {
-  configureEach {
-    preserveFileTimestamps = false
-    reproducibleFileOrder = true
-  }
+tasks.withType(AbstractArchiveTask).configureEach {
+  preserveFileTimestamps = false
+  reproducibleFileOrder = true
 }

@@ -21,22 +21,15 @@ javadoc {
 
 tasks.withType(JavaCompile).configureEach {
   options.encoding = 'UTF-8'
-  options.compilerArgs.addAll(['-Xlint:all', '-parameters', '-g', '-Xmaxwarns', '999'])
-
-  sourceCompatibility = 17 // for the IDE support
-  targetCompatibility = 8
-  options.release.set(8) // javac --release 7..18+
+  options.compilerArgs.addAll(['-Xlint:all,-serial', '-parameters', '-g', '-Xmaxwarns', '999'])
+  options.release.set(17) // javac --release 7..21+
   options.deprecation = true
-  javaCompiler.set( javaToolchains.compilerFor {
-    languageVersion = JavaLanguageVersion.of(17)
-  })
 
   options.errorprone {
     enabled = true
     disableWarningsInGeneratedCode = true
     excludedPaths = ".*/(build/gen|test).*/.*"
     disable("MissingSummary")
-    disable("ParameterName")
     disable("UnusedVariable")
     errorproneArgs = ["--illegal-access=warn"]
   }
@@ -56,9 +49,6 @@ java {
 
 dependencies {
   errorprone "com.google.errorprone:error_prone_core:latest.release"
-  // Java 8 support
-  annotationProcessor 'com.github.bsideup.jabel:jabel-javac-plugin:latest.release' // 0.4.2
-  compileOnly 'com.github.bsideup.jabel:jabel-javac-plugin:latest.release'
 
   implementation libs.servletApi
 
@@ -97,9 +87,5 @@ test {
   System.setProperty("user.language", "en")
   Locale.setDefault(new Locale("en", "US"));
 }
-lombok {
-  version = "latest.release"
-}
-sonarLint {
-  ignoreFailures = true
-}
+lombok { version = "latest.release"; }
+sonarLint { ignoreFailures = true; }

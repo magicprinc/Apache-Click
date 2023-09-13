@@ -2,6 +2,7 @@ package org.apache.click.service;
 
 import lombok.NonNull;
 import ognl.DefaultTypeConverter;
+import ognl.OgnlContext;
 import ognl.OgnlOps;
 import ognl.OgnlRuntime;
 import ognl.TypeConverter;
@@ -12,11 +13,10 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.ParseException;
-import java.util.Map;
 
 /**
  * Provides an OGNL TypeConverter class.
- * <p/>
+ * <p>
  * This class is adapted from the OGNL <tt>DefaultTypeConverter</tt>, by
  * Luke Blanshard and Drew Davidson, and provides additional Date conversion
  * capabilities.
@@ -39,13 +39,7 @@ public class OGNLTypeConverter implements TypeConverter {
      * @return Converted value of type toType or TypeConverter.NoConversionPossible
      *  to indicate that the conversion was not possible.
      */
-    @Override public Object convertValue(Map context,
-                               Object target,
-                               Member member,
-                               String propertyName,
-                               Object value,
-                               Class toType) {
-
+    @Override public Object convertValue(OgnlContext context, Object target, Member member, String propertyName, Object value, Class<?> toType){
         return convertValue(value, toType);
     }
 

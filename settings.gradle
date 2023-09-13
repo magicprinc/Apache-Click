@@ -7,8 +7,8 @@ rootProject.name = 'click'
 dependencyResolutionManagement {
   versionCatalogs {
     libs {
-      version('springVersion', "4.3.+")
-      version('securityVersion', "4.2.+")
+      version('springVersion', "5.+")
+      version('securityVersion', "5.+")
       version("tomcatVersion", "8.0.+")
 
 
@@ -20,11 +20,17 @@ dependencyResolutionManagement {
       library("spring-tx", "org.springframework", "spring-tx").versionRef("springVersion")
 
       library("spring-security-core", "org.springframework.security", "spring-security-core").versionRef("securityVersion")
-      library("spring-security-web", "org.springframework.security", "spring-security-web").versionRef("securityVersion")
+      library("spring-security-web", "org.springframework.security",  "spring-security-web").versionRef("securityVersion")
       library("spring-security-config", "org.springframework.security", "spring-security-config").versionRef("securityVersion")
 
-      library("junit", "junit", "junit").version("4.+")
-      library("mockito", "org.mockito", "mockito-inline").version("latest.release")
+      library("junit4", "junit", "junit").version("4.+")
+      library("junit-jupiter", "org.junit.jupiter","junit-jupiter").version("latest.release")
+      library("junit-vintage", "org.junit.vintage","junit-vintage-engine").version("latest.release")
+      library("mockitoCore", "org.mockito", "mockito-core").version("latest.release") // 3,4 req JDK 8; 5 req JDK 11
+      library("mockitoJUnit", "org.mockito", "mockito-junit-jupiter").version("latest.release")
+
+      library("googletruthcore", "com.google.truth", "truth").version("latest.release")
+      library("googletruth8", "com.google.truth.extensions", "truth-java8-extension").version("latest.release")
 
       library("servletApi", "javax.servlet", "servlet-api").version("2.5")
 
@@ -36,12 +42,12 @@ dependencyResolutionManagement {
       bundle("spring", ["spring-core", "spring-context", "spring-context-support", "spring-web", "spring-jdbc", "spring-tx"])
       bundle("springSecurity", ["spring-security-core", "spring-security-web", "spring-security-config"])
       bundle("tomcat", ["tomcat-core", "tomcat-juli", "tomcat-jasper"])
-      bundle("junit", ["junit", "mockito"])
+      bundle("junit", ["junit4", "junit-jupiter", "junit-vintage", "mockitoCore","mockitoJUnit", "googletruthcore","googletruth8"])
 
       //*** libs.plugins ***
       plugin("lombok", "io.freefair.lombok").version("6.+") //old: id 'io.franzbecker.gradle-lombok' version 'latest.release'
-      plugin("sonarLint", "name.remal.sonarlint").version("3.0.+") // https://github.com/remal-gradle-plugins/sonarlint + https://lift.sonatype.com/ + https://www.sonarsource.com/products/sonarlint/
-      plugin("errorProne", "net.ltgt.errorprone").version("3.0.+") // https://errorprone.info/ + https://github.com/tbroyer/gradle-errorprone-plugin
+      plugin("sonarLint", "name.remal.sonarlint").version("latest.release") // https://github.com/remal-gradle-plugins/sonarlint + https://lift.sonatype.com/ + https://www.sonarsource.com/products/sonarlint/
+      plugin("errorProne", "net.ltgt.errorprone").version("latest.release") // https://errorprone.info/ + https://github.com/tbroyer/gradle-errorprone-plugin
 
       plugin("tomcat", "com.bmuschko.tomcat").version("2.+") // https://github.com/bmuschko/gradle-tomcat-plugin + https://plugins.gradle.org/plugin/com.bmuschko.tomcat
       //^?or:  id("org.gretty") version "4.0.+" // https://gretty-gradle-plugin.github.io/gretty-doc/

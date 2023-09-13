@@ -1,10 +1,10 @@
 package org.apache.click.service;
 
 import ognl.AbstractMemberAccess;
+import ognl.OgnlContext;
 
 import java.lang.reflect.Member;
 import java.lang.reflect.Modifier;
-import java.util.Map;
 
 public class DefaultMemberAccess extends AbstractMemberAccess {
 
@@ -18,7 +18,7 @@ public class DefaultMemberAccess extends AbstractMemberAccess {
    * @param propertyName the property to test accessibility for (not used).
    * @return true if the member is accessible in the context, false otherwise.
    */
-  @Override public boolean isAccessible (Map context, Object target, Member member, String propertyName) {
+  @Override public boolean isAccessible (OgnlContext context, Object target, Member member, String propertyName){
     int modifiers = member.getModifiers();
     return Modifier.isPublic(modifiers);
   }

@@ -26,7 +26,7 @@ import org.apache.click.examples.domain.Customer;
 import org.apache.click.examples.page.BorderPage;
 import org.apache.click.examples.service.CustomerService;
 import org.apache.click.util.ClickUtils;
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -41,8 +41,6 @@ import java.util.Map;
  */
 @Component
 public class AjaxLiveScroller extends BorderPage {
-
-    private static final long serialVersionUID = 1L;
 
     @Resource(name="customerService")
     private CustomerService customerService;
