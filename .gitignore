@@ -46,7 +46,7 @@ out/
 .classpath
 .project
 .settings
-classes/
+/classes/
 
 # LOGs
 *.log
@@ -107,7 +107,10 @@ generated_tests/
 *.generated.*
 
 ### Apache Ignite ###
-ignite
+ignite/
+!**/src/**/ignite/
 
+### .env contains private info
+.env
 
 ### Your Application specifics
