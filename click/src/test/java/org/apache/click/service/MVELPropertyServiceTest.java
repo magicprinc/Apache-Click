@@ -82,6 +82,8 @@ public class MVELPropertyServiceTest extends PropertyServiceTestCase {
 		assertEquals("java.lang.String", ps.distinctClassName(""));
 		assertEquals("java.lang.Class", ps.distinctClassName("".getClass()));
 		assertEquals("java.lang.Character$UnicodeBlock", ps.distinctClassName(java.lang.Character.UnicodeBlock.LATIN_1_SUPPLEMENT));
-		assertTrue(ps.distinctClassName((Runnable)()->{}).startsWith("org.apache.click.service.MVELPropertyServiceTest$$Lambda$"));
+		String className = ps.distinctClassName((Runnable) ()->{ });
+		System.err.println(className);
+		assertTrue(className, className.startsWith("org.apache.click.service.MVELPropertyServiceTest$$Lambda"));
 	}
 }

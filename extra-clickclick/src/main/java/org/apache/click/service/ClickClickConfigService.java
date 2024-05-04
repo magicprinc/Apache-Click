@@ -3,8 +3,8 @@ package org.apache.click.service;
 import org.apache.click.Page;
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
-import org.apache.commons.lang.ClassUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ClassUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Element;
 
 import java.lang.reflect.Field;
@@ -21,7 +21,6 @@ import java.util.Map;
  * and enables hot reloading of Page classes.
  */
 public class ClickClickConfigService extends XmlConfigService {
-
 
   private static final Object PAGE_LOAD_LOCK = new Object();
 

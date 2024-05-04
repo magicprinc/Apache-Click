@@ -70,7 +70,7 @@ public class DatabaseInitListener implements ServletContextListener {
 			List<Customer> customers = service.getCustomers();
 
 			for (Customer customer : customers) {
-				EntityManager localEm = EMF.getEMF().createEntityManager();
+				EntityManager localEm = EMF.entityManagerFactory().createEntityManager();
 				try {
 					localEm.remove(localEm.find(Customer.class, customer.getId()));
 				} finally {

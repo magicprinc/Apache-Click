@@ -3,6 +3,7 @@ package org.apache.click.extras.filter;
 import lombok.NonNull;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -17,7 +18,6 @@ import java.util.zip.GZIPOutputStream;
  * convenience.
  */
 public class CompressionResponseStream extends ServletOutputStream {
-
 
   /**
    * The threshold number which decides to compress or not.
@@ -70,10 +70,7 @@ public class CompressionResponseStream extends ServletOutputStream {
    * @param request The associated request
    * @throws IOException if an IO error occurs reading the response stream
    */
-  public CompressionResponseStream(HttpServletResponse response,
-      HttpServletRequest request) throws IOException {
-
-    super();
+  public CompressionResponseStream (HttpServletResponse response, HttpServletRequest request) throws IOException {
     this.closed = false;
     this.response = response;
     this.request = request;
@@ -303,4 +300,14 @@ public class CompressionResponseStream extends ServletOutputStream {
     response.addHeader("Vary", "Accept-Encoding");
     return response.containsHeader("Content-Encoding");
   }
+
+	@Override
+	public boolean isReady () {
+		return true;
+	}
+
+	@Override
+	public void setWriteListener (WriteListener writeListener) {
+		throw new UnsupportedOperationException();
+	}
 }

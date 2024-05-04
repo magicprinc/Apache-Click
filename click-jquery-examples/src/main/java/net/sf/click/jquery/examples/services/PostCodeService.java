@@ -15,7 +15,7 @@ package net.sf.click.jquery.examples.services;
 
 import net.sf.click.jquery.examples.domain.PostCode;
 import net.sf.click.jquery.examples.util.StartupListener;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;

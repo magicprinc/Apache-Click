@@ -3,7 +3,7 @@ package net.sf.clickclick.control;
 import org.apache.click.Context;
 import org.apache.click.control.AbstractControl;
 import org.apache.click.util.HtmlStringBuffer;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 
 

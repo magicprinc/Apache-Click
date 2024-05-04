@@ -19,7 +19,7 @@
 package org.apache.click.servlet;
 
 import org.apache.click.util.HtmlStringBuffer;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;

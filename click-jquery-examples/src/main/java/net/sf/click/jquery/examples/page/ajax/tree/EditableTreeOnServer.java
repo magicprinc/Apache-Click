@@ -34,8 +34,8 @@ import org.apache.click.control.Submit;
 import org.apache.click.control.TextField;
 import org.apache.click.element.JsScript;
 import org.apache.click.util.ContainerUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.RandomUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.Iterator;

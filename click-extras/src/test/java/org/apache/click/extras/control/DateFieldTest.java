@@ -3,7 +3,7 @@ package org.apache.click.extras.control;
 import junit.framework.TestCase;
 import org.apache.click.MockContext;
 import org.apache.click.servlet.MockRequest;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 import java.util.Locale;
@@ -20,12 +20,12 @@ public class DateFieldTest extends TestCase {
     DateField dateField = new DateField("dateField");
     assertEquals("dateField", dateField.getName());
 
-    request.getParameterMap().put("dateField", "");
+    request.getParameterMap().put("dateField", new String[]{""});
     dateField.onProcess();
     Date date = dateField.getDate();
     assertNull(date);
 
-    request.getParameterMap().put("dateField", " ");
+    request.getParameterMap().put("dateField", new String[]{" "});
     dateField.onProcess();
     date = dateField.getDate();
     assertNull(date);
@@ -54,7 +54,7 @@ public class DateFieldTest extends TestCase {
     DateField dateField = new DateField("dateField");
     dateField.setFormatPattern("dd MMM yyyy H m s S");
     String requestParam = "06 Oct 2008 2 30 59 999";
-    request.getParameterMap().put("dateField", requestParam);
+    request.getParameterMap().put("dateField", new String[]{requestParam});
 
     assertTrue(dateField.onProcess());
 

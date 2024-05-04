@@ -19,7 +19,7 @@ import org.apache.click.dataprovider.DataProvider;
 import org.apache.click.extras.control.DateField;
 import org.apache.click.extras.control.DoubleField;
 import org.apache.click.extras.control.IntegerField;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 

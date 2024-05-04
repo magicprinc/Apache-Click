@@ -29,7 +29,7 @@ import org.apache.click.control.Table;
 import org.apache.click.dataprovider.PagingDataProvider;
 import org.apache.click.element.Element;
 import org.apache.click.util.HtmlStringBuffer;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
@@ -278,12 +278,11 @@ public class FormTable extends Table {
      * with the same name
      */
     @Override
-    public Column addColumn(Column column) {
+    public Column addColumn(@NonNull Column column) {
         super.addColumn(column);
 
-        if (column instanceof FieldColumn) {
-            FieldColumn fieldColumn = (FieldColumn) column;
-            if (fieldColumn.getField() != null) {
+        if (column instanceof FieldColumn fieldColumn){
+					if (fieldColumn.getField() != null){
                 fieldColumn.getField().setForm(getForm());
             }
         }

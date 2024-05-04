@@ -18,12 +18,7 @@
  */
 package org.apache.click.extras.cayenne;
 
-import java.util.Collection;
-import java.util.List;
 import org.apache.cayenne.BaseContext;
-
-import org.apache.click.util.ClickUtils;
-
 import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.DataObject;
 import org.apache.cayenne.ObjectContext;
@@ -41,7 +36,11 @@ import org.apache.click.control.Field;
 import org.apache.click.control.Form;
 import org.apache.click.control.TextArea;
 import org.apache.click.control.TextField;
-import org.apache.commons.lang.Validate;
+import org.apache.click.util.ClickUtils;
+import org.apache.commons.lang3.Validate;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Provides Cayenne DataObject utility methods to looking up object by their

@@ -29,7 +29,7 @@ import org.apache.click.control.RadioGroup;
 import org.apache.click.control.Submit;
 import org.apache.click.control.TextField;
 import org.apache.click.util.ClickUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Demonstrates a form that is dynamically built using AJAX, The form is submitted

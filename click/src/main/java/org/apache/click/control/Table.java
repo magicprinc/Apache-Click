@@ -13,9 +13,10 @@ import org.apache.click.element.CssStyle;
 import org.apache.click.element.Element;
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -277,7 +278,7 @@ import java.util.StringTokenizer;
  * @see Decorator
  */
 public class Table extends AbstractControl implements Stateful {
-  private static final long serialVersionUID = 3096465347838579988L;
+  @Serial private static final long serialVersionUID = 3096465347838579988L;
 
   private static final Set<String> DARK_STYLES;
 
@@ -602,18 +603,12 @@ public class Table extends AbstractControl implements Stateful {
    * @throws IllegalArgumentException if the table already contains a column
    * with the same name, or the column name is not defined
    */
-  public Column addColumn(Column column) {
-    if (column == null) {
-      String msg = "column parameter cannot be null";
-      throw new IllegalArgumentException(msg);
-    }
-    if (StringUtils.isBlank(column.getName())) {
+  public Column addColumn (@NonNull Column column) {
+    if (StringUtils.isBlank(column.getName())){
       throw new IllegalArgumentException("Column name is not defined");
     }
     if (getColumns().containsKey(column.getName())) {
-      String msg =
-          "Table already contains column named: " + column.getName();
-      throw new IllegalArgumentException(msg);
+      throw new IllegalArgumentException("Table already contains column named: " + column.getName());
     }
 
     getColumns().put(column.getName(), column);

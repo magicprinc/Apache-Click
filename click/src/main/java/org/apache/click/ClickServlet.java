@@ -1,6 +1,7 @@
 package org.apache.click;
 
 import lombok.Getter;
+import lombok.val;
 import org.apache.click.service.ConfigService;
 import org.apache.click.service.ConfigService.AutoBinding;
 import org.apache.click.service.LogService;
@@ -13,8 +14,8 @@ import org.apache.click.util.ErrorPage;
 import org.apache.click.util.HtmlStringBuffer;
 import org.apache.click.util.PageImports;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.lang.ClassUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ClassUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -27,6 +28,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.Serial;
 import java.io.Writer;
 import java.lang.reflect.Field;
 import java.util.Collections;
@@ -84,7 +86,7 @@ import java.util.TreeMap;
  * ServletContext using the key {@value org.apache.click.service.ConfigService#CONTEXT_NAME}.
  */
 public class ClickServlet extends HttpServlet {
-  private static final long serialVersionUID = -2529351634349647916L;
+  @Serial private static final long serialVersionUID = -2529351634349647916L;
 
   /**
    * The <tt>mock page reference</tt> request attribute: key: &nbsp;
@@ -110,17 +112,17 @@ public class ClickServlet extends HttpServlet {
    * The click application configuration service classname init parameter name:
    * &nbsp; "<tt>config-service-class</tt>".
    */
-  protected final static String CONFIG_SERVICE_CLASS = "config-service-class";
+	protected static final String CONFIG_SERVICE_CLASS = "config-service-class";
 
   /**
    * The forwarded request marker attribute: &nbsp; "<tt>click-forward</tt>".
    */
-  protected final static String CLICK_FORWARD = "click-forward";
+	protected static final String CLICK_FORWARD = "click-forward";
 
   /**
    * The Page to forward to request attribute: &nbsp; "<tt>click-page</tt>".
    */
-  protected final static String FORWARD_PAGE = "forward-page";
+	protected static final String FORWARD_PAGE = "forward-page";
 
 
 
@@ -544,7 +546,7 @@ public class ClickServlet extends HttpServlet {
   protected boolean performOnSecurityCheck(Page page, Context context) {
     boolean continueProcessing = page.onSecurityCheck();
 
-    if (logger.isTraceEnabled()) {
+    if (logger.isTraceEnabled()){
       logger.trace("   invoked: "
           + ClassUtils.getShortClassName(page.getClass())
           + ".onSecurityCheck() : " + continueProcessing);
@@ -758,7 +760,7 @@ public class ClickServlet extends HttpServlet {
     final HttpServletRequest request = context.getRequest();
     final HttpServletResponse response = context.getResponse();
 
-    if (StringUtils.isNotBlank(page.getRedirect())) {
+    if (StringUtils.isNotBlank(page.getRedirect())){
       String url = page.getRedirect();
 
       url = response.encodeRedirectURL(url);
@@ -1180,11 +1182,9 @@ public class ClickServlet extends HttpServlet {
       if (newPage.hasHeaders()) {
 
         // Don't override existing headers
-        Map pageHeaders = newPage.getHeaders();
-        for (Map.Entry entry : defaultHeaders.entrySet()) {
-          if (!pageHeaders.containsKey(entry.getKey())) {
-            pageHeaders.put(entry.getKey(), entry.getValue());
-          }
+        val pageHeaders = newPage.getHeaders();
+        for (val entry : defaultHeaders.entrySet()) {
+					pageHeaders.computeIfAbsent(entry.getKey(), k->entry.getValue());
         }
 
       } else {
@@ -1263,7 +1263,7 @@ public class ClickServlet extends HttpServlet {
 
             propertyService.setValue(page, name, value);
 
-            if (logger.isTraceEnabled()) {
+            if (logger.isTraceEnabled()){
               logger.trace("   auto bound variable: " + name + "=" + value);
             }
           }
@@ -1890,17 +1890,10 @@ public class ClickServlet extends HttpServlet {
    * @throws RuntimeException if the configuration service cannot be
    * destroyed
    */
-  void destroyConfigService(ServletContext servletContext) {
-
-    if (configService != null) {
-
+  void destroyConfigService (ServletContext servletContext) {
+    if (configService != null){
       try {
         configService.onDestroy();
-
-      } catch (RuntimeException e) {
-        throw e;
-      } catch (Exception e) {
-        throw new RuntimeException(e);
       } finally {
         servletContext.setAttribute(ConfigService.CONTEXT_NAME, null);
       }

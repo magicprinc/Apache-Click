@@ -8,8 +8,9 @@ import org.apache.click.element.JsImport;
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.ContainerUtils;
 import org.apache.click.util.HtmlStringBuffer;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -107,7 +108,7 @@ import java.util.Set;
  * @see Tree
  */
 public class CheckboxTree extends Tree {
-  private static final long serialVersionUID = -126999161409734779L;
+  @Serial private static final long serialVersionUID = -126999161409734779L;
 
   /**
    * Determines if the checkboxes of child nodes should also be

@@ -5,9 +5,9 @@ import org.apache.click.ActionListener;
 import org.apache.click.Context;
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
-
+import java.io.Serial;
 
 /**
  * Provides a Action Link control: &nbsp; &lt;a href=""&gt;&lt;/a&gt;.
@@ -127,7 +127,7 @@ import org.apache.commons.lang.StringUtils;
  * @see Submit
  */
 public class ActionLink extends AbstractLink {
-  private static final long serialVersionUID = -5025910359741041085L;
+  @Serial private static final long serialVersionUID = -5025910359741041085L;
 
   /** The action link parameter name: &nbsp; <tt>actionLink</tt>. */
   public static final String ACTION_LINK = "actionLink";

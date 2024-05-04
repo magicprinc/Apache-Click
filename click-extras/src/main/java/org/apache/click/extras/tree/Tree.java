@@ -15,11 +15,13 @@ import org.apache.click.element.JsImport;
 import org.apache.click.extras.control.SubmitLink;
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -148,7 +150,7 @@ import java.util.StringTokenizer;
  * </ul>
  */
 public class Tree extends AbstractControl {
-  private static final long serialVersionUID = 1L;
+  @Serial private static final long serialVersionUID = 1L;
 
   /** The tree's expand/collapse parameter name: <tt>"expandTreeNode"</tt>. */
   public static final String EXPAND_TREE_NODE_PARAM = "expandTreeNode";
@@ -1582,11 +1584,11 @@ public class Tree extends AbstractControl {
       javascriptHandler.init(Context.getThreadLocalContext());
     }
 
-    if (!ArrayUtils.isEmpty(expandOrCollapseNodeIds)) {
+    if (!ArrayUtils.isEmpty(expandOrCollapseNodeIds)){
       expandOrCollapse(expandOrCollapseNodeIds);
     }
 
-    if (!ArrayUtils.isEmpty(selectOrDeselectNodeIds)) {
+    if (!ArrayUtils.isEmpty(selectOrDeselectNodeIds)){
       selectOrDeselect(selectOrDeselectNodeIds);
     }
     return true;
@@ -2028,7 +2030,7 @@ public class Tree extends AbstractControl {
    * user navigates the tree.
    */
   protected class CookieHandler implements JavascriptHandler {
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     /** Cookie value delimiter. */
     private final static String DELIM = ",";
@@ -2243,7 +2245,7 @@ public class Tree extends AbstractControl {
     @SneakyThrows
     protected String prepareCookieValue(String value) {
       if (StringUtils.isNotBlank(value)) {
-        value = URLDecoder.decode(value, "UTF-8");
+        value = URLDecoder.decode(value, StandardCharsets.UTF_8);
         value = trimStr(value, "\"");
       }
       return value;
@@ -2375,7 +2377,7 @@ public class Tree extends AbstractControl {
    * will <strong>overwrite</strong> each others session attribute!
    */
   protected class SessionHandler implements JavascriptHandler {
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     /**
      * The reserved session key prefix for the selected paths
@@ -2605,7 +2607,7 @@ public class Tree extends AbstractControl {
    * java.util.Map, where the node's id is the key and the entry is the value.
    */
   private static final class Entry implements Serializable {
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     /** Number of times this entry was found on the path. */
     private int count = 1;

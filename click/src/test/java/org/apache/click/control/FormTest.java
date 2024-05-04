@@ -17,14 +17,16 @@
  * under the License.
  */
 package org.apache.click.control;
-import java.util.HashMap;
-import java.util.Map;
+
 import junit.framework.Assert;
 import junit.framework.TestCase;
 import org.apache.click.MockContext;
 import org.apache.click.Page;
 import org.apache.click.servlet.MockRequest;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Test Form behavior.

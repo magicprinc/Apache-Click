@@ -1,9 +1,9 @@
 package net.sf.click.jquery.examples.control.jstree;
 
 import lombok.NonNull;
+import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -259,7 +259,7 @@ public class JSTreeNode {
    * @return true if this node has any children false otherwise
    */
   public boolean hasChildren() {
-    return !CollectionUtils.isEmpty(children);
+    return !ClickUtils.isEmpty(children);
   }
 
   /**

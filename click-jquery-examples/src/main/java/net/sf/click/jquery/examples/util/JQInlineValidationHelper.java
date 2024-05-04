@@ -31,7 +31,7 @@ import org.apache.click.extras.control.PickList;
 import org.apache.click.extras.control.TelephoneField;
 import org.apache.click.util.ContainerUtils;
 import org.apache.click.util.HtmlStringBuffer;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 

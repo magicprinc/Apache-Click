@@ -7,9 +7,9 @@ rootProject.name = 'click'
 dependencyResolutionManagement {
   versionCatalogs {
     libs {
-      version('springVersion', "5.+")
-      version('securityVersion', "5.+")
-      version("tomcatVersion", "8.0.+")
+      version('springVersion',  "5.+")
+      version('securityVersion',"5.+")
+      version("tomcatVersion",  "8.+")
 
 
       library("spring-core", "org.springframework", "spring-core").versionRef("springVersion")
@@ -32,7 +32,12 @@ dependencyResolutionManagement {
       library("googletruthcore", "com.google.truth", "truth").version("latest.release")
       library("googletruth8", "com.google.truth.extensions", "truth-java8-extension").version("latest.release")
 
-      library("servletApi", "javax.servlet", "servlet-api").version("2.5")
+			library("byteBuddy", "net.bytebuddy","byte-buddy").version("latest.release")
+			library("byteBuddyAgent", "net.bytebuddy","byte-buddy-agent").version("latest.release")
+			library("asm", 'org.ow2.asm','asm').version("latest.release")
+			library("cglib", 'cglib','cglib').version("latest.release")
+
+      library("servletApi", "jakarta.servlet", "jakarta.servlet-api").version("4.+")
 
       library("tomcat-core",   "org.apache.tomcat.embed", "tomcat-embed-core").versionRef("tomcatVersion")
       library("tomcat-juli",   "org.apache.tomcat.embed", "tomcat-embed-logging-juli").versionRef("tomcatVersion")
@@ -42,10 +47,10 @@ dependencyResolutionManagement {
       bundle("spring", ["spring-core", "spring-context", "spring-context-support", "spring-web", "spring-jdbc", "spring-tx"])
       bundle("springSecurity", ["spring-security-core", "spring-security-web", "spring-security-config"])
       bundle("tomcat", ["tomcat-core", "tomcat-juli", "tomcat-jasper"])
-      bundle("junit", ["junit4", "junit-jupiter", "junit-vintage", "mockitoCore","mockitoJUnit", "googletruthcore","googletruth8"])
+      bundle("junit", ["junit4", "junit-jupiter", "junit-vintage", "mockitoCore","mockitoJUnit", "googletruthcore","googletruth8", "byteBuddy", "byteBuddyAgent", "asm", "cglib"])
 
       //*** libs.plugins ***
-      plugin("lombok", "io.freefair.lombok").version("6.+") //old: id 'io.franzbecker.gradle-lombok' version 'latest.release'
+      plugin("lombok", "io.freefair.lombok").version("latest.release") //old: id 'io.franzbecker.gradle-lombok' version 'latest.release'
       plugin("sonarLint", "name.remal.sonarlint").version("latest.release") // https://github.com/remal-gradle-plugins/sonarlint + https://lift.sonatype.com/ + https://www.sonarsource.com/products/sonarlint/
       plugin("errorProne", "net.ltgt.errorprone").version("latest.release") // https://errorprone.info/ + https://github.com/tbroyer/gradle-errorprone-plugin
 

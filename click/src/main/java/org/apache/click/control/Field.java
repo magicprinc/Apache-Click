@@ -11,7 +11,9 @@ import org.apache.click.Stateful;
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.ContainerUtils;
 import org.apache.click.util.HtmlStringBuffer;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.Serial;
 
 import static org.apache.click.util.ClickUtils.len;
 
@@ -168,7 +170,7 @@ import static org.apache.click.util.ClickUtils.len;
  * </dl>
  */
 public abstract class Field extends AbstractControl implements Stateful {
-  private static final long serialVersionUID = 2196415359858221925L;
+  @Serial private static final long serialVersionUID = 2196415359858221925L;
 
   /** The Field disabled value. */
   protected boolean disabled;
@@ -283,13 +285,13 @@ public abstract class Field extends AbstractControl implements Stateful {
    * referencing <tt>this</tt> object: <tt>if (parent == this)</tt>
    */
   @Override
-  public void setParent(Object parent) {
+  public void setParent (Object parent) {
     if (parent == this) {
       throw new IllegalArgumentException("Cannot set parent to itself");
     }
     // Guard against fields without names, as fields would throw
     // exceptions when binding to request value.
-    if (StringUtils.isBlank(getName())) {
+    if (StringUtils.isBlank(getName())){
       String msg = "Field name not defined: " + getClass().getName();
       throw new IllegalArgumentException(msg);
     }

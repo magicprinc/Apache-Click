@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.click.Page;
 import org.apache.click.service.TemplateException;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -19,7 +19,6 @@ import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -123,35 +122,34 @@ public class ErrorReport {
         if (getCause() instanceof IllegalArgumentException) {
           line = tokenizer.nextToken();
 
-          if (line.contains("org.apache.commons.lang.Validate")) {
+          if (line.contains("org.apache.commons.lang3.Validate")) {
             line = tokenizer.nextToken();
           }
         }
 
         int nameStart = line.indexOf("at ");
-        int nameEnd = line.indexOf("(");
-        nameEnd = line.lastIndexOf(".", nameEnd);
+        int nameEnd = line.indexOf('(');
+        nameEnd = line.lastIndexOf('.', nameEnd);
         if (line.contains("$")) {
-          nameEnd = line.indexOf("$");
+          nameEnd = line.indexOf('$');
         }
 
         if (nameStart != -1 && nameEnd != -1) {
           String classname = line.substring(nameStart + 3, nameEnd);
 
-          int lineStart = line.indexOf(":");
+          int lineStart = line.indexOf(':');
           if (lineStart != -1) {
-            int lineEnd = line.indexOf(")");
+            int lineEnd = line.indexOf(')');
             String lineNumber = line.substring(lineStart + 1, lineEnd);
 
             this.lineNumber = Integer.parseInt(lineNumber);
 
-            String filename =
-                "/" + classname.replace('.', '/') + ".java";
+            String filename = "/"+ classname.replace('.', '/') +".java";
 
             sourceReader = getJavaSourceReader(filename);
           }
         }
-      } catch (Exception e) {
+      } catch (Exception e){
         log.warn("ErrorReport [× parse error]: {} page: {} req: {}", error, pageClass, request, e);
       }
     }
@@ -228,9 +226,9 @@ public class ErrorReport {
     buffer.append("<tr><td colspan='2' style='color:white; background-color: navy; font-weight: bold'>Request</td></tr>");
 
     Map<String, Object> requestAttributes = new TreeMap<>();
-    Enumeration attributeNames = request.getAttributeNames();
-    while (attributeNames.hasMoreElements()) {
-      String name = attributeNames.nextElement().toString();
+    var attributeNames = request.getAttributeNames();
+    while (attributeNames.hasMoreElements()){
+      String name = attributeNames.nextElement();
       requestAttributes.put(name, request.getAttribute(name));
     }
     buffer.append("<tr><td width='12%' valign='top'><b>Attributes</b></td><td>");
@@ -250,9 +248,9 @@ public class ErrorReport {
     buffer.append("</td></tr>");
 
     Map<String, Object> requestHeaders = new TreeMap<>();
-    Enumeration headerNames = request.getHeaderNames();
-    while (headerNames.hasMoreElements()) {
-      String name = headerNames.nextElement().toString();
+    var headerNames = request.getHeaderNames();
+    while (headerNames.hasMoreElements()){
+      String name = headerNames.nextElement();
       requestHeaders.put(name, request.getHeader(name));
     }
     buffer.append("<tr><td width='12%' valign='top'><b>Headers</b></td><td>");
@@ -269,9 +267,9 @@ public class ErrorReport {
     buffer.append("</td></tr>");
 
     Map<String, Object> requestParams = new TreeMap<>();
-    Enumeration paramNames = request.getParameterNames();
-    while (paramNames.hasMoreElements()) {
-      String name = paramNames.nextElement().toString();
+    var paramNames = request.getParameterNames();
+    while (paramNames.hasMoreElements()){
+      String name = paramNames.nextElement();
       requestParams.put(name, request.getParameter(name));
     }
     buffer.append("<tr><td width='12%' valign='top'><b>Parameters</b></td><td>");
@@ -304,7 +302,7 @@ public class ErrorReport {
       HttpSession session = request.getSession();
       attributeNames = session.getAttributeNames();
       while (attributeNames.hasMoreElements()) {
-        String name = attributeNames.nextElement().toString();
+        String name = attributeNames.nextElement();
         sessionAttributes.put(name, session.getAttribute(name));
       }
     }
@@ -443,7 +441,6 @@ public class ErrorReport {
    * @throws FileNotFoundException if file could not be found
    */
   protected LineNumberReader getJavaSourceReader(String filename) throws FileNotFoundException {
-
     if (pageClass == null) {
       return null;
     }
@@ -478,7 +475,6 @@ public class ErrorReport {
         }
       }
     }
-
     return null;
   }
 

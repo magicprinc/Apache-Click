@@ -6,24 +6,25 @@ import org.apache.click.extras.control.Menu;
 import org.apache.click.extras.control.MenuFactory;
 import org.apache.click.util.ClickUtils;
 
-public class BorderPage extends Page {
+import java.io.Serial;
 
-  private static final long serialVersionUID = 1L;
+public class BorderPage extends Page {
+  @Serial private static final long serialVersionUID = 1L;
 
   private final Menu rootMenu = new MenuFactory().getRootMenu();
 
-  public BorderPage() {
+  public BorderPage () {
     String className = getClass().getName();
 
     String shortName = className.substring(className.lastIndexOf('.') + 1);
     String title = ClickUtils.toLabel(shortName);
     addModel("title", title);
 
-    String srcPath = className.replace('.', '/') + ".java";
+    String srcPath = className.replace('.', '/') +".java";
     addModel("srcPath", srcPath);
 
     addControl(rootMenu);
-  }
+  }//new
 
   /**
    * @see #getTemplate()
@@ -35,5 +36,4 @@ public class BorderPage extends Page {
   public CustomerService getCustomerService() {
     return new CustomerService();
   }
-
 }

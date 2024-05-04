@@ -16,7 +16,7 @@ import org.apache.click.util.ClickUtils;
 import org.apache.click.util.Format;
 import org.apache.click.util.HtmlStringBuffer;
 import org.apache.click.util.MessagesMap;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.EntityResolver;
@@ -1204,7 +1204,7 @@ public class XmlConfigService implements ConfigService, EntityResolver {
     for (Element controlSet : ClickUtils.getChildren(controlsElm, "control-set")) {
 
       String name = controlSet.getAttribute("name");
-      if (StringUtils.isBlank(name)) {
+      if (StringUtils.isBlank(name)){
         String msg =
             "'control-set' element missing 'name' attribute.";
         throw new RuntimeException(msg);

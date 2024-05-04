@@ -11,8 +11,9 @@ import org.apache.click.element.CssImport;
 import org.apache.click.element.Element;
 import org.apache.click.util.ActionListenerAdaptor;
 import org.apache.click.util.ClickUtils;
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
+import java.io.Serial;
 import java.util.List;
 
 /**
@@ -122,7 +123,7 @@ import java.util.List;
  * &lt;/html&gt; </pre>
  */
 public class TabbedPanel extends Panel implements Stateful {
-  private static final long serialVersionUID = -623038215750858480L;
+  @Serial private static final long serialVersionUID = -623038215750858480L;
 
   /** The currently active panel. */
   protected Panel activePanel;
@@ -610,14 +611,11 @@ public class TabbedPanel extends Panel implements Stateful {
       if (link.isClicked()) {
 
         // Check which panel user selected and set that Panel as active
-        for (int i = 0; i < getPanels().size(); i++) {
-          Panel panel = getPanels().get(i);
-
+        for (Panel panel : getPanels()){
           // Deactivate panel
           panel.setActive(false);
 
-          if (link.getValue().equals(panel.getName())
-              && !panel.isDisabled()) {
+          if (link.getValue().equals(panel.getName()) && !panel.isDisabled()){
 
             setActivePanel(panel);
           }
@@ -625,5 +623,4 @@ public class TabbedPanel extends Panel implements Stateful {
       }
     }
   }
-
 }

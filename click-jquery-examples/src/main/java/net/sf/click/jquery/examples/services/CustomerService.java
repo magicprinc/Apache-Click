@@ -4,7 +4,7 @@ import lombok.val;
 import net.sf.click.jquery.examples.domain.Customer;
 import net.sf.click.jquery.examples.util.StartupListener;
 import org.apache.click.service.PropertyService;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 

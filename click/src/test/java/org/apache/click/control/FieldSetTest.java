@@ -18,12 +18,13 @@
  */
 package org.apache.click.control;
 
-import java.util.HashMap;
-import java.util.Map;
 import junit.framework.TestCase;
 import org.apache.click.Control;
 import org.apache.click.MockContext;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Test FieldSet behavior.
@@ -32,7 +33,7 @@ public class FieldSetTest extends TestCase {
 
     /** FieldSet which index position to test. */
     private FieldSet testFieldSet;
-    
+
     /** TextField which position is tracked in the FieldSet. */
     private TextField trackField;
 
@@ -72,7 +73,7 @@ public class FieldSetTest extends TestCase {
         assertTrue(testFieldSet.getControls().indexOf(nameField) == 1);
         // nameField index: #fieldList=1
         assertTrue(testFieldSet.getFieldList().indexOf(nameField) == 1);
-        
+
        // trackField index: #controls=0
         assertTrue(testFieldSet.getControls().indexOf(trackField) == 0);
         // trackField index: #fieldList=0
@@ -93,7 +94,7 @@ public class FieldSetTest extends TestCase {
         assertTrue(testFieldSet.getControls().indexOf(nameField) == 0);
         // nameindex: #fieldList=1
         assertTrue(testFieldSet.getFieldList().indexOf(nameField) == 1);
-        
+
        // trackField index: #controls=1
         assertTrue(testFieldSet.getControls().indexOf(trackField) == 1);
         // trackField index: #fieldList=0
@@ -116,7 +117,7 @@ public class FieldSetTest extends TestCase {
         assertTrue(testFieldSet.getControls().indexOf(table) == 0);
         // table: #fieldList=-1
         assertTrue(testFieldSet.getFieldList().indexOf(table) == -1);
-        
+
        // trackField index: #controls=1
         assertTrue(testFieldSet.getControls().indexOf(trackField) == 1);
         // trackField index: #fieldList=0
@@ -159,7 +160,7 @@ public class FieldSetTest extends TestCase {
         assertTrue(testFieldSet.getControls().indexOf(hidden) == 0);
         // hidden index: #fieldList=1
         assertTrue(testFieldSet.getFieldList().indexOf(hidden) == 1);
-        
+
         // trackField index: #controls=1
         assertTrue(testFieldSet.getControls().indexOf(trackField) == 1);
         // trackField index: #fieldList=0
@@ -183,12 +184,12 @@ public class FieldSetTest extends TestCase {
         assertTrue(testFieldSet.getControls().indexOf(trackField) == 1);
         // trackField index: #fieldList=0
         assertTrue(testFieldSet.getFieldList().indexOf(trackField) == 0);
-        
+
         int expectedSize = 2;
         // Check the list sizes to be 2
         assertTrue(testFieldSet.getControls().size() == expectedSize);
         assertTrue(testFieldSet.getFieldList().size() == expectedSize);
-        
+
         // Removing field should shift up trackField index
         testFieldSet.remove(field);
 
@@ -196,13 +197,13 @@ public class FieldSetTest extends TestCase {
         // Check the list sizes to be 1
         assertTrue(testFieldSet.getControls().size() == expectedSize);
         assertTrue(testFieldSet.getFieldList().size() == expectedSize);
-        
+
         // trackField index: #controls=0
         assertTrue(testFieldSet.getControls().indexOf(trackField) == 0);
         // trackField index: #fieldList=0
         assertTrue(testFieldSet.getFieldList().indexOf(trackField) == 0);
     }
-    
+
     /**
      * Test that FieldSet#add(Control, int) and FieldSet#remove(Control) properly
      * sets and removes the fieldWidth for a Field.
@@ -212,18 +213,18 @@ public class FieldSetTest extends TestCase {
 
         // Check that fieldWidth is empty
         assertTrue(testFieldSet.getFieldWidths().isEmpty());
-            
+
         int colspan = 4;
         testFieldSet.add(field, colspan);
 
         // Check that fieldWidth has entry for field
         assertTrue(testFieldSet.getFieldWidths().size() == 1);
-        
+
         Integer width = testFieldSet.getFieldWidths().get(field.getName());
         assertEquals(4, width.intValue());
 
         testFieldSet.remove(field);
-        
+
         // Check that fieldWidth is empty
         assertTrue(testFieldSet.getFieldWidths().isEmpty());
     }
@@ -237,18 +238,18 @@ public class FieldSetTest extends TestCase {
 
         // Check that fieldWidth is empty
         assertTrue(testFieldSet.getFieldWidths().isEmpty());
-            
+
         int colspan = 4;
         testFieldSet.add(table, colspan);
 
         // Check that fieldWidth has entry for table
         assertTrue(testFieldSet.getFieldWidths().size() == 1);
-        
+
         Integer width = testFieldSet.getFieldWidths().get(table.getName());
         assertEquals(4, width.intValue());
 
         testFieldSet.remove(table);
-        
+
         // Check that fieldWidth is empty
         assertTrue(testFieldSet.getFieldWidths().isEmpty());
     }
@@ -259,7 +260,7 @@ public class FieldSetTest extends TestCase {
      *
      * The main use case for FieldSet.getFieldList() is that it enables one to use
      * Velocity to render Fields e.g.:
-     * 
+     *
      * #foreach ($field in $fieldSet.fieldList)
      *   <td>$field.label:</td> <td>$field</td>
      * #end
@@ -309,13 +310,13 @@ public class FieldSetTest extends TestCase {
 
         // Check that list does *not* contain Div
         assertFalse(fieldSet.getFieldList().contains(div));
-        
+
         // Check that list does *not* contain Button
         assertFalse(fieldSet.getFieldList().contains(button));
 
         // Check that list contains other FieldSet
         //assertTrue(testFieldSet.getFieldList().contains(anotherFieldSet));
-        
+
         // Check that list does *not* contains the other FieldSet's Field
         //assertFalse(testFieldSet.getFieldList().contains(anotherFieldSetField));
 
@@ -333,10 +334,10 @@ public class FieldSetTest extends TestCase {
      * $form.testFieldSet.fields.name   <- name this is a TextField
      * $form.testFieldSet.fields.div    <- div is a AbstractContainer
      * $form.testFieldSet.fields.button <- button is a Submit
-     * 
+     *
      * Also check that FieldSet.getFields() returns a cached Map so that access to
      * FieldSet.getFields() is fast.
-     * 
+     *
      * Q: Why not return "only" Fields?
      * A: FieldSet will then have to maintain another map besides #controlMap.
      *    However it could lead to issues when users iterate the map and receive
@@ -355,7 +356,7 @@ public class FieldSetTest extends TestCase {
 
         String buttonName = "button";
         form.add(new Button(buttonName));
-        
+
         // Assemble FieldSet
         String fieldSetName = "fieldSet";
         FieldSet fieldSet = new FieldSet(fieldSetName);
@@ -369,10 +370,10 @@ public class FieldSetTest extends TestCase {
         assertTrue(form.getFields().containsKey(fieldName));
         assertTrue(form.getFields().containsKey(divName));
         assertTrue(form.getFields().containsKey(buttonName));
-        
+
         // Check that map contains FieldSet
         assertTrue(form.getFields().containsKey(fieldSetName));
-        
+
         // Check that map does *not* contain the FieldSet's Field
         assertFalse(form.getFields().containsKey(fieldSetFieldName));
 
@@ -599,7 +600,7 @@ public class FieldSetTest extends TestCase {
 
         /**
          * Return the Div tag.
-         * 
+         *
          * @return the div tag
          */
         @Override

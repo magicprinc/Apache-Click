@@ -7,9 +7,10 @@ import org.apache.click.Context;
 import org.apache.click.Stateful;
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.Serial;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -26,7 +27,7 @@ import java.util.Set;
  * @see Submit
  */
 public abstract class AbstractLink extends AbstractControl implements Stateful {
-  private static final long serialVersionUID = -9034986276750129166L;
+  @Serial private static final long serialVersionUID = -9034986276750129166L;
 
   /** The Field disabled value. */
   protected boolean disabled;

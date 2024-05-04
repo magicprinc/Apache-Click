@@ -13,16 +13,17 @@
  */
 package net.sf.click.ajax4click.jquery;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
 import org.apache.click.ActionResult;
 import org.apache.click.Context;
 import org.apache.click.Control;
 import org.apache.click.ajax.DefaultAjaxBehavior;
 import org.apache.click.element.Element;
 import org.apache.click.element.JsImport;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Provides a jQuery specific behavior with the following features:

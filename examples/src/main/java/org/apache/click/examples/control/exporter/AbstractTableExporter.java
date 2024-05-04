@@ -25,7 +25,7 @@ import org.apache.click.control.AbstractControl;
 import org.apache.click.control.AbstractLink;
 import org.apache.click.control.ActionLink;
 import org.apache.click.util.ClickUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;

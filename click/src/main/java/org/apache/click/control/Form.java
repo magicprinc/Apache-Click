@@ -16,10 +16,11 @@ import org.apache.click.util.HtmlStringBuffer;
 import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededException;
 import org.apache.commons.fileupload.FileUploadBase.SizeLimitExceededException;
 import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -491,7 +492,7 @@ import java.util.UUID;
  @see Field
  @see Submit */
 public class Form extends AbstractContainer implements Stateful {
-  private static final long serialVersionUID = -5038737218349023962L;
+  @Serial private static final long serialVersionUID = -5038737218349023962L;
 
   /** The align left, form layout constant: &nbsp; <tt>"left"</tt>. */
   public static final String ALIGN_LEFT = "left";
@@ -926,10 +927,10 @@ public class Form extends AbstractContainer implements Stateful {
 
     if (newControl instanceof Field field){
 
-      if (field instanceof Button){
+      if (field instanceof Button btn){
         // Replace field in buttonList for fast access
         int buttonIndex = getButtonList().indexOf(currentControl);
-        getButtonList().set(buttonIndex, (Button) field);
+        getButtonList().set(buttonIndex, btn);
       } else {
         // Replace field in fieldList for fast access
         int fieldIndex = getFieldList().indexOf(currentControl);
@@ -2349,7 +2350,6 @@ public class Form extends AbstractContainer implements Stateful {
    @return true if the submit is OK or false otherwise
    */
   protected boolean performSubmitCheck () {
-
     if (StringUtils.isBlank(getName())){
       throw new IllegalStateException("Form name is not defined.");
     }
@@ -2884,8 +2884,7 @@ public class Form extends AbstractContainer implements Stateful {
           && !field.isHidden()
           && !field.isDisabled()){
 
-        String focusJavaScript =
-            StringUtils.replace(FOCUS_JAVASCRIPT,
+        String focusJavaScript = StringUtils.replace(FOCUS_JAVASCRIPT,
                 "$id",
                 field.getId());
         buffer.append(focusJavaScript);
@@ -3095,7 +3094,7 @@ public class Form extends AbstractContainer implements Stateful {
    incoming value. In addition, the field name cannot be changed once set.
    */
   private static class NonProcessedHiddenField extends HiddenField {
-    private static final long serialVersionUID = 5716774345794705088L;
+    @Serial private static final long serialVersionUID = 5716774345794705088L;
 
     /**
      Create a field with the given name and class.
@@ -3147,7 +3146,7 @@ public class Form extends AbstractContainer implements Stateful {
    is set.
    */
   private static class ImmutableHiddenField extends NonProcessedHiddenField {
-    private static final long serialVersionUID = 1588695221234483698L;
+    @Serial private static final long serialVersionUID = 1588695221234483698L;
 
     /**
      Create a field with the given name and value.

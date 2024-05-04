@@ -5,8 +5,9 @@ import lombok.Setter;
 import org.apache.click.Context;
 import org.apache.click.util.HtmlStringBuffer;
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serial;
 import java.text.MessageFormat;
 
 /**
@@ -50,7 +51,7 @@ import java.text.MessageFormat;
  * </ul>
  */
 public class FileField extends Field {
-  private static final long serialVersionUID = 1375330044029313119L;
+  @Serial private static final long serialVersionUID = 1375330044029313119L;
 
   /**
    * The field validation JavaScript function template.
@@ -313,7 +314,7 @@ public class FileField extends Field {
 
     if (isRequired()) {
       FileItem localFileItem = getFileItem();
-      if (localFileItem == null || StringUtils.isBlank(localFileItem.getName())) {
+      if (localFileItem == null || StringUtils.isBlank(localFileItem.getName())){
         setErrorMessage("file-required-error");
       }
     }

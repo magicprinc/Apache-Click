@@ -11,7 +11,7 @@ import org.apache.click.examples.page.BorderPage;
 import org.apache.click.examples.page.springsecurity.secure.SecurePage;
 import org.apache.click.examples.service.UserService;
 import org.apache.click.extras.control.EmailField;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

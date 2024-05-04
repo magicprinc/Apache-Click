@@ -16,14 +16,14 @@ import org.apache.click.extras.control.EmailField;
 import org.apache.click.extras.control.IntegerField;
 import org.apache.click.util.Bindable;
 
-
+import java.io.Serial;
 
 public class EditCustomer extends BorderPage {
-  private static final long serialVersionUID = 7494162676914271159L;
+  @Serial private static final long serialVersionUID = 7494162676914271159L;
 
   // Public controls are automatically added to the page
-  @Bindable public Form form = new Form("form");
-  @Bindable public HiddenField referrerField = new HiddenField("referrer", String.class);
+  @Bindable public final Form form = new Form("form");
+  @Bindable public final HiddenField referrerField = new HiddenField("referrer", String.class);
 
   // Public variables can automatically have their value set by request parameters
   @Bindable public Long id;

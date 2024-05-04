@@ -18,14 +18,15 @@
  */
 package org.apache.click.extras.control;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import junit.framework.TestCase;
 import org.apache.click.MockContainer;
 import org.apache.click.MockContext;
 import org.apache.click.control.Option;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Provides tests for the PickList control.

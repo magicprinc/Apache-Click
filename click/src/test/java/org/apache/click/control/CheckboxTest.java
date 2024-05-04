@@ -21,7 +21,7 @@ package org.apache.click.control;
 import junit.framework.TestCase;
 import org.apache.click.MockContext;
 import org.apache.click.servlet.MockRequest;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Test Checkbox behavior.
@@ -43,51 +43,51 @@ public class CheckboxTest extends TestCase {
 
         // Check that checkbox does not render a value attribute
         assertEquals(false, StringUtils.contains(checkbox.toString(), valueAttr));
-        
+
         // Check that the value <script> is not rendered
         assertTrue(checkbox.toString().indexOf(value) < 0);
     }
-    
+
     /**
      * Test TextField onProcess behavior.
      */
     public void testOnProcess() {
         MockContext context = MockContext.initContext();
         MockRequest request = context.getMockRequest();
-        
+
         Checkbox checkbox = new Checkbox("checkbox");
         assertEquals("checkbox", checkbox.getName());
-        
+
         request.setParameter("checkbox", "");
-        
+
         assertTrue(checkbox.onProcess());
         assertTrue(checkbox.isValid());
         assertEquals("true", checkbox.getValue());
         assertEquals(Boolean.TRUE, checkbox.getValueObject());
-        
-        request.setParameter("checkbox", "true");
-        
-        assertTrue(checkbox.onProcess());
-        assertTrue(checkbox.isValid());
-        assertEquals("true", checkbox.getValue());
-        assertEquals(Boolean.TRUE, checkbox.getValueObject());
-        
-        checkbox.setRequired(true);
-        request.removeParameter("checkbox");
-        
-        assertTrue(checkbox.onProcess());
-        assertFalse(checkbox.isValid());
-        assertEquals("false", checkbox.getValue());
-        assertEquals(Boolean.FALSE, checkbox.getValueObject());
-        assertTrue(checkbox.toString().contains("class=\"error\""));
-        
+
         request.setParameter("checkbox", "true");
 
         assertTrue(checkbox.onProcess());
         assertTrue(checkbox.isValid());
         assertEquals("true", checkbox.getValue());
         assertEquals(Boolean.TRUE, checkbox.getValueObject());
-        
+
+        checkbox.setRequired(true);
+        request.removeParameter("checkbox");
+
+        assertTrue(checkbox.onProcess());
+        assertFalse(checkbox.isValid());
+        assertEquals("false", checkbox.getValue());
+        assertEquals(Boolean.FALSE, checkbox.getValueObject());
+        assertTrue(checkbox.toString().contains("class=\"error\""));
+
+        request.setParameter("checkbox", "true");
+
+        assertTrue(checkbox.onProcess());
+        assertTrue(checkbox.isValid());
+        assertEquals("true", checkbox.getValue());
+        assertEquals(Boolean.TRUE, checkbox.getValueObject());
+
         request.setParameter("checkbox", "true");
 
         checkbox.setDisabled(true);
@@ -95,27 +95,27 @@ public class CheckboxTest extends TestCase {
         assertTrue(checkbox.isValid());
         assertFalse(checkbox.isDisabled());
     }
-    
+
     /**
      * Coverage test of constructors.
      */
     public void testConstructors() {
         Checkbox field = new Checkbox("field", true);
         assertTrue(field.isRequired());
-        
+
         field = new Checkbox("field", "label");
         assertEquals("label", field.getLabel());
-        
+
         field = new Checkbox();
         assertNull(field.getName());
     }
-    
+
     /**
      * Coverage test of tab-index.
      */
     public void testTabIndex() {
         MockContext.initContext();
-        
+
         Checkbox field = new Checkbox("field");
         field.setTabIndex(5);
 
@@ -127,7 +127,7 @@ public class CheckboxTest extends TestCase {
      */
     public void testDisabled() {
         MockContext.initContext();
-        
+
         Checkbox field = new Checkbox("field");
         field.setDisabled(true);
         assertTrue(field.toString().contains("disabled=\"disabled\""));
@@ -138,12 +138,12 @@ public class CheckboxTest extends TestCase {
      */
     public void testReadonly() {
         MockContext.initContext();
-        
+
         Checkbox field = new Checkbox("field");
         field.setReadonly(true);
 
         assertTrue(field.toString().contains("disabled=\"disabled\""));
-        
+
         field = new Checkbox("field");
         field.setReadonly(true);
         field.setChecked(true);
@@ -158,7 +158,7 @@ public class CheckboxTest extends TestCase {
      */
     public void testHelp() {
         MockContext.initContext();
-        
+
         Checkbox field = new Checkbox("field");
         field.setHelp("help");
 
@@ -170,30 +170,30 @@ public class CheckboxTest extends TestCase {
      */
     public void testValidationJS() {
         MockContext.initContext();
-        
+
         Checkbox field = new Checkbox("field");
         assertNull(field.getValidationJavaScript());
-        
+
         field = new Checkbox("field");
         field.setRequired(true);
 
         assertTrue(field.getValidationJavaScript().startsWith("function validate_field()"));
     }
-    
+
     public void testValue() {
         MockContext.initContext();
-        
+
         Checkbox field = new Checkbox("field");
         field.setValue("xxx");
         assertFalse(field.isChecked());
-        
+
         field.setValue("true");
         assertTrue(field.isChecked());
         field.setValue("false");
         assertFalse(field.isChecked());
-        
+
         field.setChecked(false);
-        
+
         field.setValueObject("xxx");
         assertFalse(field.isChecked());
         field.setValueObject(null);

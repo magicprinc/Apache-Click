@@ -15,7 +15,7 @@ package net.sf.clickclick.control.html.table;
 
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Provide a table header cell control: <tt>&lt;th&gt;</tt>.

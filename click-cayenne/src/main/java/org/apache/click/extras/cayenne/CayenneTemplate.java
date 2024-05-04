@@ -18,7 +18,7 @@ import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.query.ObjectIdQuery;
 import org.apache.cayenne.query.Query;
 import org.apache.cayenne.query.SelectQuery;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 
 import java.sql.Connection;
 import java.sql.SQLException;

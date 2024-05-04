@@ -1,28 +1,12 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.click.element;
 
-import java.util.Map;
 import org.apache.click.Context;
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
-import org.apache.commons.lang.builder.HashCodeBuilder;
+
+import java.io.Serial;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Provides a Css HEAD element for importing <tt>external</tt> Cascading
@@ -52,8 +36,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  * &lt;link type="text/css" rel="stylesheet" href="/myApp/css/style.css"/&gt; </pre>
  */
 public class CssImport extends ResourceElement {
-
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     // Constructors -----------------------------------------------------------
 
@@ -248,14 +231,11 @@ public class CssImport extends ResourceElement {
         }
 
         //2. Use the instanceof operator to check if the argument is of the correct type.
-        if (!(o instanceof CssImport)) {
+        if (!( o instanceof CssImport that )) {
             return false;
         }
 
-        //3. Cast the argument to the correct type.
-        CssImport that = (CssImport) o;
-
-        return getHref() == null ? that.getHref() == null
+			return getHref() == null ? that.getHref() == null
             : getHref().equals(that.getHref());
     }
 
@@ -266,7 +246,6 @@ public class CssImport extends ResourceElement {
      */
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37).append(getHref()).toHashCode();
+			return Objects.hashCode(getHref());
     }
-
 }

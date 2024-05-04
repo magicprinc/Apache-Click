@@ -7,9 +7,9 @@ import org.apache.click.ActionListener;
 import org.apache.click.Context;
 import org.apache.click.Page;
 import org.apache.click.util.HtmlStringBuffer;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
-
+import java.io.Serial;
 
 /**
  * Provides a Page Link control: &nbsp; &lt;a href="" &gt;&lt;/a&gt;.
@@ -31,7 +31,7 @@ import org.apache.commons.lang.StringUtils;
  * @see org.apache.click.control.ActionLink
  */
 public class PageLink extends AbstractLink {
-  private static final long serialVersionUID = -8328035709892349227L;
+  @Serial private static final long serialVersionUID = -8328035709892349227L;
 
   /** The target page class.
    Set the target Page class. The page link href URL attribute will be  to the path of the target page.*/

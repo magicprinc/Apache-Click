@@ -25,7 +25,7 @@ import org.apache.click.service.ConfigService;
 import org.apache.click.service.LogService;
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.Format;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.ServletContext;
 import java.io.Serializable;

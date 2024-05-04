@@ -1,9 +1,12 @@
 package org.apache.click.service;
 
-import org.apache.commons.lang.StringUtils;
+
+import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.io.Serial;
 
 
 /**
@@ -11,19 +14,31 @@ import java.io.PrintWriter;
  * used to wrap TemplateService exceptions and provide error diagnostics
  * such as line and column where error occurred.
  */
+@Getter
 public class TemplateException extends Exception {
-  private static final long serialVersionUID = 7843729461356696583L;
+  @Serial private static final long serialVersionUID = 7843729461356696583L;
 
-  /** The template column number where this exception occurred. */
+  /** The template column number where this exception occurred.
+	 * -- GETTER --
+	 *  Return the template column number where this exception occurred.
+	 *@return the template column number where this exception occurred
+	 */
   private int columnNumber;
 
-  /** The template the line number where this exception occurred. */
+  /** The template the line number where this exception occurred.
+	 * -- GETTER --
+	 *  Return the template the line number where this exception occurred.
+	 *@return the template the line number where this exception occurred
+	 */
   private int lineNumber;
 
-  /** The Template name where this exception occurred. */
+  /** The Template name where this exception occurred.
+	 * -- GETTER --
+	 *  Return the Template name where this exception occurred.
+	 *@return the Template name where this exception occurred
+	 */
   private String templateName;
 
-  // Constructors -----------------------------------------------------------
 
   /**
    * Create a template service exception with the given cause.
@@ -43,11 +58,8 @@ public class TemplateException extends Exception {
    * @param lineNumber the template error line number
    * @param columnNumber the template error column number
    */
-  public TemplateException(Exception cause, String templateName,
-      int lineNumber, int columnNumber) {
-
+  public TemplateException(Exception cause, String templateName, int lineNumber, int columnNumber) {
     super(cause);
-
     this.templateName = templateName;
     this.lineNumber = lineNumber;
     this.columnNumber = columnNumber;
@@ -55,34 +67,7 @@ public class TemplateException extends Exception {
 
   // Public Methods ------------------------------------------------------
 
-  /**
-   * Return the template column number where this exception occurred.
-   *
-   * @return the template column number where this exception occurred
-   */
-  public int getColumnNumber() {
-    return columnNumber;
-  }
-
-  /**
-   * Return the template the line number where this exception occurred.
-   *
-   * @return the template the line number where this exception occurred
-   */
-  public int getLineNumber() {
-    return lineNumber;
-  }
-
-  /**
-   * Return the Template name where this exception occurred.
-   *
-   * @return the Template name where this exception occurred
-   */
-  public String getTemplateName() {
-    return templateName;
-  }
-
-  /**
+	/**
    * Return true if a template parsing error.
    *
    * @return true if a template parsing error
@@ -98,7 +83,7 @@ public class TemplateException extends Exception {
    */
   @Override
   public void printStackTrace(PrintStream printStream) {
-    if (getCause() == this) {
+    if (getCause() == this){
       super.printStackTrace(printStream);
     } else {
       getCause().printStackTrace(printStream);
@@ -141,7 +126,7 @@ public class TemplateException extends Exception {
    */
   @Override
   public String toString() {
-    StringBuilder builder = new StringBuilder();
+    StringBuilder builder = new StringBuilder(255);
     builder.append(getClass().getName());
     builder.append(": ");
     if (getLocalizedMessage() != null) {

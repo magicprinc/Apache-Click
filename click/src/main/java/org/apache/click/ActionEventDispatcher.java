@@ -24,7 +24,7 @@ import org.apache.click.ajax.AjaxBehavior;
 import org.apache.click.service.ConfigService;
 import org.apache.click.service.LogService;
 import org.apache.click.util.HtmlStringBuffer;
-import org.apache.commons.lang.ClassUtils;
+import org.apache.commons.lang3.ClassUtils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -309,7 +309,7 @@ public class ActionEventDispatcher {
 
     boolean continueProcessing = true;
 
-    if (logger.isTraceEnabled()) {
+    if (logger.isTraceEnabled()){
       String sourceClassName = ClassUtils.getShortClassName(source.getClass());
       HtmlStringBuffer buffer = new HtmlStringBuffer();
       buffer.append("   processing AjaxBehaviors for control: '");

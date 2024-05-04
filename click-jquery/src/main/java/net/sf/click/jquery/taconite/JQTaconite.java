@@ -22,7 +22,7 @@ import org.apache.click.element.JsScript;
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
 import org.apache.click.util.PageImports;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.StringReader;
 import java.util.ArrayList;

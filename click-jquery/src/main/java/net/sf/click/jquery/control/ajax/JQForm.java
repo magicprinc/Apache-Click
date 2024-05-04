@@ -8,7 +8,7 @@ import org.apache.click.control.HiddenField;
 import org.apache.click.element.Element;
 import org.apache.click.element.JsScript;
 import org.apache.click.util.HtmlStringBuffer;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 

@@ -23,86 +23,85 @@ import org.apache.click.MockContext;
 import org.apache.click.servlet.MockRequest;
 
 public class LongFieldTest extends TestCase {
-    
+
     public void testOnProcess() {
         MockContext mockContext = MockContext.initContext();
         MockRequest request = mockContext.getMockRequest();
-        
+
         LongField longField = new LongField("id");
         assertEquals("id", longField.getName());
 
-        request.getParameterMap().put("id", "1234");
-        
+        request.getParameterMap().put("id", new String[]{"1234"});
+
         assertTrue(longField.onProcess());
         assertTrue(longField.isValid());
         assertEquals("1234", longField.getValue());
-        assertEquals(new Long(1234), longField.getValueObject());
-        
-        request.getParameterMap().put("id", "123.4");
-        
+        assertEquals(1234L, longField.getValueObject());
+
+        request.getParameterMap().put("id", new String[]{"123.4"});
+
         assertTrue(longField.onProcess());
         assertFalse(longField.isValid());
         assertEquals("123.4", longField.getValue());
         assertNull(longField.getValueObject());
 
         // Test not required + blank value
-        request.getParameterMap().put("id", "");
-        
+        request.getParameterMap().put("id", new String[]{""});
+
         assertTrue(longField.onProcess());
         assertTrue(longField.isValid());
         assertEquals("", longField.getValue());
         assertNull(longField.getValueObject());
-        
+
         longField.setRequired(true);
         assertTrue(longField.onProcess());
         assertFalse(longField.isValid());
         assertEquals("", longField.getValue());
         assertNull(longField.getValueObject());
-        
-        request.getParameterMap().put("id", "10");
-        
-        longField.setMinValue(10);     
+
+        request.getParameterMap().put("id", new String[]{"10"});
+
+        longField.setMinValue(10);
         assertTrue(longField.onProcess());
         assertTrue(longField.isValid());
         assertEquals("10", longField.getValue());
-        assertEquals(new Long(10), longField.getValueObject());
-        
+        assertEquals(10L, longField.getValueObject());
+
         longField.setMinValue(11);
         assertTrue(longField.onProcess());
         assertFalse(longField.isValid());
         assertEquals("10", longField.getValue());
-        assertEquals(new Long(10), longField.getValueObject());
-        
-        request.getParameterMap().put("id", "20");
-        
+        assertEquals(10L, longField.getValueObject());
+
+        request.getParameterMap().put("id", new String[]{"20"});
+
         longField.setMaxValue(20);
         assertTrue(longField.onProcess());
         assertTrue(longField.isValid());
         assertEquals("20", longField.getValue());
-        assertEquals(new Long(20), longField.getValueObject());
-        
+        assertEquals(20L, longField.getValueObject());
+
         longField.setMaxValue(20);
         assertTrue(longField.onProcess());
         assertTrue(longField.isValid());
         assertEquals("20", longField.getValue());
-        assertEquals(new Long(20), longField.getValueObject());
-        
+        assertEquals(20L, longField.getValueObject());
+
         longField.setMaxValue(19);
         assertTrue(longField.onProcess());
         assertFalse(longField.isValid());
         assertEquals("20", longField.getValue());
-        assertEquals(new Long(20), longField.getValueObject());
-        
-        assertEquals(new Long(20), longField.getLong());
-        assertEquals(new Integer(20), longField.getInteger());
-        
-        request.getParameterMap().put("id", "-20");
-        
+        assertEquals(20L, longField.getValueObject());
+
+        assertEquals(20L, longField.getLong().longValue());
+        assertEquals(20, longField.getInteger().intValue());
+
+        request.getParameterMap().put("id", new String[]{"-20"});
+
         longField.setMinValue(-21);
         assertTrue(longField.onProcess());
         assertTrue(longField.isValid());
         assertEquals("-20", longField.getValue());
-        assertEquals(new Long(-20), longField.getValueObject());
+        assertEquals(-20L, longField.getValueObject());
     }
-
 }

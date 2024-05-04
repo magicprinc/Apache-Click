@@ -23,7 +23,7 @@ import org.apache.click.servlet.MockResponse;
 import org.apache.click.servlet.MockServletConfig;
 import org.apache.click.servlet.MockServletContext;
 import org.apache.click.servlet.MockSession;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;

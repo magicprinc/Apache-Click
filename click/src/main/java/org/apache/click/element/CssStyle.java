@@ -1,28 +1,12 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.click.element;
 
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.click.Context;
 import org.apache.click.util.HtmlStringBuffer;
-import org.apache.commons.lang.builder.HashCodeBuilder;
+
+import java.io.Serial;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Provides a Css HEAD element for including <tt>inline</tt> Cascading
@@ -142,8 +126,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  * <a target="_blank" href="http://javascript.about.com/library/blxhtml.htm">http://javascript.about.com/library/blxhtml.htm</a>.
  */
 public class CssStyle extends ResourceElement {
-
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
      // Variables -------------------------------------------------------------
 
@@ -377,16 +360,15 @@ public class CssStyle extends ResourceElement {
         }
 
         //2. Use the instanceof operator to check if the argument is of the correct type.
-        if (!(o instanceof CssStyle)) {
+        if (!( o instanceof CssStyle that )) {
             return false;
         }
 
         //3. Cast the argument to the correct type.
-        CssStyle that = (CssStyle) o;
 
-        String id = getId();
+			String id = getId();
         String thatId = that.getId();
-        return id == null ? thatId == null : id.equals(thatId);
+        return Objects.equals(id, thatId);
     }
 
     /**
@@ -399,7 +381,7 @@ public class CssStyle extends ResourceElement {
         if (!isUnique()) {
             return super.hashCode();
         }
-        return new HashCodeBuilder(17, 37).append(getId()).toHashCode();
+        return Objects.hashCode(getId());
     }
 
     // Protected Methods ------------------------------------------------------

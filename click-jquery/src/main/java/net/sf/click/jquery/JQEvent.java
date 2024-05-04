@@ -1,6 +1,6 @@
 package net.sf.click.jquery;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
 /**
  * Provides constants for JavaScript/JQuery events. See the jQuery documentation
@@ -137,11 +137,11 @@ public class JQEvent {
 
     /**
      * Returns true if the the event is bindable.
-     * 
+     *
      * @param event the event name to check upon.
      * @return true if the event is bindable, false otherwise.
      */
     public static boolean isBindableEvent(String event) {
-        return !ArrayUtils.contains(NON_BINDABLE, event);
+      return !ArrayUtils.contains(NON_BINDABLE, event);
     }
 }

@@ -18,18 +18,6 @@
  */
 package org.apache.click.extras.cayenne;
 
-import java.io.IOException;
-
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
 import org.apache.cayenne.BaseContext;
 import org.apache.cayenne.LifecycleListener;
 import org.apache.cayenne.access.DataContext;
@@ -43,7 +31,18 @@ import org.apache.click.service.ConfigService;
 import org.apache.click.service.LogService;
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
 
 /**
  * Provides a servlet filter which binds DataContext objects to the current
@@ -151,7 +150,7 @@ import org.apache.commons.lang.StringUtils;
  * <p/>
  * This configuration is useful when multiple applications are making changes to
  * the database.
- 
+
  * <pre class="codeConfig">
  *
  * &lt;web-app&gt;

@@ -3,9 +3,9 @@ package org.apache.click.control;
 import lombok.Getter;
 import lombok.NonNull;
 import org.apache.click.Context;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
-
+import java.io.Serial;
 
 /**
  * Provides a Submit control: &nbsp; &lt;input type='submit'&gt;.
@@ -27,7 +27,7 @@ import org.apache.commons.lang.StringUtils;
  *    href="http://www.w3.org/TR/html401/interact/forms.html#h-17.4">INPUT</a>
  */
 public class Submit extends Button {
-  private static final long serialVersionUID = -5837393715010800738L;
+  @Serial private static final long serialVersionUID = -5837393715010800738L;
 
   /** The button is clicked (true if the submit button was clicked). */
   @Getter protected boolean clicked;

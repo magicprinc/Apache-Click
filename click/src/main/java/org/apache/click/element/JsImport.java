@@ -4,8 +4,8 @@ import lombok.val;
 import org.apache.click.Context;
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
-import org.apache.commons.lang.builder.HashCodeBuilder;
 
+import java.io.Serial;
 import java.util.Map;
 import java.util.Objects;
 
@@ -37,7 +37,7 @@ import java.util.Objects;
  * &lt;script type="text/javascript" href="/myApp/js/js-library.js"&gt;&lt;/script&gt; </pre>
  */
 public class JsImport extends ResourceElement {
-  private static final long serialVersionUID = 5269604875698077292L;
+  @Serial private static final long serialVersionUID = 5269604875698077292L;
 
 
   /**
@@ -240,6 +240,6 @@ public class JsImport extends ResourceElement {
    */
   @Override
   public int hashCode() {
-    return new HashCodeBuilder(17, 37).append(getSrc()).toHashCode();
+    return Objects.hashCode(getSrc());
   }
 }

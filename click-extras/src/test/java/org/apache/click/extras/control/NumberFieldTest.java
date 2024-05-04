@@ -101,13 +101,13 @@ public class NumberFieldTest {
   @Test public void testOnProcess() {
     MockContext mockContext = MockContext.initContext(Locale.US);
     MockRequest req = mockContext.getMockRequest();
-    Map<String, Object> params = req.getParameterMap();
+    Map<String, String[]> params = req.getParameterMap();
 
     NumberField engF = new NumberField("en");
     engF.setPattern("#,##0.00");
 
     engF.setValidate(false);
-    params.put("en", "no number");
+    params.put("en", new String[]{"no number"});
     assertTrue(engF.onProcess());
     assertEquals("no number", engF.getValue());
     assertTrue(engF.isValid());
@@ -117,7 +117,7 @@ public class NumberFieldTest {
 
     engF = new NumberField("en");
     engF.setPattern("#,##0.00");
-    params.put("en", "12.3");
+    params.put("en", new String[]{"12.3"});
 
     engF.setValidate(false);
     assertTrue(engF.onProcess());
@@ -128,13 +128,13 @@ public class NumberFieldTest {
 
     engF = new NumberField("en");
     engF.setPattern("#,##0.00");
-    params.put("en", "12.3");
+    params.put("en", new String[]{"12.3"});
 
     assertTrue(engF.onProcess());
     assertEquals("12.30", engF.getValue());
     assertEquals("12.3", req.getParameter(engF.getName()));
 
-    params.put("en", "some value");
+    params.put("en", new String[]{"some value"});
     assertTrue(engF.onProcess());
     assertEquals("some value", engF.getValue());
     assertNull(engF.getNumber());
@@ -144,7 +144,7 @@ public class NumberFieldTest {
   @Test public void testValidate() {
     MockContext mockContext = MockContext.initContext(Locale.US);
     MockRequest req = mockContext.getMockRequest();
-    Map<String, Object> params = req.getParameterMap();
+    Map<String, String[]> params = req.getParameterMap();
 
     NumberField engF = new NumberField("en");
     engF.setPattern("0");
@@ -153,7 +153,7 @@ public class NumberFieldTest {
     engF.setMinValue(1);
     engF.setRequired(true);
 
-    params.put("en", "2.23");
+    params.put("en", new String[]{"2.23"});
     assertTrue(engF.onProcess());
     assertTrue(engF.isValid());
     assertEquals("2", engF.getValue());
@@ -173,7 +173,7 @@ public class NumberFieldTest {
 
     // Test required + blank value
     engF.setRequired(true);
-    params.put("en", "");
+    params.put("en", new String[]{""});
 
     assertTrue(engF.onProcess());
     assertFalse(engF.isValid());

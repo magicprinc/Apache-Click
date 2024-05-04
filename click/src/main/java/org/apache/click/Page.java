@@ -7,9 +7,9 @@ import org.apache.click.util.ClickUtils;
 import org.apache.click.util.Format;
 import org.apache.click.util.HtmlStringBuffer;
 import org.apache.click.util.PageImports;
-import org.apache.commons.lang.StringUtils;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -128,7 +128,7 @@ import java.util.Map;
  */
 @Slf4j
 public class Page implements Serializable {
-  private static final long serialVersionUID = 7870291259863448620L;
+  @Serial private static final long serialVersionUID = 7870291259863448620L;
 
 
   /**
@@ -139,7 +139,7 @@ public class Page implements Serializable {
   /**
    * The Page action request parameter: &nbsp; "<tt>pageAction</tt>".
    */
-  public final static String PAGE_ACTION = "pageAction";
+	public static final String PAGE_ACTION = "pageAction";
 
   // Instance Variables -----------------------------------------------------
 
@@ -355,8 +355,8 @@ public class Page implements Serializable {
     }
 
     // Check if page already contains a named value
-    @Nullable Object currentValue = getModel().get(control.getName());
-    if (currentValue instanceof Control currentControl) {// => !null
+    Object currentValue = getModel().get(control.getName());
+    if (currentValue instanceof Control currentControl){// => !null
       replaceControl(currentControl, control);
       return;
     }

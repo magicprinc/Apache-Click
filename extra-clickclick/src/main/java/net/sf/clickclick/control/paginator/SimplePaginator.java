@@ -9,8 +9,9 @@ import org.apache.click.element.CssImport;
 import org.apache.click.element.Element;
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
+import java.io.Serial;
 import java.util.List;
 
 /**
@@ -29,7 +30,7 @@ import java.util.List;
  * </ul>
  */
 public class SimplePaginator extends AbstractControl implements Paginator {
-  private static final long serialVersionUID = 722447277080781529L;
+  @Serial private static final long serialVersionUID = 722447277080781529L;
 
 
   /** The control ActionLink page number parameter name: <tt>"page"</tt>. */

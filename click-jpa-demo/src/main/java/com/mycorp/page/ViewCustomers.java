@@ -1,6 +1,7 @@
 package com.mycorp.page;
 
 import com.mycorp.service.CustomerService;
+import lombok.val;
 import org.apache.click.Page;
 import org.apache.click.control.AbstractLink;
 import org.apache.click.control.ActionLink;
@@ -9,8 +10,6 @@ import org.apache.click.control.PageLink;
 import org.apache.click.control.Table;
 import org.apache.click.extras.control.LinkDecorator;
 import org.apache.click.util.Bindable;
-
-import java.util.List;
 
 public class ViewCustomers extends BorderPage {
     private static final long serialVersionUID = -8820573903081328643L;
@@ -71,7 +70,7 @@ public class ViewCustomers extends BorderPage {
 	 */
 	@Override
 	public void onRender() {
-		List list = getCustomerService().getCustomers();
+		val list = getCustomerService().getCustomers();
 		table.setRowList(list);
 	}
 

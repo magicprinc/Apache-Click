@@ -1,21 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.click.util;
 
 import lombok.NonNull;
@@ -37,16 +19,16 @@ import org.apache.click.service.ConfigService;
 import org.apache.click.service.LogService;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.ClassUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.apache.commons.lang3.ClassUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.EntityResolver;
 
+import javax.annotation.Nullable;
 import javax.annotation.WillClose;
 import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
@@ -75,6 +57,7 @@ import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -1443,7 +1426,7 @@ public class ClickUtils {
 
       if (isProductionModes && isEnableResourceVersion(context)) {
         String version = getApplicationVersion();
-        if (StringUtils.isNotBlank(version)) {
+        if (StringUtils.isNotBlank(version)){
           cachedApplicationVersionIndicator = VERSION_INDICATOR_SEP + version;
           return cachedApplicationVersionIndicator;
         }
@@ -2541,13 +2524,12 @@ public class ClickUtils {
    * @param context the request context
    */
   public static void removeState (@NonNull Stateful control, String controlName, @NonNull Context context) {
-    if (controlName == null) {
-      throw new IllegalStateException(ClassUtils.getShortClassName(control.getClass())
-          + " name has not been set. State cannot be removed until the name is set");
+    if (controlName == null){
+      throw new IllegalStateException(ClassUtils.getShortClassName(control.getClass()) +" name has not been set. State cannot be removed until the name is set");
     }
 
     String resourcePath = context.getResourcePath();
-    Map pageMap = getPageState(resourcePath, context);
+    val pageMap = getPageState(resourcePath, context);
     if (pageMap != null) {
       Object pop = pageMap.remove(controlName);
 
@@ -2582,8 +2564,8 @@ public class ClickUtils {
           + " name has not been set. State cannot be restored until the name is set");
     }
     String resourcePath = context.getResourcePath();
-    Map pageMap = getPageState(resourcePath, context);
-    if (pageMap != null) {
+    val pageMap = getPageState(resourcePath, context);
+    if (pageMap != null){
       control.setState(pageMap.get(controlName));
     }
   }
@@ -3257,4 +3239,7 @@ public class ClickUtils {
     return ifNone;
   }
 
+	public static boolean isEmpty (@Nullable Collection<?> list) {
+		return list == null || list.isEmpty();
+	}
 }

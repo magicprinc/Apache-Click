@@ -14,7 +14,7 @@ import org.apache.click.control.Label;
 import org.apache.click.service.ConfigService;
 import org.apache.click.service.LogService;
 import org.apache.click.service.PropertyService;
-import org.apache.commons.lang.ClassUtils;
+import org.apache.commons.lang3.ClassUtils;
 
 import javax.servlet.ServletContext;
 import java.lang.reflect.Constructor;
@@ -85,7 +85,7 @@ public class ContainerUtils {
   {
     final String containerClassName = ClassUtils.getShortClassName(container.getClass());
 
-    if (fieldList.isEmpty()) {
+    if (fieldList.isEmpty()){
       log.debug("{} has no fields to copy from. To {}", containerClassName, object);
       return; // Exit early
     }
@@ -96,7 +96,7 @@ public class ContainerUtils {
     }
 
     String objectClassname = object.getClass().getName(); // org.apache.click.Demo
-    objectClassname = objectClassname.substring(objectClassname.lastIndexOf(".") + 1);
+    objectClassname = objectClassname.substring(objectClassname.lastIndexOf('.') + 1);
 
     Set<String> properties = getObjectPropertyNames(object);
 
@@ -177,7 +177,7 @@ public class ContainerUtils {
     }
 
     String objectClassname = object.getClass().getName();
-    objectClassname = objectClassname.substring(objectClassname.lastIndexOf(".") + 1);
+    objectClassname = objectClassname.substring(objectClassname.lastIndexOf('.') + 1);
 
     //If the given object is a map, populate the fields name/value from the maps key/value pair.
     if (object instanceof Map<?, ?>) {
@@ -622,7 +622,7 @@ public class ContainerUtils {
    * @param object the object to extract property names from
    * @return the unique set of property names
    */
-  private static Set<String> getObjectPropertyNames(Object object) {
+  private static Set<String> getObjectPropertyNames (Object object) {
     if (object instanceof Map map) {
       return map.keySet();
     }
@@ -659,7 +659,7 @@ public class ContainerUtils {
   private static boolean hasMatchingProperty (Field field, Set<String> properties) {
     String fieldName = field.getName();
     if (fieldName.contains(".")) {
-      fieldName = fieldName.substring(0, fieldName.indexOf("."));
+      fieldName = fieldName.substring(0, fieldName.indexOf('.'));
     }
     return properties.contains(fieldName);
   }
@@ -891,7 +891,7 @@ public class ContainerUtils {
 
     String objectClassname = map.getClass().getName();
     objectClassname =
-        objectClassname.substring(objectClassname.lastIndexOf(".") + 1);
+        objectClassname.substring(objectClassname.lastIndexOf('.') + 1);
 
     for (Field field : fieldList) {
 
@@ -927,7 +927,7 @@ public class ContainerUtils {
 
     String objectClassname = map.getClass().getName();
     objectClassname =
-        objectClassname.substring(objectClassname.lastIndexOf(".") + 1);
+        objectClassname.substring(objectClassname.lastIndexOf('.') + 1);
 
     for (Field field : fieldList) {
       String fieldName = field.getName();
@@ -1012,8 +1012,7 @@ public class ContainerUtils {
     for (Control control : container.getControls()) {
 
       if (control instanceof Label || control instanceof Button) {
-        // Skip buttons and labels
-        continue;
+        continue;// Skip buttons and labels
 
       } else if (control instanceof Container childContainer) {
         // Include fields but skip fieldSets
@@ -1217,5 +1216,4 @@ public class ContainerUtils {
     ConfigService configService = ClickUtils.getConfigService(sc);
     return configService.getPropertyService();
   }
-
 }

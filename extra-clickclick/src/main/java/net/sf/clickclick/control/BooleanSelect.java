@@ -13,11 +13,12 @@
  */
 package net.sf.clickclick.control;
 
-import java.util.List;
 import org.apache.click.control.Select;
 import org.apache.click.extras.control.DateField;
 import org.apache.click.extras.control.IntegerField;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.List;
 
 /**
  * Provides a Select control that can be used as either a simple two-option
@@ -48,7 +49,7 @@ import org.apache.commons.lang.StringUtils;
  * <i>Required</i> == <i>Tristate</i>.
  * <p/>
  * Changing one of these properties after creation will not influence the other.
- * 
+ *
  * <h4>Values</h4>
  * <p/>
  * In holding with {@link IntegerField}, {@link DateField} and others the
