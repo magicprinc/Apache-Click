@@ -47,16 +47,13 @@ dependencies {
   implementation 'org.slf4j:slf4j-simple:1.7.+'
 
   //*** TEST TEST TEST
-
   testImplementation libs.bundles.junit
-
   testImplementation project(':click-mock')
-
-  tomcat libs.bundles.tomcat // https://github.com/bmuschko/gradle-tomcat-plugin + alias(libs.plugins.tomcat)
 }
 configurations.configureEach { // .implementation  // https://tomgregory.com/how-to-exclude-gradle-dependencies/
 	exclude group: "velocity", module: "velocity" // 1.3 they come from somewhere..
 	exclude group: "commons-logging", module: "commons-logging" // spring?
+	exclude group: 'org.springframework', module: 'spring-jcl'
 	exclude group: "org.apache.logging.log4j", module: "log4j-api"
 	exclude group: "org.apache.logging.log4j", module: "log4j-to-slf4j"
 	exclude group: "log4j", module: "log4j"
@@ -77,12 +74,7 @@ java {
   withSourcesJar()
 }
 
-idea {
-  module {
-    downloadJavadoc = true
-    downloadSources = true
-  }
-}
+idea { module { downloadJavadoc = true; downloadSources = true } }
 
 test {
   useJUnit()
@@ -110,4 +102,9 @@ tasks.named("sonarlintTest").configure {
 	onlyIf {
 		(project.hasProperty('sonarlint') && 'true'.equalsIgnoreCase(project.property('sonarlint').toString())) || 'true'.equalsIgnoreCase(System.getProperty('sonarlint'))
 	}
+}
+
+gretty {// https://gretty-gradle-plugin.github.io/gretty-doc/Switching-between-servlet-containers.html
+	servletContainer = 'tomcat9'
+	jvmArgs = ['-ea', '--add-opens=java.base/java.lang=ALL-UNNAMED', '--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED']
 }

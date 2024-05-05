@@ -78,12 +78,8 @@ dependencies {
   implementation("javax.jdo:jdo-api:3.2.1")
 
   //*** TEST TEST TEST
-
   testImplementation libs.bundles.junit
-
   testImplementation project(':click-mock')
-
-  tomcat libs.bundles.tomcat // https://github.com/bmuschko/gradle-tomcat-plugin + alias(libs.plugins.tomcat)
 
   modules {
     module('velocity:velocity') {
@@ -105,6 +101,10 @@ configurations.configureEach { // .implementation  // https://tomgregory.com/how
 	exclude group: "javax.servlet", module: "servlet-api"
 }
 
+gretty {// https://gretty-gradle-plugin.github.io/gretty-doc/Switching-between-servlet-containers.html
+	servletContainer = 'tomcat9'
+	jvmArgs = ['-ea', '--add-opens=java.base/java.lang=ALL-UNNAMED', '--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED']
+}
 
 idea { module { downloadJavadoc = true; downloadSources = true } }
 

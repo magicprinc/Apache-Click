@@ -73,12 +73,8 @@ dependencies {
   implementation 'org.slf4j:slf4j-simple:1.7.+'
 
   //*** TEST TEST TEST
-
   testImplementation libs.bundles.junit
-
   testImplementation project(':click-mock')
-
-  tomcat libs.bundles.tomcat // https://github.com/bmuschko/gradle-tomcat-plugin + alias(libs.plugins.tomcat)
 
   modules {
     module('velocity:velocity') {
@@ -97,7 +93,7 @@ configurations.configureEach { // .implementation  // https://tomgregory.com/how
 
 	exclude group: "com.mchange", module: "c3p0"
 	exclude group: 'com.google.guava', module: 'listenablefuture'
-	exclude group: "javax.servlet", module: "servlet-api"
+	exclude group: "javax.servlet", module: "servlet-api" // we use jakarta artifact with javax package
 }
 
 idea { module { downloadJavadoc = true; downloadSources = true } }
@@ -128,4 +124,9 @@ tasks.named("sonarlintTest").configure {
 	onlyIf {
 		(project.hasProperty('sonarlint') && 'true'.equalsIgnoreCase(project.property('sonarlint').toString())) || 'true'.equalsIgnoreCase(System.getProperty('sonarlint'))
 	}
+}
+
+gretty {// https://gretty-gradle-plugin.github.io/gretty-doc/Switching-between-servlet-containers.html
+	servletContainer = 'tomcat9'
+	jvmArgs = ['-ea', '--add-opens=java.base/java.lang=ALL-UNNAMED', '--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED']
 }

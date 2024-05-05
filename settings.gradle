@@ -39,14 +39,14 @@ dependencyResolutionManagement {
 
       library("servletApi", "jakarta.servlet", "jakarta.servlet-api").version("4.+")
 
-      library("tomcat-core",   "org.apache.tomcat.embed", "tomcat-embed-core").versionRef("tomcatVersion")
-      library("tomcat-juli",   "org.apache.tomcat.embed", "tomcat-embed-logging-juli").versionRef("tomcatVersion")
-      library("tomcat-jasper", "org.apache.tomcat.embed", "tomcat-embed-jasper").versionRef("tomcatVersion")
+//      library("tomcat-core",   "org.apache.tomcat.embed", "tomcat-embed-core").versionRef("tomcatVersion")
+//      library("tomcat-juli",   "org.apache.tomcat.embed", "tomcat-embed-logging-juli").versionRef("tomcatVersion")
+//      library("tomcat-jasper", "org.apache.tomcat.embed", "tomcat-embed-jasper").versionRef("tomcatVersion")
 
       //*** libs.bundles ***
       bundle("spring", ["spring-core", "spring-context", "spring-context-support", "spring-web", "spring-jdbc", "spring-tx"])
       bundle("springSecurity", ["spring-security-core", "spring-security-web", "spring-security-config"])
-      bundle("tomcat", ["tomcat-core", "tomcat-juli", "tomcat-jasper"])
+//      bundle("tomcat", ["tomcat-core", "tomcat-juli", "tomcat-jasper"])
       bundle("junit", ["junit4", "junit-jupiter", "junit-vintage", "mockitoCore","mockitoJUnit", "googletruthcore","googletruth8", "byteBuddy", "byteBuddyAgent", "asm", "cglib"])
 
       //*** libs.plugins ***
@@ -54,8 +54,8 @@ dependencyResolutionManagement {
       plugin("sonarLint", "name.remal.sonarlint").version("latest.release") // https://github.com/remal-gradle-plugins/sonarlint + https://lift.sonatype.com/ + https://www.sonarsource.com/products/sonarlint/
       plugin("errorProne", "net.ltgt.errorprone").version("latest.release") // https://errorprone.info/ + https://github.com/tbroyer/gradle-errorprone-plugin
 
-      plugin("tomcat", "com.bmuschko.tomcat").version("2.+") // https://github.com/bmuschko/gradle-tomcat-plugin + https://plugins.gradle.org/plugin/com.bmuschko.tomcat
-      //^?or:  id("org.gretty") version "4.0.+" // https://gretty-gradle-plugin.github.io/gretty-doc/
+//      plugin("tomcat", "com.bmuschko.tomcat").version("2.+") // https://github.com/bmuschko/gradle-tomcat-plugin + https://plugins.gradle.org/plugin/com.bmuschko.tomcat
+			plugin("tomcat", "org.gretty").version("3.+") // https://gretty-gradle-plugin.github.io/gretty-doc/ → https://github.com/gretty-gradle-plugin/gretty/tree/gretty-3.x
       plugin("palantirGitVersion", 'com.palantir.git-version').version('latest.release')// https://github.com/palantir/gradle-git-version
     }
   }
