@@ -819,7 +819,7 @@ public class MockServletContext implements ServletContext {
 
 	@Override
 	public int getEffectiveMajorVersion () {
-		return 0;
+		return 4;
 	}
 
 	@Override
@@ -944,7 +944,7 @@ public class MockServletContext implements ServletContext {
 
 	@Override
 	public ClassLoader getClassLoader () {
-		return null;
+		return Thread.currentThread().getContextClassLoader();
 	}
 
 	@Override
@@ -969,7 +969,7 @@ public class MockServletContext implements ServletContext {
 
 	@Override
 	public String getRequestCharacterEncoding () {
-		return "";
+		return "UTF-8";
 	}
 
 	@Override
@@ -979,7 +979,7 @@ public class MockServletContext implements ServletContext {
 
 	@Override
 	public String getResponseCharacterEncoding () {
-		return "";
+		return "UTF-8";
 	}
 
 	@Override
