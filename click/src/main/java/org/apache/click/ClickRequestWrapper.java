@@ -149,7 +149,7 @@ class ClickRequestWrapper extends HttpServletRequestWrapper {
     if (isMultipartRequest){
       val array = getMultipartParameterMap().get(name);
 
-			if (array.length >= 1){
+			if (array != null && array.length >= 1){
 				return array[0];
 			} else {
 				return null;
