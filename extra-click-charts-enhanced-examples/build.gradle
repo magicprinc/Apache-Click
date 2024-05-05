@@ -91,10 +91,19 @@ test {
   enableAssertions = true
   maxHeapSize = "500m"
 
-  System.setProperty("slf4j.detectLoggerNameMismatch", "true")
   System.setProperty("file.encoding", "UTF-8")
   System.setProperty("user.language", "en")
   Locale.setDefault(new Locale("en", "US"));
 }
-lombok { version = "latest.release"; }
-sonarLint { ignoreFailures = true; }
+lombok { version = "latest.release" }
+sonarLint { ignoreFailures = true }
+tasks.named("sonarlintMain").configure {
+	onlyIf { // gradle build -Psonarlint=true  -or- -Dsonarlint=true
+		(project.hasProperty('sonarlint') && 'true'.equalsIgnoreCase(project.property('sonarlint').toString())) || 'true'.equalsIgnoreCase(System.getProperty('sonarlint'))
+	}
+}
+tasks.named("sonarlintTest").configure {
+	onlyIf {
+		(project.hasProperty('sonarlint') && 'true'.equalsIgnoreCase(project.property('sonarlint').toString())) || 'true'.equalsIgnoreCase(System.getProperty('sonarlint'))
+	}
+}

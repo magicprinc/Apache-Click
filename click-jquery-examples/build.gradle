@@ -54,11 +54,18 @@ dependencies {
 
   tomcat libs.bundles.tomcat // https://github.com/bmuschko/gradle-tomcat-plugin + alias(libs.plugins.tomcat)
 }
-// https://tomgregory.com/how-to-exclude-gradle-dependencies/
-configurations.configureEach { // .implementation
-  exclude group: "velocity", module: "velocity" // 1.3 comes from somewhere..
-  exclude group: "commons-logging", module: "commons-logging"
+configurations.configureEach { // .implementation  // https://tomgregory.com/how-to-exclude-gradle-dependencies/
+	exclude group: "velocity", module: "velocity" // 1.3 they come from somewhere..
+	exclude group: "commons-logging", module: "commons-logging" // spring?
+	exclude group: "org.apache.logging.log4j", module: "log4j-api"
+	exclude group: "org.apache.logging.log4j", module: "log4j-to-slf4j"
+	exclude group: "log4j", module: "log4j"
+	exclude group: "org.jboss.slf4j", module: "slf4j-jboss-logmanager"
+
+	exclude group: "com.mchange", module: "c3p0"
+	exclude group: 'com.google.guava', module: 'listenablefuture'
 }
+
 publishing {
   publications { // artifactId = folder name
     maven(MavenPublication) {
@@ -88,10 +95,19 @@ test {
   enableAssertions = true
   maxHeapSize = "500m"
 
-  System.setProperty("slf4j.detectLoggerNameMismatch", "true")
   System.setProperty("file.encoding", "UTF-8")
   System.setProperty("user.language", "en")
   Locale.setDefault(new Locale("en", "US"));
 }
-lombok { version = "latest.release"; }
-sonarLint { ignoreFailures = true; }
+lombok { version = "latest.release" }
+sonarLint { ignoreFailures = true }
+tasks.named("sonarlintMain").configure {
+	onlyIf { // gradle build -Psonarlint=true  -or- -Dsonarlint=true
+		(project.hasProperty('sonarlint') && 'true'.equalsIgnoreCase(project.property('sonarlint').toString())) || 'true'.equalsIgnoreCase(System.getProperty('sonarlint'))
+	}
+}
+tasks.named("sonarlintTest").configure {
+	onlyIf {
+		(project.hasProperty('sonarlint') && 'true'.equalsIgnoreCase(project.property('sonarlint').toString())) || 'true'.equalsIgnoreCase(System.getProperty('sonarlint'))
+	}
+}

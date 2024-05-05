@@ -13,11 +13,6 @@ repositories {
   mavenCentral()
 }
 
-javadoc {
-  options.encoding = 'UTF-8'
-  options.addBooleanOption('html5', true)
-}
-
 tasks.withType(JavaCompile).configureEach {
   options.encoding = 'UTF-8'
   options.compilerArgs.addAll(['-Xlint:all,-serial', '-parameters', '-g', '-Xmaxwarns', '999'])
@@ -48,9 +43,6 @@ java {
 
 dependencies {
   errorprone "com.google.errorprone:error_prone_core:latest.release"
-  // Java 8 support
-  annotationProcessor 'com.github.bsideup.jabel:jabel-javac-plugin:latest.release' // 0.4.2
-  compileOnly 'com.github.bsideup.jabel:jabel-javac-plugin:latest.release'
 
   implementation libs.servletApi
 
@@ -67,12 +59,7 @@ dependencies {
   testImplementation project(':click-velocity')
 }
 
-idea {
-  module {
-    downloadJavadoc = true
-    downloadSources = true
-  }
-}
+idea { module { downloadJavadoc = true; downloadSources = true } }
 
 test {
   useJUnit()
@@ -85,10 +72,19 @@ test {
   enableAssertions = true
   maxHeapSize = "500m"
 
-  System.setProperty("slf4j.detectLoggerNameMismatch", "true")
   System.setProperty("file.encoding", "UTF-8")
   System.setProperty("user.language", "en")
   Locale.setDefault(new Locale("en", "US"));
 }
-lombok { version = "latest.release"; }
-sonarLint { ignoreFailures = true; }
+lombok { version = "latest.release" }
+sonarLint { ignoreFailures = true }
+tasks.named("sonarlintMain").configure {
+	onlyIf { // gradle build -Psonarlint=true  -or- -Dsonarlint=true
+		(project.hasProperty('sonarlint') && 'true'.equalsIgnoreCase(project.property('sonarlint').toString())) || 'true'.equalsIgnoreCase(System.getProperty('sonarlint'))
+	}
+}
+tasks.named("sonarlintTest").configure {
+	onlyIf {
+		(project.hasProperty('sonarlint') && 'true'.equalsIgnoreCase(project.property('sonarlint').toString())) || 'true'.equalsIgnoreCase(System.getProperty('sonarlint'))
+	}
+}

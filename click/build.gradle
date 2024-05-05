@@ -25,11 +25,7 @@ println "[INFO] ${project.group}:${project.name}:$version  =>  ${project.archive
 repositories {
   mavenLocal()
   mavenCentral()
-}
-
-javadoc {
-  options.encoding = 'UTF-8'
-  options.addBooleanOption('html5', true)
+  maven { url "https://jitpack.io" }
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -74,13 +70,11 @@ dependencies {
 
   api 'org.mvel:mvel2:latest.release'// 2.4.14
   api("com.github.ben-manes.caffeine:caffeine:latest.release")
-  api('com.google.guava:guava:latest.release')
+  api('com.google.guava:guava:33.2.0-jre')
 
   api 'org.apache.commons:commons-lang3:3.+'
-  api('commons-lang:commons-lang:2.+')
   api 'commons-io:commons-io:2.+'
-  api('commons-collections:commons-collections:3.+')
-  api('commons-fileupload:commons-fileupload:1.3.+')
+  api('commons-fileupload:commons-fileupload:1.+')
 
   //*** TEST TEST TEST
 
@@ -94,18 +88,20 @@ dependencies {
   testImplementation project(path: ':click-extras')
   testImplementation project(':click-velocity')
 }
-// https://tomgregory.com/how-to-exclude-gradle-dependencies/
-configurations.configureEach { // .implementation
+configurations.configureEach { // .implementation  // https://tomgregory.com/how-to-exclude-gradle-dependencies/
   exclude group: "velocity", module: "velocity" // 1.3 they come from somewhere..
-  exclude group: "commons-logging", module: "commons-logging"
+	exclude group: "commons-logging", module: "commons-logging" // spring?
+	exclude group: 'org.springframework', module: 'spring-jcl'
+	exclude group: "org.apache.logging.log4j", module: "log4j-api"
+	exclude group: "org.apache.logging.log4j", module: "log4j-to-slf4j"
+	exclude group: "log4j", module: "log4j"
+	exclude group: "org.jboss.slf4j", module: "slf4j-jboss-logmanager"
+
+	exclude group: "com.mchange", module: "c3p0"
+	exclude group: 'com.google.guava', module: 'listenablefuture'
 }
 
-idea {
-  module {
-    downloadJavadoc = true
-    downloadSources = true
-  }
-}
+idea { module { downloadJavadoc = true; downloadSources = true } }
 
 test {
   useJUnitPlatform()
@@ -118,14 +114,23 @@ test {
   enableAssertions = true
   maxHeapSize = "500m"
 
-  systemProperty("slf4j.detectLoggerNameMismatch", "true")
   systemProperty("file.encoding", "UTF-8")
   System.setProperty("file.encoding", "UTF-8")
   systemProperty("user.language", "en")
   Locale.setDefault(new Locale("en", "US"));
 }
-lombok { version = "latest.release"; }
-sonarLint { ignoreFailures = true; }
+lombok { version = "latest.release" }
+sonarLint { ignoreFailures = true }
+tasks.named("sonarlintMain").configure {
+	onlyIf { // gradle build -Psonarlint=true  -or- -Dsonarlint=true
+		(project.hasProperty('sonarlint') && 'true'.equalsIgnoreCase(project.property('sonarlint').toString())) || 'true'.equalsIgnoreCase(System.getProperty('sonarlint'))
+	}
+}
+tasks.named("sonarlintTest").configure {
+	onlyIf {
+		(project.hasProperty('sonarlint') && 'true'.equalsIgnoreCase(project.property('sonarlint').toString())) || 'true'.equalsIgnoreCase(System.getProperty('sonarlint'))
+	}
+}
 
 tasks.withType(AbstractArchiveTask).configureEach {
   preserveFileTimestamps = false
