@@ -18,6 +18,8 @@
  */
 package org.apache.click;
 
+import lombok.Getter;
+import lombok.val;
 import org.apache.click.service.FileUploadService;
 import org.apache.click.util.ClickUtils;
 import org.apache.commons.fileupload.FileItem;
@@ -42,8 +44,13 @@ class ClickRequestWrapper extends HttpServletRequestWrapper {
 
   /**
    * The <tt>FileItem</tt> objects for <tt>"multipart"</tt> POST requests.
-   */
-  private final Map<String, FileItem[]> fileItemMap;
+	 * -- GETTER --
+	 *  Returns a map of <tt>FileItem arrays</tt> keyed on request parameter
+	 *  name for "multipart" POST requests (file uploads). Thus each map entry
+	 *  will consist of one or more <tt>FileItem</tt> objects.
+	 *@return map of <tt>FileItem arrays</tt> keyed on request parameter name for "multipart" POST requests
+	 */
+  @Getter private final Map<String, FileItem[]> fileItemMap;
 
   /** The request is a multi-part file upload POST request. */
   private final boolean isMultipartRequest;
@@ -134,38 +141,19 @@ class ClickRequestWrapper extends HttpServletRequestWrapper {
 
   // Public Methods ---------------------------------------------------------
 
-  /**
-   * Returns a map of <tt>FileItem arrays</tt> keyed on request parameter
-   * name for "multipart" POST requests (file uploads). Thus each map entry
-   * will consist of one or more <tt>FileItem</tt> objects.
-   *
-   * @return map of <tt>FileItem arrays</tt> keyed on request parameter name
-   * for "multipart" POST requests
-   */
-  public Map<String, FileItem[]> getFileItemMap() {
-    return fileItemMap;
-  }
-
-  /**
+	/**
    * @see javax.servlet.ServletRequest#getParameter(String)
    */
-  @Override public String getParameter(String name){
-    if (isMultipartRequest) {
-      Object value = getMultipartParameterMap().get(name);
+  @Override
+	public String getParameter (String name){
+    if (isMultipartRequest){
+      val array = getMultipartParameterMap().get(name);
 
-      if (value instanceof String) {
-        return (String) value;
-      }
-
-      if (value instanceof String[] array) {
-        if (array.length >= 1) {
-          return array[0];
-        } else {
-          return null;
-        }
-      }
-
-      return (value == null ? null : value.toString());
+			if (array.length >= 1){
+				return array[0];
+			} else {
+				return null;
+			}
 
     } else {
       return getRequest().getParameter(name);
@@ -176,8 +164,7 @@ class ClickRequestWrapper extends HttpServletRequestWrapper {
    * @see javax.servlet.ServletRequest#getParameterNames()
    */
   @Override
-  @SuppressWarnings("unchecked")
-  public Enumeration getParameterNames() {
+  public Enumeration<String> getParameterNames() {
     if (isMultipartRequest) {
       return Collections.enumeration(getMultipartParameterMap().keySet());
 
@@ -190,18 +177,9 @@ class ClickRequestWrapper extends HttpServletRequestWrapper {
    * @see javax.servlet.ServletRequest#getParameterValues(String)
    */
   @Override
-  public String[] getParameterValues(String name) {
-    if (isMultipartRequest) {
-      Object values = getMultipartParameterMap().get(name);
-      if (values instanceof String) {
-        return new String[] { values.toString() };
-      }
-      if (values instanceof String[]) {
-        return (String[]) values;
-      } else {
-        return null;
-      }
-
+  public String[] getParameterValues (String name) {
+    if (isMultipartRequest){
+      return getMultipartParameterMap().get(name);
     } else {
       return getRequest().getParameterValues(name);
     }
@@ -211,9 +189,8 @@ class ClickRequestWrapper extends HttpServletRequestWrapper {
    * @see javax.servlet.ServletRequest#getParameterMap()
    */
   @Override
-  @SuppressWarnings("unchecked")
-  public Map getParameterMap() {
-    if (isMultipartRequest) {
+  public Map<String,String[]> getParameterMap() {
+    if (isMultipartRequest){
       return getMultipartParameterMap();
     } else {
       return getRequest().getParameterMap();
@@ -227,9 +204,8 @@ class ClickRequestWrapper extends HttpServletRequestWrapper {
    *
    * @return the <tt>"multipart"</tt> request parameter map
    */
-  @SuppressWarnings("unchecked")
-  Map getMultipartParameterMap() {
-    if (getRequest().getAttribute(ClickServlet.MOCK_MODE_ENABLED) == null) {
+  Map<String,String[]> getMultipartParameterMap() {
+    if (getRequest().getAttribute(ClickServlet.MOCK_MODE_ENABLED) == null){
       return multipartParameterMap;
     } else {
       // In mock mode return the request parameter map. This ensures

@@ -661,6 +661,7 @@ public class MockRequest implements HttpServletRequest {
 
 		 @return The parameters
 		 */
+	@Override
 	public Map<String,String[]> getParameterMap() {
 		return parameters;
 	}
@@ -670,6 +671,7 @@ public class MockRequest implements HttpServletRequest {
 	 *
 	 * @return The parameter names
 	 */
+	@Override
 	public Enumeration<String> getParameterNames() {
 		return Collections.enumeration(parameters.keySet());
 	}

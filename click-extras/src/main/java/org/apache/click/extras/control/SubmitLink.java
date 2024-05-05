@@ -11,6 +11,7 @@ import org.apache.click.util.HtmlStringBuffer;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.Serial;
 import java.util.List;
 import java.util.Set;
 
@@ -85,7 +86,7 @@ import java.util.Set;
  * </ul>
  */
 public class SubmitLink extends ActionLink {
-  private static final long serialVersionUID = 6227351843582847924L;
+  @Serial private static final long serialVersionUID = 6227351843582847924L;
 
   /** The SubmitLink parent Form. */
   private Form form;
@@ -387,7 +388,7 @@ public class SubmitLink extends ActionLink {
       String prefix = getParameterPrefix();
 
       HttpServletRequest request = context.getRequest();
-      Set<String> parameterNames = (Set<String>) request.getParameterMap().keySet();
+      Set<String> parameterNames = request.getParameterMap().keySet();
 
       boolean hasParentForm = hasParentForm();
 
@@ -466,7 +467,6 @@ public class SubmitLink extends ActionLink {
     super.render(buffer);
   }
 
-  // -------------------------------------------------------- Private Methods
 
   /**
    * Render the specified name and value pair to the buffer.
@@ -477,8 +477,7 @@ public class SubmitLink extends ActionLink {
    * @param buffer the buffer to render the parameter to
    * @param context the request context
    */
-  private void renderParameter(String name, Object value, String prefix,
-      HtmlStringBuffer buffer, Context context) {
+  private void renderParameter (String name, Object value, String prefix, HtmlStringBuffer buffer, Context context) {
 
     // Don't render null values
     if (value == null) {
