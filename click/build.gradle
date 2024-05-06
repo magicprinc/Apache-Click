@@ -30,11 +30,12 @@ tasks.withType(JavaCompile).configureEach {
     errorproneArgs = ["--illegal-access=warn"]
   }
 }
-// https://docs.gradle.org/current/userguide/publishing_maven.html
-publishing {
-  publications { // artifactId == folder name
-    maven(MavenPublication) {
+
+publishing {// https://docs.gradle.org/current/userguide/publishing_maven.html
+  publications {
+    maven(MavenPublication){// groupId in gradle.properties;  artifactId == folder name
       from components.java
+			suppressPomMetadataWarningsFor('runtimeElements')
     }
   }
 }
@@ -116,6 +117,12 @@ tasks.named("sonarlintMain").configure {
 tasks.named("sonarlintTest").configure {
 	onlyIf {
 		(project.hasProperty('sonarlint') && 'true'.equalsIgnoreCase(project.property('sonarlint').toString())) || 'true'.equalsIgnoreCase(System.getProperty('sonarlint'))
+	}
+}
+
+jar {
+	from generatePomFileForMavenPublication {
+		rename('pom-default.xml', "META-INF/maven/${project.group}/${project.name}/pom.xml")
 	}
 }
 

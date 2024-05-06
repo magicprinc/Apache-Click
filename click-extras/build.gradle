@@ -31,13 +31,18 @@ tasks.withType(JavaCompile).configureEach {
     errorproneArgs = ["--illegal-access=warn"]
   }
 }
-// https://docs.gradle.org/current/userguide/publishing_maven.html
-publishing {
-  publications { // artifactId == folder name
-    maven(MavenPublication) {
-      from components.java
-    }
-  }
+publishing {// https://docs.gradle.org/current/userguide/publishing_maven.html
+	publications {
+		maven(MavenPublication){// groupId in gradle.properties;  artifactId == folder name
+			from components.java
+			suppressPomMetadataWarningsFor('runtimeElements')
+		}
+	}
+}
+jar {
+	from generatePomFileForMavenPublication {
+		rename('pom-default.xml', "META-INF/maven/${project.group}/${project.name}/pom.xml")
+	}
 }
 java {
   withSourcesJar()
