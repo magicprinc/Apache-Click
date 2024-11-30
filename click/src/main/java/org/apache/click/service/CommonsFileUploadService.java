@@ -1,5 +1,11 @@
 package org.apache.click.service;
 
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.apache.click.util.ClickUtils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
@@ -8,13 +14,14 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.servlet.ServletRequestContext;
-import org.apache.commons.lang3.Validate;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.security.AccessControlException;
 import java.util.List;
+
+import static org.apache.click.util.ClickUtils.trim;
 
 /**
  * Provides an Apache Commons FileUploadService class.
@@ -26,11 +33,11 @@ import java.util.List;
  * For example:
  * <pre class="prettyprint">
  * &lt;file-upload-service&gt;
- *     &lt;!-- Set the total request maximum size to 10mb (10 x 1024 x 1024 = 10485760). --&gt;
- *     &lt;property name="sizeMax" value="10485760"/&gt;
+ *	 &lt;!-- Set the total request maximum size to 10mb (10 x 1024 x 1024 = 10485760). --&gt;
+ *	 &lt;property name="sizeMax" value="10485760"/&gt;
  *
- *     &lt;!-- Set the maximum individual file size to 2mb (2 x 1024 x 1024 = 2097152). --&gt;
- *     &lt;property name="fileSizeMax" value="2097152"/&gt;
+ *	 &lt;!-- Set the maximum individual file size to 2mb (2 x 1024 x 1024 = 2097152). --&gt;
+ *	 &lt;property name="fileSizeMax" value="2097152"/&gt;
  * &lt;/file-upload-service&gt; </pre>
  *
  * Note that this is a global configuration and applies to the all file uploads
@@ -40,159 +47,109 @@ import java.util.List;
  * use the <tt>classname</tt> attribute:
  * <pre class="prettyprint">
  * &lt;file-upload-service classname="com.mycorp.util.CustomFileUploadService"&gt;
- *     &lt;property name="customProperty" value="customValue"/&gt;
+ *	 &lt;property name="customProperty" value="customValue"/&gt;
  * &lt;/file-upload-service&gt; </pre>
  */
+@Getter @Setter  @ToString @Slf4j
 public class CommonsFileUploadService implements FileUploadService {
+	/** The total request maximum size in bytes. By default there is no limit. */
+	protected long sizeMax;
 
-    // -------------------------------------------------------------- Constants
+	/** The maximum individual file size in bytes. By default there is no limit. */
+	protected long fileSizeMax;
 
-    /** The total request maximum size in bytes. By default there is no limit. */
-    protected long sizeMax;
+	/**
+	 * @see FileUploadService#onInit(ServletContext)
+	 * @param servletContext the application servlet context
+	 * @throws Exception if an error occurs initializing the FileUploadService
+	 */
+	@Override
+	public void onInit (ServletContext servletContext) throws Exception {
+		//ConfigService configService = ClickUtils.getConfigService(servletContext);
+		String s = trim(servletContext.getInitParameter("file-upload-service.sizeMax"));
+		if (!s.isEmpty()){
+			sizeMax = Long.parseLong(s);
+		}
+		s = trim(servletContext.getInitParameter("file-upload-service.fileSizeMax"));
+		if (!s.isEmpty()){
+			fileSizeMax = Long.parseLong(s);
+		}
+		boolean logWarning = false;
+		boolean restrictedEnvironment = false;
 
-    /** The maximum individual file size in bytes. By default there is no limit. */
-    protected long fileSizeMax;
+		// Uploaded files are saved to java.io.tmpdir. Here we check if this directory exists, if it doesn't, log a warning
+		String tmpdir = System.getProperty("java.io.tmpdir");
+		try {
+			if (tmpdir == null){
+				logWarning = true;
 
-    // --------------------------------------------------------- Public Methods
+			} else {
+				File tmpfile = new File(tmpdir);
+				if (!tmpfile.exists()){
+					logWarning = true;
+				}
+			}
 
-    /**
-     * @see FileUploadService#onInit(ServletContext)
-     * @param servletContext the application servlet context
-     * @throws Exception if an error occurs initializing the FileUploadService
-     */
-    @Override public void onInit(ServletContext servletContext) throws Exception {
-        ConfigService configService = ClickUtils.getConfigService(servletContext);
-        LogService logService = configService.getLogService();
+			if (!ClickUtils.isResourcesDeployable(servletContext)){
+				restrictedEnvironment = true;
+			}
 
-        boolean logWarning = false;
-        boolean restrictedEnvironment = false;
+		} catch (AccessControlException exception) {
+			if (ClickUtils.isResourcesDeployable(servletContext)){
+				throw exception;// If resources are deployable, throw exception
+			} else {
+				restrictedEnvironment = true;
+			}
+		}
 
-        // Uploaded files are saved to java.io.tmpdir. Here we check if this
-        // directory exists, if it does does not, log a warning
-        String tmpdir = System.getProperty("java.io.tmpdir");
+		if (logWarning){
+			log.warn(
+				"The java.io.tmpdir dir '{}', does not exist. This can cause file uploading to fail as uploaded files are saved to the directory specified by the 'java.io.tmpdir' property.",
+				tmpdir
+			);
+		}
+		if (restrictedEnvironment){
+			// Probably deploying on Google App Engine which throws Security Exception if accessing temp folder
+			log.warn("If you are deploying to Google App Engine, please note that Click's default 'org.apache.click.service.CommonsFileUploadService'"
+				+ " does not work with Google App Engine. Instead use 'org.apache.click.extras.gae.MemoryFileUploadService'.");
+		}
+	}
 
-        try {
-            if (tmpdir == null) {
-                logWarning = true;
+	/** @see FileUploadService#onDestroy() */
+	@Override public void onDestroy (){}
 
-            } else {
-                File tmpfile = new File(tmpdir);
-                if (!tmpfile.exists()) {
-                    logWarning = true;
-                }
-            }
+	/**
+	 * @see FileUploadService#parseRequest(HttpServletRequest)
+	 *
+	 * @param request the servlet request
+	 * @return the list of FileItem instances parsed from the request
+	 * @throws FileUploadException if request cannot be parsed
+	 */
+	@Override
+	public List<FileItem> parseRequest (@NonNull HttpServletRequest request) throws FileUploadException {
+		FileItemFactory fileItemFactory = createFileItemFactory(request);
 
-            if (!ClickUtils.isResourcesDeployable(servletContext)) {
-                restrictedEnvironment = true;
-            }
+		FileUploadBase fileUpload = new ServletFileUpload();
+		fileUpload.setFileItemFactory(fileItemFactory);
 
-        } catch (AccessControlException exception) {
-            if (ClickUtils.isResourcesDeployable(servletContext)) {
-                // If resources are deployable, throw exception
-                throw exception;
-            } else {
-                restrictedEnvironment = true;
-            }
-        }
+		if (fileSizeMax > 0) {
+			fileUpload.setFileSizeMax(fileSizeMax);
+		}
+		if (sizeMax > 0) {
+			fileUpload.setSizeMax(sizeMax);
+		}
+		val requestContext = new ServletRequestContext(request);
 
-        if (logWarning) {
-            logService.warn("The java.io.tmpdir directory, '" + tmpdir
-                + "', does not exist. This can cause file uploading to fail"
-                + " as uploaded files are saved to the directory specified by"
-                + " the 'java.io.tmpdir' property.");
-        }
+		return fileUpload.parseRequest(requestContext);
+	}
 
-        if (restrictedEnvironment) {
-            // Probably deploying on Google App Engine which throws
-            // Security Exception if accessing temp folder
-            logService.warn("If you are deploying to Google App Engine,"
-                + " please note that Click's default"
-                + " 'org.apache.click.service.CommonsFileUploadService'"
-                + " does not work with Google App Engine. Instead use"
-                + " 'org.apache.click.extras.gae.MemoryFileUploadService'.");
-        }
-    }
-
-    /**
-     * @see FileUploadService#onDestroy()
-     */
-    @Override public void onDestroy() {
-    }
-
-    /**
-     * @see FileUploadService#parseRequest(HttpServletRequest)
-     *
-     * @param request the servlet request
-     * @return the list of FileItem instances parsed from the request
-     * @throws FileUploadException if request cannot be parsed
-     */
-    @Override @SuppressWarnings("unchecked")
-    public List<FileItem> parseRequest(HttpServletRequest request)
-            throws FileUploadException {
-
-        Validate.notNull(request, "Null request parameter");
-
-        FileItemFactory fileItemFactory = createFileItemFactory(request);
-
-        FileUploadBase fileUpload = new ServletFileUpload();
-        fileUpload.setFileItemFactory(fileItemFactory);
-
-        if (fileSizeMax > 0) {
-            fileUpload.setFileSizeMax(fileSizeMax);
-        }
-        if (sizeMax > 0) {
-            fileUpload.setSizeMax(sizeMax);
-        }
-
-        ServletRequestContext requestContext = new ServletRequestContext(request);
-
-        return fileUpload.parseRequest(requestContext);
-    }
-
-    /**
-     * Return maximum individual size in bytes. By default there is no limit.
-     *
-     * @return the fileSizeMax
-     */
-    public long getFileSizeMax() {
-        return fileSizeMax;
-    }
-
-    /**
-     * Set the maximum individual size in bytes. By default there is no limit.
-     *
-     * @param value the fileSizeMax to set
-     */
-    public void setFileSizeMax(long value) {
-        this.fileSizeMax = value;
-    }
-
-    /**
-     * Return the total request maximum size in bytes. By default there is no limit.
-     *
-     * @return the setSizeMax
-     */
-    public long getSizeMax() {
-        return sizeMax;
-    }
-
-    /**
-     * Set the total request maximum size in bytes. By default there is no limit.
-     *
-     * @param value the setSizeMax to set
-     */
-    public void setSizeMax(long value) {
-        this.sizeMax = value;
-    }
-
-    /**
-     * Create and return a new Commons Upload FileItemFactory instance.
-     *
-     * @param request the servlet request
-     * @return a new Commons FileUpload FileItemFactory instance
-     */
-    public FileItemFactory createFileItemFactory(HttpServletRequest request) {
-        return new DiskFileItemFactory();
-    }
-
+	/**
+	 * Create and return a new Commons Upload FileItemFactory instance.
+	 *
+	 * @param request the servlet request
+	 * @return a new Commons FileUpload FileItemFactory instance
+	 */
+	public FileItemFactory createFileItemFactory (HttpServletRequest request) {
+		return new DiskFileItemFactory();
+	}
 }

@@ -1,6 +1,7 @@
 package org.apache.click.extras.gae;
 
 import junit.framework.TestCase;
+import lombok.val;
 import org.apache.click.MockContainer;
 import org.apache.click.control.FileField;
 import org.apache.click.control.Form;
@@ -13,12 +14,14 @@ import java.io.File;
  * Provides tests for the Google App Engine MemoryFileItem.
  */
 public class MemoryFileItemTest extends TestCase {
-
-  /**
-   * Test Google App Engine (GAE) MemoryFileItem support.
-   */
+  /** Test Google App Engine (GAE) MemoryFileItem support. */
   public void testMemoryFileItem() {
-    MockContainer container = new MockContainer("web");
+    val container = new MockContainer("web").pages("org.apache.click.extras.pages");
+		// Set the total request maximum size to 10mb (10 x 1024 x 1024 = 10485760). The default request upload size is unlimited.
+		container.getServletContext().addInitParameter("sizeMax", "10485760");
+		// Set the maximum individual file size to 2mb (2 x 1024 x 1024 = 2097152). The default file upload size is unlimited.
+		container.getServletContext().addInitParameter("fileSizeMax", "2097152");
+		container.getServletContext().addInitParameter("file-upload-service", "org.apache.click.extras.gae.MemoryFileUploadService");
     container.start();
 
     String firstname = "Steve";
