@@ -1,24 +1,8 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.click;
 
 import org.apache.click.service.PropertyServiceBase;
+
+import javax.servlet.ServletContext;
 
 /**
  * Provides a Page life cycle interceptor. Classes implementing this interface
@@ -68,8 +52,8 @@ import org.apache.click.service.PropertyServiceBase;
  *
  * <pre class="prettyprint">
  * &lt;page-interceptor classname="com.mycorp.PageSecurityInterceptor" scope="application"&gt;
- *     &lt;property name="notAuthenticatedPath" value="/not-authenticated.htm"/&gt;
- *     &lt;property name="notAuthorizedPath" value="/not-authorized.htm"/&gt;
+ *	 &lt;property name="notAuthenticatedPath" value="/not-authenticated.htm"/&gt;
+ *	 &lt;property name="notAuthorizedPath" value="/not-authorized.htm"/&gt;
  * &lt;/page-interceptor&gt; </pre>
  *
  * The default scope for page interceptors is "request", but this can be configured
@@ -80,87 +64,87 @@ import org.apache.click.service.PropertyServiceBase;
  * <pre class="prettyprint">
  * public class SecurityInterceptor implements PageInterceptor {
  *
- *    // The request not authenticated redirect path.
- *    private String notAuthenticatedPath;
+ *	// The request not authenticated redirect path.
+ *	private String notAuthenticatedPath;
  *
- *    // The request not authorized redirect path.
- *    private String notAuthorizedPath;
+ *	// The request not authorized redirect path.
+ *	private String notAuthorizedPath;
  *
- *    // Public Methods ---------------------------------------------------------
+ *	// Public Methods ---------------------------------------------------------
  *
- *    public boolean preCreate(Class<? extends Page> pageClass, Context context) {
+ *	public boolean preCreate(Class<? extends Page> pageClass, Context context) {
  *
- *       // If authentication required, then ensure user is authenticated
- *       Authentication authentication = pageClass.getAnnotation(Authentication.class);
+ *	   // If authentication required, then ensure user is authenticated
+ *	   Authentication authentication = pageClass.getAnnotation(Authentication.class);
  *
- *       // TODO: user context check.
+ *	   // TODO: user context check.
  *
- *       if (authentication != null && authentication.required()) {
- *          sendRedirect(getNotAuthenticatedPath(), context);
- *          return false;
- *       }
+ *	   if (authentication != null && authentication.required()) {
+ *		  sendRedirect(getNotAuthenticatedPath(), context);
+ *		  return false;
+ *	   }
  *
- *       // If authorization permission defined, then ensure user is authorized to access the page
- *       Authorization authorization = pageClass.getAnnotation(Authorization.class);
- *       if (authorization != null) {
- *          if (!UserContext.getThreadUserContext().hasPermission(authorization.permission())) {
- *             sendRedirect(getNotAuthorizedPath(), context);
- *             return false;
- *          }
- *       }
+ *	   // If authorization permission defined, then ensure user is authorized to access the page
+ *	   Authorization authorization = pageClass.getAnnotation(Authorization.class);
+ *	   if (authorization != null) {
+ *		  if (!UserContext.getThreadUserContext().hasPermission(authorization.permission())) {
+ *			 sendRedirect(getNotAuthorizedPath(), context);
+ *			 return false;
+ *		  }
+ *	   }
  *
- *       return true;
- *    }
+ *	   return true;
+ *	}
  *
- *    public boolean postCreate(Page page) {
- *       return true;
- *    }
+ *	public boolean postCreate(Page page) {
+ *	   return true;
+ *	}
  *
- *    public boolean preResponse(Page page) {
- *       return true;
- *    }
+ *	public boolean preResponse(Page page) {
+ *	   return true;
+ *	}
  *
- *    public void postDestroy(Page page) {
- *    }
+ *	public void postDestroy(Page page) {
+ *	}
  *
- *    public String getNotAuthenticatedPath() {
- *       return notAuthenticatedPath;
- *    }
+ *	public String getNotAuthenticatedPath() {
+ *	   return notAuthenticatedPath;
+ *	}
  *
- *    public void setNotAuthenticatedPath(String notAuthenticatedPath) {
- *       this.notAuthenticatedPath = notAuthenticatedPath;
- *    }
+ *	public void setNotAuthenticatedPath(String notAuthenticatedPath) {
+ *	   this.notAuthenticatedPath = notAuthenticatedPath;
+ *	}
  *
- *    public String getNotAuthorizedPath() {
- *       return notAuthorizedPath;
- *    }
+ *	public String getNotAuthorizedPath() {
+ *	   return notAuthorizedPath;
+ *	}
  *
- *    public void setNotAuthorizedPath(String notAuthorizedPath) {
- *       this.notAuthorizedPath = notAuthorizedPath;
- *    }
+ *	public void setNotAuthorizedPath(String notAuthorizedPath) {
+ *	   this.notAuthorizedPath = notAuthorizedPath;
+ *	}
  *
- *    // Protected Methods ------------------------------------------------------
+ *	// Protected Methods ------------------------------------------------------
  *
- *    protected void sendRedirect(String location, Context context) {
- *       if (StringUtils.isNotBlank(location)) {
- *          if (location.charAt(0) == '/') {
- *             String contextPath = context.getRequest().getContextPath();
+ *	protected void sendRedirect(String location, Context context) {
+ *	   if (StringUtils.isNotBlank(location)) {
+ *		  if (location.charAt(0) == '/') {
+ *			 String contextPath = context.getRequest().getContextPath();
  *
- *             // Guard against adding duplicate context path
- *             if (!location.startsWith(contextPath + '/')) {
- *                location = contextPath + location;
- *             }
- *          }
- *       }
+ *			 // Guard against adding duplicate context path
+ *			 if (!location.startsWith(contextPath + '/')) {
+ *				location = contextPath + location;
+ *			 }
+ *		  }
+ *	   }
  *
- *       location = context.getResponse().encodeRedirectURL(location);
+ *	   location = context.getResponse().encodeRedirectURL(location);
  *
- *       try {
- *          context.getResponse().sendRedirect(location);
+ *	   try {
+ *		  context.getResponse().sendRedirect(location);
  *
- *       } catch (IOException ioe) {
- *          throw new RuntimeException(ioe);
- *       }
+ *	   } catch (IOException ioe) {
+ *		  throw new RuntimeException(ioe);
+ *	   }
  *   }
  * } </pre>
  *
@@ -168,73 +152,74 @@ import org.apache.click.service.PropertyServiceBase;
  * // Page class authentication annotation
  * &#64;Retention(RetentionPolicy.RUNTIME)
  * public @interface Authentication {
- *    boolean required() default true;
+ *	boolean required() default true;
  * } </pre>
  *
  * <pre class="prettyprint">
  * // Page class authorization annotation
  * &#64;Retention(RetentionPolicy.RUNTIME)
  * public @interface Authorization {
- *    String permission();
+ *	String permission();
  * }
  * </pre>
  */
 public interface PageInterceptor {
 
-    /**
-     * Provides a before page object creation interceptor method, which is passed
-     * the class of the page to be instantiated and the page request context.
-     * If this method returns true then the normal page processing is performed,
-     * otherwise if this method returns false the page instance is never created
-     * and the request is considered to have been handled.
-     *
-     * @param pageClass the class of the page to be instantiated
-     * @param context the page request context
-     * @return true to continue normal page processing or false whereby the
-     * request is considered to be handled
-     */
-    public boolean preCreate(Class<? extends Page> pageClass, Context context);
+	void onInit (ServletContext servletContext);
 
-    /**
-     * Provides a post page object creation interceptor method, which is passed
-     * the instance of the newly created page. This interceptor method is called
-     * before the page {@link Page#onSecurityCheck()} method is invoked.
-     * <p/>
-     * If this method returns true then the normal page processing is performed,
-     * otherwise if this method returns false the request is considered to have
-     * been handled.
-     * <p/>
-     * Please note the page {@link Page#onDestroy()} method will still be invoked.
-     *
-     * @param page the newly instantiated page instance
-     * @return true to continue normal page processing or false whereby the
-     * request is considered to be handled
-     */
-    public boolean postCreate(Page page);
+	/**
+	 * Provides a before page object creation interceptor method, which is passed
+	 * the class of the page to be instantiated and the page request context.
+	 * If this method returns true then the normal page processing is performed,
+	 * otherwise if this method returns false the page instance is never created
+	 * and the request is considered to have been handled.
+	 *
+	 * @param pageClass the class of the page to be instantiated
+	 * @param context the page request context
+	 * @return true to continue normal page processing or false whereby the
+	 * request is considered to be handled
+	 */
+	boolean preCreate (Class<? extends Page> pageClass, Context context);
 
-    /**
-     * Provides a page interceptor before response method. This method is invoked
-     * prior to the page redirect, forward or rendering phase.
-     * <p/>
-     * If this method returns true then the normal page processing is performed,
-     * otherwise if this method returns false request is considered to have been
-     * handled.
-     * <p/>
-     * Please note the page {@link Page#onDestroy()} method will still be invoked.
-     *
-     * @param page the newly instantiated page instance
-     * @return true to continue normal page processing or false whereby the
-     * request is considered to be handled
-     */
-    public boolean preResponse(Page page);
+	/**
+	 * Provides a post page object creation interceptor method, which is passed
+	 * the instance of the newly created page. This interceptor method is called
+	 * before the page {@link Page#onSecurityCheck()} method is invoked.
+	 * <p/>
+	 * If this method returns true then the normal page processing is performed,
+	 * otherwise if this method returns false the request is considered to have
+	 * been handled.
+	 * <p/>
+	 * Please note the page {@link Page#onDestroy()} method will still be invoked.
+	 *
+	 * @param page the newly instantiated page instance
+	 * @return true to continue normal page processing or false whereby the
+	 * request is considered to be handled
+	 */
+	boolean postCreate (Page page);
 
-    /**
-     * Provides a post page destroy interceptor method. This interceptor method
-     * is called immediately after the page {@link Page#onDestroy()} method is
-     * invoked.
-     *
-     * @param page the page object which has just been destroyed
-     */
-    public void postDestroy(Page page);
+	/**
+	 * Provides a page interceptor before response method. This method is invoked
+	 * prior to the page redirect, forward or rendering phase.
+	 * <p/>
+	 * If this method returns true then the normal page processing is performed,
+	 * otherwise if this method returns false request is considered to have been
+	 * handled.
+	 * <p/>
+	 * Please note the page {@link Page#onDestroy()} method will still be invoked.
+	 *
+	 * @param page the newly instantiated page instance
+	 * @return true to continue normal page processing or false whereby the
+	 * request is considered to be handled
+	 */
+	boolean preResponse (Page page);
 
+	/**
+	 * Provides a post page destroy interceptor method. This interceptor method
+	 * is called immediately after the page {@link Page#onDestroy()} method is
+	 * invoked.
+	 *
+	 * @param page the page object which has just been destroyed
+	 */
+	void postDestroy(Page page);
 }
