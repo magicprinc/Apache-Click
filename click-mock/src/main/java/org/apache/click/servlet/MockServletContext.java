@@ -50,13 +50,10 @@ import java.util.Set;
  * This class was adapted from <a href="http://wicket.apache.org">Apache Wicket</a>.
  */
 public class MockServletContext implements ServletContext {
-
 	/**
 	 * The servlet context default context path, <em>"/mock"</em>.
 	 */
 	public static final String DEFAULT_CONTEXT_PATH = "/mock";
-
-	// -------------------------------------------------------- Private variables
 
 	/** Map of attributes. */
 	private final Map<String, Object> attributes = new HashMap<>();
@@ -356,7 +353,7 @@ public class MockServletContext implements ServletContext {
 		if (initParameters == null) {
 			return;
 		}
-		initParameters.putAll(initParameters);
+		this.initParameters.putAll(initParameters);
 	}
 
 	// Configuration methods
@@ -376,6 +373,7 @@ public class MockServletContext implements ServletContext {
 	 * @param name The attribute name
 	 * @return The value, or null
 	 */
+	@Override
 	public Object getAttribute(final String name) {
 		return attributes.get(name);
 	}
@@ -385,11 +383,11 @@ public class MockServletContext implements ServletContext {
 	 *
 	 * @return The attribute names
 	 */
+	@Override
 	public Enumeration<String> getAttributeNames() {
 		return Collections.enumeration(attributes.keySet());
 	}
 
-	// -------------------------------------------------------- ServletContext interface methods
 
 	/**
 	 * Get the context for the given URL path.
@@ -425,6 +423,7 @@ public class MockServletContext implements ServletContext {
 	 * @param name The name
 	 * @return The parameter, or null if no such parameter
 	 */
+	@Override
 	public String getInitParameter(final String name) {
 		return initParameters.get(name);
 	}

@@ -1,7 +1,8 @@
 package org.apache.click;
 
 import lombok.NonNull;
-import org.apache.click.service.ConfigService;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.apache.click.servlet.MockRequest;
 import org.apache.click.servlet.MockResponse;
 import org.apache.click.servlet.MockServletConfig;
@@ -65,9 +66,8 @@ import java.util.Locale;
  * {@link #reset()}, which removes all references to Controls,
  * ActionListeners and Behaviors.
  */
+@Slf4j
 public class MockContext extends Context {
-
-
   /**
    * Create a new MockContext instance for the specified Mock objects.
    *
@@ -77,13 +77,9 @@ public class MockContext extends Context {
    * @param isPost specified if this a POST or GET request
    * @param clickServlet the mock clickServlet
    */
-  MockContext(ServletConfig servletConfig, HttpServletRequest request,
-      HttpServletResponse response, boolean isPost, ClickServlet clickServlet) {
-    super(servletConfig == null ? null : servletConfig.getServletContext(),
-        servletConfig, request, response, isPost, clickServlet);
+  MockContext(ServletConfig servletConfig, HttpServletRequest request, HttpServletResponse response, boolean isPost, ClickServlet clickServlet) {
+    super(servletConfig == null ? null : servletConfig.getServletContext(), servletConfig, request, response, isPost, clickServlet);
   }
-
-  // --------------------------------------------------------- Public getters and setters
 
   /**
    * Return the mock {@link org.apache.click.ClickServlet} instance for this
@@ -91,9 +87,7 @@ public class MockContext extends Context {
    *
    * @return the clickServlet instance
    */
-  public ClickServlet getServlet() {
-    return clickServlet;
-  }
+  public ClickServlet getServlet (){ return clickServlet; }
 
   /**
    * Return the {@link org.apache.click.servlet.MockRequest} instance for this
@@ -105,7 +99,6 @@ public class MockContext extends Context {
     return MockContainer.findMockRequest(request);
   }
 
-  // -------------------------------------------------------- Public methods
 
   /**
    * Creates and returns a new Context instance.
@@ -140,35 +133,28 @@ public class MockContext extends Context {
     return initContext(locale, "/mock.htm");
   }
 
-
   /**
-   * Creates and returns a new Context instance for the specified locale and
-   * servletPath.
+   * Creates and returns a new Context instance for the specified locale and servletPath.
    *
    * @param locale the requests locale
    * @param servletPath the requests servletPath
    * @return new Context instance
    */
   public static MockContext initContext (@NonNull Locale locale, String servletPath) {
-    MockServletContext servletContext = new MockServletContext();
+    val servletContext = new MockServletContext();
     String servletName = "click-servlet";
-    MockServletConfig servletConfig = new MockServletConfig(servletName, servletContext);
+    val servletConfig = new MockServletConfig(servletName, servletContext);
 
-    ClickServlet servlet = new ClickServlet();
-
-    MockResponse response = new MockResponse();
-
-    MockSession session = new MockSession(servletContext);
-
-    MockRequest request = new MockRequest(locale, MockServletContext.DEFAULT_CONTEXT_PATH,
-        servletPath, servletContext, session);
+    val servlet = new ClickServlet();
+    val response = new MockResponse();
+    val session = new MockSession(servletContext);
+    val request = new MockRequest(locale, MockServletContext.DEFAULT_CONTEXT_PATH, servletPath, servletContext, session);
 
     return initContext(servletConfig, request, response, servlet);
   }
 
   /**
-   * Creates and returns a new Context instance for the specified mock
-   * objects.
+   * Creates and returns a new Context instance for the specified mock objects.
    *
    * @param servletConfig the mock servletConfig
    * @param request the mock request
@@ -176,9 +162,7 @@ public class MockContext extends Context {
    * @param clickServlet the mock clickServlet
    * @return new Context instance
    */
-  public static MockContext initContext(MockServletConfig servletConfig,
-      MockRequest request, MockResponse response, ClickServlet clickServlet) {
-
+  public static MockContext initContext (MockServletConfig servletConfig, MockRequest request, MockResponse response, ClickServlet clickServlet) {
     return initContext(servletConfig, request, response, clickServlet, null, null);
   }
 
@@ -194,31 +178,39 @@ public class MockContext extends Context {
    * @param controlRegistry the control registry
    * @return new Context instance
    */
-  public static MockContext initContext(@NonNull MockServletConfig servletConfig,
-      @NonNull MockRequest request, @NonNull MockResponse response, @NonNull ClickServlet clickServlet,
-      ActionEventDispatcher actionEventDispatcher, ControlRegistry controlRegistry)
-  {
+  public static MockContext initContext (
+			@NonNull MockServletConfig servletConfig,
+      @NonNull MockRequest request,
+			@NonNull MockResponse response,
+			@NonNull ClickServlet clickServlet,
+      ActionEventDispatcher actionEventDispatcher,
+			ControlRegistry controlRegistry
+	){
     try {// Sanity checks
       if (servletConfig.getServletContext() == null) {
         throw new IllegalArgumentException("ServletConfig.getServletContext() cannot return null");
       }
-      boolean isPost = request.getMethod().equalsIgnoreCase("POST");
+      boolean isPost = "POST".equalsIgnoreCase(request.getMethod());
 
-      MockServletContext servletContext = (MockServletContext) servletConfig.getServletContext();
+      val servletContext = (MockServletContext) servletConfig.getServletContext();
 
       servletContext.setAttribute(ClickServlet.MOCK_MODE_ENABLED, Boolean.TRUE);
       request.setAttribute(ClickServlet.MOCK_MODE_ENABLED, Boolean.TRUE);
+			if (servletContext.getInitParameter("pages") == null){
+				log.warn("MockServletContext.initParameter.pages == null: fallback to org.apache.click.pages");
+				servletContext.addInitParameter("pages", "org.apache.click.pages");
+			}
 
       clickServlet.init(servletConfig);
 
-      ConfigService configService = clickServlet.getConfigService();
+      val configService = clickServlet.getConfigService();
       if (configService == null) {
         throw new IllegalArgumentException("ClickServlet.getConfigService() cannot return null");
       }
 
-      MockContext mockContext = new MockContext(servletConfig, request, response, isPost, clickServlet);
+      val mockContext = new MockContext(servletConfig, request, response, isPost, clickServlet);
 
-      if (actionEventDispatcher == null) {
+      if (actionEventDispatcher == null){
         actionEventDispatcher = new ActionEventDispatcher(configService);
       }
 
@@ -246,7 +238,6 @@ public class MockContext extends Context {
    */
   public boolean executeActionListeners() {
     ActionEventDispatcher dispatcher = ActionEventDispatcher.getThreadLocalDispatcher();
-
     // Fire action events
     return dispatcher.fireActionEvents(this);
   }
@@ -258,7 +249,6 @@ public class MockContext extends Context {
    */
   public boolean executeBehaviors() {
     ActionEventDispatcher dispatcher = ActionEventDispatcher.getThreadLocalDispatcher();
-
     // Fire behaviors
     return dispatcher.fireAjaxBehaviors(this);
   }
@@ -266,7 +256,7 @@ public class MockContext extends Context {
   /**
    * Execute the preResponse method for all registered behaviors.
    */
-  public void executePreResponse() {
+  public void executePreResponse () {
     ControlRegistry registry = ControlRegistry.getThreadLocalRegistry();
 
     registry.processPreResponse(this);
@@ -296,13 +286,13 @@ public class MockContext extends Context {
    * MockContext could lead to <tt>out of memory</tt> errors. Calling this
    * method will remove any references to objects, thus freeing up memory.
    */
-  public void reset() {
-    if (ControlRegistry.hasThreadLocalRegistry()) {
+  public void reset () {
+    if (ControlRegistry.hasThreadLocalRegistry()){
       ControlRegistry registry = ControlRegistry.getThreadLocalRegistry();
       registry.clear();
     }
 
-    if (ActionEventDispatcher.hasThreadLocalDispatcher()) {
+    if (ActionEventDispatcher.hasThreadLocalDispatcher()){
       ActionEventDispatcher actionEventDispatcher = ActionEventDispatcher.getThreadLocalDispatcher();
       actionEventDispatcher.clear();
     }
@@ -325,5 +315,4 @@ public class MockContext extends Context {
    @see MockServletContext
    */
   @Override public MockServletContext getServletContext (){ return (MockServletContext) servletContext;}
-
 }
