@@ -57,11 +57,12 @@ dependencies {
   implementation libs.bundles.springMini, libs.bundles.springSecurity
 
   implementation project(':click')
+	implementation(libs.slf4jApi, libs.slf4jJCL, libs.slf4jLog4j)
 
   // TEST
   testImplementation libs.bundles.junit
 
-  testRuntimeOnly 'org.slf4j:slf4j-simple:1.7.+'
+  testRuntimeOnly libs.slf4jSimple
 	testImplementation(libs.javaxServletApi)
   testImplementation project(':click-mock')
   testImplementation project(':click-velocity')

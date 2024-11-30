@@ -45,6 +45,7 @@ dependencies {
   errorprone "com.google.errorprone:error_prone_core:latest.release"
 
   implementation(libs.javax.annotationApi) // @Resource
+	implementation(libs.slf4jApi, libs.slf4jJCL, libs.slf4jLog4j)
 
 	compileOnly libs.javaxServletApi
 
@@ -61,14 +62,13 @@ dependencies {
   implementation("org.objectstyle.ashwood:ashwood:2.0")
 	implementation('commons-collections:commons-collections:3.+')
 
-
   implementation("hsqldb:hsqldb:1.8.0.10")
   implementation("javax.servlet:jstl:1.1.2")
   implementation("opensymphony:oscache:2.4.1")// "javax.jms:jms:1.1"
   implementation("taglibs:standard:1.1.2")
 
   // we need to put it in .war
-  implementation 'org.slf4j:slf4j-simple:1.7.+'
+  implementation libs.slf4jSimple
 
   //*** TEST TEST TEST
   testImplementation libs.bundles.junit

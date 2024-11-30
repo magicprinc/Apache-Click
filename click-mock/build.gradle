@@ -53,12 +53,13 @@ dependencies {
 
   implementation project(':click')
   implementation project(':click-extras')
+	implementation(libs.slf4jApi, libs.slf4jJCL, libs.slf4jLog4j)
 
   // TEST
   testImplementation libs.bundles.junit
 	testImplementation(libs.javaxServletApi)
   testImplementation project(':click-velocity')
-  testRuntimeOnly 'org.slf4j:slf4j-simple:1.7.+'
+  testRuntimeOnly libs.slf4jSimple
 }
 
 idea { module { downloadJavadoc = true; downloadSources = true } }

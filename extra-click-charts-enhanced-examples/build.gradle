@@ -42,11 +42,12 @@ dependencies {
   implementation project(':click-extras')
   implementation project(':click-velocity')
   implementation project(':extra-click-charts-enhanced')
+	implementation(libs.slf4jApi, libs.slf4jJCL, libs.slf4jLog4j)
 
   implementation("org.eclipse.jetty.aggregate:jetty-all-server:8.2.0.v20160908")
 
   // we need to put it in .war
-  implementation 'org.slf4j:slf4j-simple:1.7.+'
+  implementation libs.slf4jSimple
 
   //*** TEST TEST TEST
   testImplementation libs.bundles.junit

@@ -19,7 +19,7 @@ jackson = "2.18.+!!"
 mssql = "12.8.1.jre11!!"
 eclipseCollections = "11.+"
 ebeanVersion = "latest.release"
-slf4jVersion = "1.7.+"
+slf4jVersion = "1.7.36!!"
 
 
 ########################################################################################################################
@@ -70,10 +70,12 @@ apacheCommonsMath = { module = "org.apache.commons:commons-math3", version="late
 fastDoubleParser = { module = 'ch.randelshofer:fastdoubleparser', version="latest.release" }
 
 caffeine = { module = "com.github.ben-manes.caffeine:caffeine", version="3.+" }
+
 slf4jApi = { module = "org.slf4j:slf4j-api", version.ref="slf4jVersion" }
 slf4jJCL = { module = "org.slf4j:jcl-over-slf4j", version.ref="slf4jVersion" }
 slf4jJUL = { module = "org.slf4j:jul-to-slf4j", version.ref="slf4jVersion" }
 slf4jLog4j = { module = "org.slf4j:log4j-over-slf4j", version.ref="slf4jVersion" }
+slf4jSimple = { module = "org.slf4j:slf4j-simple", version.ref="slf4jVersion" }
 
 micrometerCore = { module = "io.micrometer:micrometer-core", version="1.12.+!!" }
 micrometerRegistryPrometheus = { module = "io.micrometer:micrometer-registry-prometheus", version="1.12.+!!" }

@@ -50,6 +50,7 @@ dependencies {
   implementation libs.bundles.springMini, libs.bundles.springSecurity
 
   implementation project(':click')
+	implementation(libs.slf4jApi, libs.slf4jJCL, libs.slf4jLog4j)
 
   implementation 'org.hibernate:hibernate:3.2.7.ga'
   implementation 'javax.transaction:jta:1.1'
@@ -57,7 +58,7 @@ dependencies {
   //*** TEST TEST TEST
   testImplementation libs.bundles.junit
 
-  testRuntimeOnly 'org.slf4j:slf4j-simple:1.7.+'
+  testRuntimeOnly libs.slf4jSimple
 
   testImplementation project(':click-mock')
 }

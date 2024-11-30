@@ -63,7 +63,7 @@ dependencies {
 
   testImplementation libs.bundles.junit
 
-  testRuntimeOnly 'org.slf4j:slf4j-simple:1.7.+'
+  testRuntimeOnly libs.slf4jSimple
 	testImplementation libs.javaxServletApi
 
 	testImplementation project(':click-mock')

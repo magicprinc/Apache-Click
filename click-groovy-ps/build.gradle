@@ -50,6 +50,7 @@ dependencies {
   implementation("org.codehaus.groovy:groovy:3.+")
 
   implementation project(':click')
+	implementation(libs.slf4jApi, libs.slf4jJCL, libs.slf4jLog4j)
 
   //*** TEST TEST TEST
   testImplementation libs.bundles.junit

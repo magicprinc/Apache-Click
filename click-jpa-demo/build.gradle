@@ -48,6 +48,7 @@ dependencies {
 	compileOnly libs.javaxServletApi
 
   implementation libs.bundles.springMini, libs.bundles.springSecurity
+	implementation(libs.slf4jApi, libs.slf4jJCL, libs.slf4jLog4j)
 
   implementation project(':click')
   implementation project(':click-extras')
@@ -66,7 +67,7 @@ dependencies {
   implementation("taglibs:standard:1.1.2")
 
   // we need to put it in .war
-  implementation 'org.slf4j:slf4j-simple:1.7.+'
+  implementation libs.slf4jSimple
 
   implementation("javax.persistence:javax.persistence-api:2.2")
   implementation("com.google.appengine.orm:datanucleus-appengine:1.+")

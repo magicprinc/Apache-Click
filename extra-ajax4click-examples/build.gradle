@@ -45,7 +45,8 @@ dependencies {
   implementation project(':extra-click-calendar')
 
   // we need to put it in .war
-  implementation 'org.slf4j:slf4j-simple:1.7.+'
+	implementation(libs.slf4jApi, libs.slf4jJCL, libs.slf4jLog4j)
+  implementation libs.slf4jSimple
 
   //*** TEST TEST TEST
   testImplementation libs.bundles.junit
