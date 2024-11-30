@@ -3,13 +3,12 @@ plugins {
   id 'war'
   id 'application'
   id 'idea'
-  id 'maven-publish'
 
-  alias(libs.plugins.tomcat)
+  alias(libs.plugins.grettyWebContainer)
 
-  alias(libs.plugins.lombok)
-  alias(libs.plugins.sonarLint)
-  alias(libs.plugins.errorProne)
+	alias(libs.plugins.lombok)
+	alias(libs.plugins.sonarlint)
+	alias(libs.plugins.errorprone)
 }
 
 repositories {
@@ -37,7 +36,7 @@ tasks.withType(JavaCompile).configureEach {
 dependencies {
   errorprone "com.google.errorprone:error_prone_core:latest.release"
 
-  implementation libs.servletApi
+	compileOnly libs.javaxServletApi
 
   implementation project(':click')
   implementation project(':click-extras')
@@ -63,19 +62,6 @@ configurations.configureEach { // .implementation  // https://tomgregory.com/how
 	exclude group: "com.mchange", module: "c3p0"
 	exclude group: 'com.google.guava', module: 'listenablefuture'
 }
-publishing {// https://docs.gradle.org/current/userguide/publishing_maven.html
-	publications {
-		maven(MavenPublication){// groupId in gradle.properties;  artifactId == folder name
-			from components.java
-			suppressPomMetadataWarningsFor('runtimeElements')
-		}
-	}
-}
-jar {
-	from generatePomFileForMavenPublication {
-		rename('pom-default.xml', "META-INF/maven/${project.group}/${project.name}/pom.xml")
-	}
-}
 java {
   withSourcesJar()
 }
@@ -83,7 +69,7 @@ java {
 idea { module { downloadJavadoc = true; downloadSources = true } }
 
 test {
-  useJUnit()
+  useJUnitPlatform()
   testLogging {
     events "passed", "skipped", "failed"
     showStandardStreams = true // show standard out & err of the test JVM on the console

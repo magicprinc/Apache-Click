@@ -4,13 +4,12 @@ plugins {
   id 'application'
   id 'idea'
 
-  alias(libs.plugins.tomcat)
+  alias(libs.plugins.grettyWebContainer)
 
-  alias(libs.plugins.lombok)
-  alias(libs.plugins.sonarLint)
-  alias(libs.plugins.errorProne)
+	alias(libs.plugins.lombok)
+	alias(libs.plugins.sonarlint)
+	alias(libs.plugins.errorprone)
 }
-
 //java { // https://docs.gradle.org/current/userguide/toolchains.html
 //  toolchain { languageVersion = JavaLanguageVersion.of(8) }}
 
@@ -45,12 +44,11 @@ tasks.withType(JavaCompile).configureEach {
 dependencies {
   errorprone "com.google.errorprone:error_prone_core:latest.release"
 
-  implementation("javax.annotation:javax.annotation-api:1.3.+") // @Resource
+  implementation(libs.javax.annotationApi) // @Resource
 
-  implementation libs.servletApi
+	compileOnly libs.javaxServletApi
 
-  implementation libs.bundles.spring
-  implementation libs.bundles.springSecurity
+  implementation libs.bundles.springMini, libs.bundles.springSecurity
 
   implementation project(':click')
   implementation project(':click-extras')
@@ -99,7 +97,7 @@ configurations.configureEach { // .implementation  // https://tomgregory.com/how
 idea { module { downloadJavadoc = true; downloadSources = true } }
 
 test {
-  useJUnit()
+  useJUnitPlatform()
   testLogging {
     events "passed", "skipped", "failed"
     showStandardStreams = true // show standard out & err of the test JVM on the console

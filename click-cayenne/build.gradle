@@ -4,8 +4,8 @@ plugins {
   id 'maven-publish'
 
   alias(libs.plugins.lombok)
-  alias(libs.plugins.sonarLint)
-  alias(libs.plugins.errorProne)
+  alias(libs.plugins.sonarlint)
+  alias(libs.plugins.errorprone)
 }
 
 repositories {
@@ -50,10 +50,9 @@ java {
 dependencies {
   errorprone "com.google.errorprone:error_prone_core:latest.release"
 
-  implementation libs.servletApi
+	compileOnly libs.javaxServletApi
 
-  implementation libs.bundles.spring
-  implementation libs.bundles.springSecurity
+  implementation libs.bundles.springMini, libs.bundles.springSecurity
 
   implementation project(':click')
 
@@ -61,7 +60,6 @@ dependencies {
   implementation 'org.apache.cayenne:cayenne-server:3.0.2'
 
   //*** TEST TEST TEST
-
   testImplementation libs.bundles.junit
 
   testRuntimeOnly 'org.slf4j:slf4j-simple:1.7.+'
@@ -84,7 +82,7 @@ configurations.configureEach { // .implementation  // https://tomgregory.com/how
 idea { module { downloadJavadoc = true; downloadSources = true } }
 
 test {
-  useJUnit()
+  useJUnitPlatform()
   testLogging {
     events "passed", "skipped", "failed"
     showStandardStreams = true // show standard out & err of the test JVM on the console

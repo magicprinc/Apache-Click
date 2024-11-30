@@ -4,8 +4,8 @@ plugins {
   id 'maven-publish'
 
   alias(libs.plugins.lombok)
-  alias(libs.plugins.sonarLint)
-  alias(libs.plugins.errorProne)
+  alias(libs.plugins.sonarlint)
+  alias(libs.plugins.errorprone)
 }
 println "[INFO] ${project.group}:${project.name}:$version  =>  ${project.archivesBaseName} # JVM: ${System.getProperty("java.version")} Gradle: ${gradle.gradleVersion}"
 
@@ -17,9 +17,9 @@ repositories {
 
 tasks.withType(JavaCompile).configureEach {
   options.encoding = 'UTF-8'
-  options.compilerArgs.addAll(['-Xlint:all,-serial', '-parameters', '-g', '-Xmaxwarns', '999'])
-  options.release.set(17) // javac --release 7..21+
-  options.deprecation = true
+  options.compilerArgs.addAll(['-Xlint:all,-serial,-unchecked,-rawtypes,-this-escape,-deprecation,-processing', '-parameters'])
+  options.release.set(17) // javac --release 7..23+
+  //options.deprecation = true
 
   options.errorprone {
     enabled = true
@@ -46,31 +46,27 @@ java {
 
 dependencies {
   errorprone "com.google.errorprone:error_prone_core:latest.release"
-  api("com.google.code.findbugs:jsr305:latest.release")// https://javadoc.io/doc/com.google.code.findbugs/jsr305/latest/index.html
-  api("com.google.errorprone:error_prone_annotations:latest.release")// https://javadoc.io/doc/com.google.errorprone/error_prone_annotations/latest/index.html
-  //implementation("javax.annotation:javax.annotation-api:latest.release")
+  api(libs.jsr305)// https://javadoc.io/doc/com.google.code.findbugs/jsr305/latest/index.html
+  api(libs.errorprone)// https://javadoc.io/doc/com.google.errorprone/error_prone_annotations/latest/index.html
 
-  implementation libs.servletApi
+	compileOnly libs.javaxServletApi
 
-  api('org.slf4j:slf4j-api:1.7.+',
-    "org.slf4j:jcl-over-slf4j:1.7.+",
-    "org.slf4j:log4j-over-slf4j:1.7.+")
+  api(libs.slf4jApi, libs.slf4jJCL, libs.slf4jLog4j)
 
   api 'org.mvel:mvel2:latest.release'// 2.4.14
-  api("com.github.ben-manes.caffeine:caffeine:latest.release")
-  api('com.google.guava:guava:33.2.0-jre')
+  api(libs.caffeine)
+  api(libs.guava)
 
-  api 'org.apache.commons:commons-lang3:3.+'
-  api 'commons-io:commons-io:2.+'
-  api('commons-fileupload:commons-fileupload:1.+')
+  api libs.commonsLang3, libs.apacheCommonsIo, libs.apacheCommonsFileUpload
 
   //*** TEST TEST TEST
 
   testImplementation libs.bundles.junit
 
   testRuntimeOnly 'org.slf4j:slf4j-simple:1.7.+'
+	testImplementation libs.javaxServletApi
 
-  testImplementation project(':click-mock')
+	testImplementation project(':click-mock')
   testImplementation project(':click-ognl')
   testImplementation project(path: ':click-groovy-ps') // groovy is fast and can set private fields, but have problems with type conversions
   testImplementation project(path: ':click-extras')
@@ -109,11 +105,6 @@ test {
 }
 lombok { version = "latest.release" }
 sonarLint { ignoreFailures = true }
-tasks.named("sonarlintMain").configure {
-	onlyIf { // gradle build -Psonarlint=true  -or- -Dsonarlint=true
-		(project.hasProperty('sonarlint') && 'true'.equalsIgnoreCase(project.property('sonarlint').toString())) || 'true'.equalsIgnoreCase(System.getProperty('sonarlint'))
-	}
-}
 tasks.named("sonarlintTest").configure {
 	onlyIf {
 		(project.hasProperty('sonarlint') && 'true'.equalsIgnoreCase(project.property('sonarlint').toString())) || 'true'.equalsIgnoreCase(System.getProperty('sonarlint'))

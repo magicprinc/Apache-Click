@@ -3,9 +3,9 @@ plugins {
   id 'idea'
   id 'maven-publish'
 
-  alias(libs.plugins.lombok)
-  alias(libs.plugins.sonarLint)
-  alias(libs.plugins.errorProne)
+	alias(libs.plugins.lombok)
+	alias(libs.plugins.sonarlint)
+	alias(libs.plugins.errorprone)
 }
 println "[INFO] ${project.group}:${project.name}:$version  =>  ${project.archivesBaseName} # JVM: ${System.getProperty("java.version")} Gradle: ${gradle.gradleVersion}"
 
@@ -45,10 +45,9 @@ java {
 dependencies {
   errorprone "com.google.errorprone:error_prone_core:latest.release"
 
-  compileOnly(libs.servletApi)
+	compileOnly libs.javaxServletApi
 	api('commons-lang:commons-lang:2.+')
 	api('commons-collections:commons-collections:3.+')
-
 
 	api("org.apache.velocity:velocity:1.+"){
     version {
@@ -63,7 +62,7 @@ dependencies {
   testImplementation project(':click-mock')
 
   testRuntimeOnly 'org.slf4j:slf4j-simple:1.7.+'
-	testImplementation(libs.servletApi)
+	testImplementation(libs.javaxServletApi)
 
   modules {
     module('velocity:velocity') {
