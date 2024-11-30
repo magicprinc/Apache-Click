@@ -21,15 +21,11 @@ import java.util.Map;
  * and enables hot reloading of Page classes.
  */
 public class ClickClickConfigService extends XmlConfigService {
-
   private static final Object PAGE_LOAD_LOCK = new Object();
-
 
   private final Map manualPageByPathMap = new HashMap<>();
 
   private final Map manualPageByClassNameMap = new HashMap<>();
-
-  // --------------------------------------------------------- Public Methods
 
   /**
    * Return the list of page packages.
@@ -46,7 +42,8 @@ public class ClickClickConfigService extends XmlConfigService {
    * @param path the page path
    * @return the page class for the given path or null if no class is found
    */
-  public Class<? extends Page> getPageClass(String path) {
+  @Override
+	public Class<? extends Page> getPageClass(String path) {
 
     // If in production or profile mode.
     if (isProductionMode() || isProfileMode()) {
@@ -100,7 +97,8 @@ public class ClickClickConfigService extends XmlConfigService {
    * @throws IllegalArgumentException if the Page Class is not configured
    * with a unique path
    */
-  public String getPagePath(Class pageClass) {
+  @Override
+	public String getPagePath(Class pageClass) {
     // Try to lookup path from manually mapped pages first
     PageMetaData page = lookupManuallyStoredMetaData(pageClass);
     if (page != null) {
@@ -117,7 +115,8 @@ public class ClickClickConfigService extends XmlConfigService {
    * @param path the path of the page
    * @return a Map of headers for the given page path
    */
-  public Map getPageHeaders(String path) {
+  @Override
+	public Map getPageHeaders(String path) {
     // Try and load the manually mapped page first
     PageMetaData page = lookupManuallyStoredMetaData(path);
 
@@ -136,7 +135,8 @@ public class ClickClickConfigService extends XmlConfigService {
    * @param fieldName the name of the field
    * @return the public field of the pageClass with the given name or null
    */
-  public Field getPageField(Class pageClass, String fieldName) {
+  @Override
+	public Field getPageField(Class pageClass, String fieldName) {
     if (isProductionMode() || isProfileMode()) {
       return super.getPageField(pageClass, fieldName);
     }
@@ -149,7 +149,8 @@ public class ClickClickConfigService extends XmlConfigService {
    * @param pageClass the page class
    * @return an array public fields for the given page class
    */
-  public Field[] getPageFieldArray(Class pageClass) {
+  @Override
+	public Field[] getPageFieldArray(Class pageClass) {
     if (isProductionMode() || isProfileMode()) {
       return super.getPageFieldArray(pageClass);
     }
@@ -162,7 +163,8 @@ public class ClickClickConfigService extends XmlConfigService {
    * @param pageClass the page class
    * @return a Map of public fields for the given page class
    */
-  public Map getPageFields(Class pageClass) {
+  @Override
+	public Map getPageFields(Class pageClass) {
     if (isProductionMode() || isProfileMode()) {
       return super.getPageFields(pageClass);
     }
@@ -174,8 +176,6 @@ public class ClickClickConfigService extends XmlConfigService {
     return fields;
   }
 
-  // ------------------------------------------------ Package Private Methods
-
   /**
    * In Production modes delegate to the super implementation. In development
    * modes add manually defined Pages to the {@link #manualPageByPathMap}.
@@ -186,7 +186,8 @@ public class ClickClickConfigService extends XmlConfigService {
    * @throws java.lang.ClassNotFoundException if the specified Page class can
    * not be found on the classpath
    */
-  void buildManualPageMapping(Element pagesElm, String pagesPackage) throws ClassNotFoundException {
+	@Override
+	void buildManualPageMapping(Element pagesElm, String pagesPackage) throws ClassNotFoundException {
     if (isProductionMode() || isProfileMode()) {
       super.buildManualPageMapping(pagesElm, pagesPackage);
       return;
@@ -218,7 +219,8 @@ public class ClickClickConfigService extends XmlConfigService {
    * @param pagesPackage the pages package prefix
    * @param templates the list of templates to map to Page classes
    */
-  void buildAutoPageMapping(Element pagesElm, String pagesPackage, List templates) throws ClassNotFoundException {
+	@Override
+	void buildAutoPageMapping(Element pagesElm, String pagesPackage, List templates) throws ClassNotFoundException {
 
     if(isProductionMode() || isProfileMode()) {
       //Build and cache in production modes.
@@ -241,7 +243,8 @@ public class ClickClickConfigService extends XmlConfigService {
    * pages will be stored by this method as automapped pages are looked up
    * dynamically.
    */
-  void buildClassMap() {
+	@Override
+	void buildClassMap() {
     if (isProductionMode() || isProfileMode()) {
       super.buildClassMap();
       return;
