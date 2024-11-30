@@ -1,7 +1,12 @@
 package org.apache.click.extras.spring;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
 import org.apache.click.ClickServlet;
 import org.apache.click.Page;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -13,12 +18,12 @@ import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletRequest;
 import java.beans.Introspector;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Provides a Spring framework integration <tt>SpringClickServlet</tt>.
@@ -328,7 +333,6 @@ public class SpringClickServlet extends ClickServlet {
 
   /** The set of setter methods to ignore. */
   static final Set<String> SETTER_METHODS_IGNORE_SET = new HashSet<>();
-
   // Initialize the setter method ignore set
   static {
     SETTER_METHODS_IGNORE_SET.add("setApplicationContext");
@@ -344,10 +348,10 @@ public class SpringClickServlet extends ClickServlet {
   }
 
   /** Spring application context bean factory. */
-  protected ApplicationContext applicationContext;
+  @Getter protected ApplicationContext applicationContext;
 
   /** The list of page injectable Spring beans, keyed on page class name. */
-  protected Map<Class<? extends Page>, List<BeanNameAndMethod>> pageSetterBeansMap = new HashMap<>();
+  protected final Map<Class<? extends Page>, Set<BeanNameAndMethod>> pageSetterBeansMap = new ConcurrentHashMap<>();
 
 
   /**
@@ -360,13 +364,14 @@ public class SpringClickServlet extends ClickServlet {
    *
    * @throws ServletException if the click app could not be initialized
    */
-  @Override public void init() throws ServletException {
+  @Override
+	public void init () throws ServletException {
     super.init();
 
     ServletContext servletContext = getServletContext();
     applicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
 
-    if (applicationContext == null) {
+    if (applicationContext == null){
       String springPath = getInitParameter(SPRING_PATH);
       if (springPath == null){
         throw new UnavailableException(SPRING_PATH + " servlet init parameter not defined");
@@ -376,8 +381,7 @@ public class SpringClickServlet extends ClickServlet {
     }
 
     String injectPageBeans = getInitParameter(INJECT_PAGE_BEANS);
-    if ("true".equalsIgnoreCase(injectPageBeans)) {
-
+    if ("true".equalsIgnoreCase(injectPageBeans)){
       // Process page classes looking for setter methods which match beans available in the applicationContext
       List<Class<? extends Page>> pageClassList = getConfigService().getPageClassList();
       for (Class<? extends Page> pageClass : pageClassList) {
@@ -385,7 +389,6 @@ public class SpringClickServlet extends ClickServlet {
       }
     }
   }
-
 
   /**
    * Create a new Spring Page bean if defined in the application context, or
@@ -404,10 +407,8 @@ public class SpringClickServlet extends ClickServlet {
    */
   @Override
   protected Page newPageInstance(String path, Class<? extends Page> pageClass, HttpServletRequest request) throws Exception {
-    Page page;
-
-    String beanName = toBeanName(pageClass);
-
+		String beanName = toBeanName(pageClass);
+		Page page;
     if (getApplicationContext().containsBean(beanName)) {
       page = (Page) getApplicationContext().getBean(beanName);
 
@@ -417,17 +418,7 @@ public class SpringClickServlet extends ClickServlet {
     } else {
       page = pageClass.newInstance();
     }
-
     return page;
-  }
-
-  /**
-   * Return the configured Spring application context.
-   *
-   * @return the configured Spring application context.
-   */
-  protected ApplicationContext getApplicationContext() {
-    return applicationContext;
   }
 
   /**
@@ -439,36 +430,31 @@ public class SpringClickServlet extends ClickServlet {
    *
    * @param page the page instance to activate
    */
-  @Override protected void activatePageInstance(Page page){
-    ApplicationContext applicationContext = getApplicationContext();
-
-    if (page instanceof ApplicationContextAware aware) {
+  @Override
+	protected void activatePageInstance(Page page){
+    if (page instanceof ApplicationContextAware aware){
       aware.setApplicationContext(applicationContext);
-    }
-
+    } else if (page instanceof BeanFactoryAware aware){
+			aware.setBeanFactory(applicationContext);
+		}
     Class<? extends Page> pageClass = page.getClass();
     String beanName = toBeanName(pageClass);
 
     if (applicationContext.containsBean(beanName)
-        || applicationContext.containsBean(pageClass.getName())) {
-
+    	|| applicationContext.containsBean(pageClass.getName())
+		){
       // Beans are injected through Spring
     } else {
-
       // Inject any Spring beans into the page instance
-      if (!pageSetterBeansMap.isEmpty()) {
-        // In development mode, lazily loaded page classes won't have
-        // their bean setters methods mapped, thus beans won't be injected
-        List<BeanNameAndMethod> beanList = pageSetterBeansMap.get(page.getClass());
-        if (beanList != null) {
+      if (!pageSetterBeansMap.isEmpty()){
+        // In development mode, lazily loaded page classes won't have their bean setters methods mapped, thus beans won't be injected
+        val beanList = pageSetterBeansMap.get(page.getClass());
+        if (beanList != null){
           for (BeanNameAndMethod bnam : beanList) {
             Object bean = applicationContext.getBean(bnam.beanName);
-
             try {
-              Object[] args = { bean };
-              bnam.method.invoke(page, args);
-
-            } catch (Exception error) {
+              bnam.method.invoke(page, bean);
+            } catch (Exception error){
               throw new RuntimeException(error);
             }
           }
@@ -487,28 +473,13 @@ public class SpringClickServlet extends ClickServlet {
     return Introspector.decapitalize(aClass.getSimpleName());
   }
 
-  // Package Private Inner Classes ------------------------------------------
-
-  /**
-   * Provides a Spring bean name and page bean property setter method holder.
-   */
-  static class BeanNameAndMethod {
+  /** Provides a Spring bean name and page bean property setter method holder. */
+	@RequiredArgsConstructor @EqualsAndHashCode
+  static final class BeanNameAndMethod {
     /** The Spring bean name. */
-    protected final String beanName;
-
+    final String beanName;
     /** The page bean property setter method. */
-    protected final Method method;
-
-    /**
-     * Create a new String bean name and page setter method object.
-     *
-     * @param beanName the spring bean name
-     * @param method the page setter method for the bean
-     */
-    protected BeanNameAndMethod(String beanName, Method method) {
-      this.beanName = beanName;
-      this.method = method;
-    }
+    final Method method;
   }
 
   /**
@@ -517,20 +488,19 @@ public class SpringClickServlet extends ClickServlet {
    * @param pageClass the page class
    */
   private void loadSpringBeanSetterMethods(Class<? extends Page> pageClass) {
-
-    Method[] methods = pageClass.getMethods();
-
-    for (Method method : methods){
+    for (Method method : pageClass.getMethods()){
       String methodName = method.getName();
 
-      if (methodName.startsWith("set") && !SETTER_METHODS_IGNORE_SET.contains(methodName) && method.getParameterTypes().length == 1){
-
+      if (methodName.startsWith("set")
+					&& !SETTER_METHODS_IGNORE_SET.contains(methodName)
+					&& method.getParameterTypes().length == 1
+			){
         // Get the bean name from the setter method name
         String beanName = Character.toLowerCase(methodName.charAt(3)) + methodName.substring(4);
 
         // If Spring contains the bean then cache in map list
         if (getApplicationContext().containsBean(beanName)){
-          List<BeanNameAndMethod> beanList = pageSetterBeansMap.computeIfAbsent(pageClass, k->new ArrayList<>());
+          val beanList = pageSetterBeansMap.computeIfAbsent(pageClass, k->new LinkedHashSet<>());
 
           beanList.add(new BeanNameAndMethod(beanName, method));
         }

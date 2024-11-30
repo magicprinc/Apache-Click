@@ -1,5 +1,6 @@
 package org.apache.click.extras.spring;
 
+import lombok.val;
 import org.apache.click.Page;
 import org.apache.click.util.ClickUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -60,7 +61,6 @@ import org.springframework.context.annotation.ScopeMetadataResolver;
  * @see SpringClickServlet
  */
 public class PageScopeResolver implements ScopeMetadataResolver {
-
   /**
    * Return the scope meta data for the given bean definition. This scope meta
    * data resolver will resolve "prototype" scope for any Click Page bean
@@ -71,13 +71,13 @@ public class PageScopeResolver implements ScopeMetadataResolver {
    * @param beanDef the component bean definition to resolve
    * @return the scope meta data for the given bean definition.
    */
-  @Override public ScopeMetadata resolveScopeMetadata(BeanDefinition beanDef) {
-    ScopeMetadata sm = new ScopeMetadata();
-
+  @Override
+	public ScopeMetadata resolveScopeMetadata (BeanDefinition beanDef) {
+    val sm = new ScopeMetadata();// e.g: "singleton"
     try {
       Class<?> beanClass = ClickUtils.classForName(beanDef.getBeanClassName());
 
-      if (Page.class.isAssignableFrom(beanClass)) {
+      if (Page.class.isAssignableFrom(beanClass)){
         sm.setScopeName(ConfigurableBeanFactory.SCOPE_PROTOTYPE);
 
       } else {
@@ -85,13 +85,10 @@ public class PageScopeResolver implements ScopeMetadataResolver {
         // from the beanDef and return this instead.
         sm.setScopeName(ConfigurableBeanFactory.SCOPE_SINGLETON);
       }
-
       return sm;
 
-    } catch (Exception e) {
-      String msg = "Could not load class for beanDef: " + beanDef;
-      throw new RuntimeException(msg, e);
+    } catch (Exception e){
+      throw new RuntimeException("Could not load class for beanDef: "+ beanDef, e);
     }
   }
-
 }
