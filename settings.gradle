@@ -5,64 +5,6 @@ rootProject.name = 'click'
 
 startParameter.setBuildScan(true)
 
-// https://docs.gradle.org/current/userguide/platforms.html
-dependencyResolutionManagement {
-  versionCatalogs {
-    libs {
-      version('springVersion',  "5.+")
-      version('securityVersion',"5.+")
-      version("tomcatVersion",  "8.+")
-
-
-      library("spring-core", "org.springframework", "spring-core").versionRef("springVersion")
-      library("spring-context", "org.springframework", "spring-context").versionRef("springVersion")
-      library("spring-context-support", "org.springframework", "spring-context-support").versionRef("springVersion")
-      library("spring-web", "org.springframework", "spring-web").versionRef("springVersion")
-      library("spring-jdbc", "org.springframework", "spring-jdbc").versionRef("springVersion")
-      library("spring-tx", "org.springframework", "spring-tx").versionRef("springVersion")
-
-      library("spring-security-core", "org.springframework.security", "spring-security-core").versionRef("securityVersion")
-      library("spring-security-web", "org.springframework.security",  "spring-security-web").versionRef("securityVersion")
-      library("spring-security-config", "org.springframework.security", "spring-security-config").versionRef("securityVersion")
-
-      library("junit4", "junit", "junit").version("4.+")
-      library("junit-jupiter", "org.junit.jupiter","junit-jupiter").version("latest.release")
-      library("junit-vintage", "org.junit.vintage","junit-vintage-engine").version("latest.release")
-      library("mockitoCore", "org.mockito", "mockito-core").version("latest.release") // 3,4 req JDK 8; 5 req JDK 11
-      library("mockitoJUnit", "org.mockito", "mockito-junit-jupiter").version("latest.release")
-
-      library("googletruthcore", "com.google.truth", "truth").version("latest.release")
-      library("googletruth8", "com.google.truth.extensions", "truth-java8-extension").version("latest.release")
-
-			library("byteBuddy", "net.bytebuddy","byte-buddy").version("latest.release")
-			library("byteBuddyAgent", "net.bytebuddy","byte-buddy-agent").version("latest.release")
-			library("asm", 'org.ow2.asm','asm').version("latest.release")
-			library("cglib", 'cglib','cglib').version("latest.release")
-
-      library("servletApi", "jakarta.servlet", "jakarta.servlet-api").version("4.+")
-
-//      library("tomcat-core",   "org.apache.tomcat.embed", "tomcat-embed-core").versionRef("tomcatVersion")
-//      library("tomcat-juli",   "org.apache.tomcat.embed", "tomcat-embed-logging-juli").versionRef("tomcatVersion")
-//      library("tomcat-jasper", "org.apache.tomcat.embed", "tomcat-embed-jasper").versionRef("tomcatVersion")
-
-      //*** libs.bundles ***
-      bundle("spring", ["spring-core", "spring-context", "spring-context-support", "spring-web", "spring-jdbc", "spring-tx"])
-      bundle("springSecurity", ["spring-security-core", "spring-security-web", "spring-security-config"])
-//      bundle("tomcat", ["tomcat-core", "tomcat-juli", "tomcat-jasper"])
-      bundle("junit", ["junit4", "junit-jupiter", "junit-vintage", "mockitoCore","mockitoJUnit", "googletruthcore","googletruth8", "byteBuddy", "byteBuddyAgent", "asm", "cglib"])
-
-      //*** libs.plugins ***
-      plugin("lombok", "io.freefair.lombok").version("latest.release") //old: id 'io.franzbecker.gradle-lombok' version 'latest.release'
-      plugin("sonarLint", "name.remal.sonarlint").version("latest.release") // https://github.com/remal-gradle-plugins/sonarlint + https://lift.sonatype.com/ + https://www.sonarsource.com/products/sonarlint/
-      plugin("errorProne", "net.ltgt.errorprone").version("latest.release") // https://errorprone.info/ + https://github.com/tbroyer/gradle-errorprone-plugin
-
-//      plugin("tomcat", "com.bmuschko.tomcat").version("2.+") // https://github.com/bmuschko/gradle-tomcat-plugin + https://plugins.gradle.org/plugin/com.bmuschko.tomcat
-			plugin("tomcat", "org.gretty").version("3.+") // https://gretty-gradle-plugin.github.io/gretty-doc/ → https://github.com/gretty-gradle-plugin/gretty/tree/gretty-3.x
-      plugin("palantirGitVersion", 'com.palantir.git-version').version('latest.release')// https://github.com/palantir/gradle-git-version
-    }
-  }
-}
-
 include 'click'
 include 'click-cayenne'
 include 'click-extras'

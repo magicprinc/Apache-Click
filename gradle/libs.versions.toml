@@ -12,8 +12,6 @@
 # toolversion=libs.versions.checkstyle.get()
 [versions]
 
-jdk = "17"
-
 groovy = "3.0.22!!" # иначе в момент обновления в maven central глюки из-за разных версий разных модулей groovy
 spring = "5.+!!" # Spring 5.3.32 vs boot 2.7.18 → 5.3.31
 springBoot = "2.+"
@@ -106,10 +104,15 @@ jacksonDataformatCbor = { module = "com.fasterxml.jackson.dataformat:jackson-dat
 
 springCore = { module = "org.springframework:spring-core", version.ref="spring" }
 springContext = { module = "org.springframework:spring-context", version.ref="spring" }
+springContextSupport = { module = "org.springframework:spring-context-support", version.ref="spring" }
 springJdbc = { module = "org.springframework:spring-jdbc", version.ref="spring" }
 springWeb = { module = "org.springframework:spring-web", version.ref="spring" }
 springWebMvc = { module = "org.springframework:spring-webmvc", version.ref="spring" }
 springTx = { module = "org.springframework:spring-tx", version.ref="spring" }
+
+springSecurityCore = { module = "org.springframework.security:spring-security-core", version.ref="spring" }
+springSecurityWeb = { module = "org.springframework.security:spring-security-web", version.ref="spring" }
+springSecurityConfig = { module = "org.springframework.security:spring-security-config", version.ref="spring" }
 
 hikariCP = { module = "com.zaxxer:HikariCP", version="latest.release" }
 
@@ -255,12 +258,13 @@ eclipseCollections = ["eclipseCollectionsApi", "eclipseCollections", "eclipseCol
 
 springMini = ["springCore","springContext","springJdbc"]
 
+springSecurity = ["springSecurityCore","springSecurityWeb","springSecurityConfig"]
+
 groovyMini = ["groovyCore","groovyTemplates"]
 
 smallryeConfig = ["smallryeConfig","smallryeConfigSourceYaml","snakeYaml","smallryeConfigValidator","jakarta-validationApi","jakarta-annotationApi"]
 
 okHttp = ["okHttpClient","okhttpLoggingInterceptor","okio"]
-
 
 upgradeBootApp = [ # "hikariCP" boot обнаруживает его и требует jdbc url в конфиге
 	"jsr305","errorprone","smallryeCommonAnnotation","javax-annotationApi","jakarta-annotationApi",
@@ -268,7 +272,7 @@ upgradeBootApp = [ # "hikariCP" boot обнаруживает его и треб
 	"javax-validationApi","jakarta-validationApi", "swaggerAnnotations",
 	"guava", "commonsLang3", "caffeine", "slf4jApi", "slf4jJCL", "slf4jJUL", "slf4jLog4j",
 	"micrometerCore", "micrometerRegistryPrometheus",
-	"commonUtils", "commonMetricsExt",
+	#"commonUtils", "commonMetricsExt",
 	"springCore","springContext","springJdbc", "springWeb"
 	]
 
