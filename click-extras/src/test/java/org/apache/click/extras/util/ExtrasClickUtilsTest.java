@@ -18,12 +18,6 @@
  */
 package org.apache.click.extras.util;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-
 import junit.framework.TestCase;
 import org.apache.click.MockContext;
 import org.apache.click.control.Checkbox;
@@ -37,16 +31,21 @@ import org.apache.click.extras.control.IntegerField;
 import org.apache.click.extras.control.LongField;
 import org.apache.click.util.ClickUtils;
 
-public class ExtrasClickUtilsTest extends TestCase {
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
+public class ExtrasClickUtilsTest extends TestCase {
     private static final java.util.Date DATE_OF_BIRTH;
     private static final String NAME = "john smith";
-    private static final Integer ID = new Integer(1234);
+    private static final Integer ID = 1234;
     private static final int INT = 98;
     private static final boolean BOOLEAN = true;
     private static final double DOUBLE = -87.23;
     private static final String TELEPHONE = "9877262";
-    
+
     static {
         Calendar calendar = new GregorianCalendar(2000, 01, 02);
         DATE_OF_BIRTH = calendar.getTime();
@@ -61,7 +60,7 @@ public class ExtrasClickUtilsTest extends TestCase {
 
     	// set up the form
         Form form = new Form("sample");
-        
+
         IntegerField idField = new IntegerField("id");
         form.add(idField);
 
@@ -70,22 +69,22 @@ public class ExtrasClickUtilsTest extends TestCase {
 
         TextField nameField = new TextField("name");
         fieldset.add(nameField);
-        
+
         DateField dateField = new DateField("dateOfBirth");
-        fieldset.add(dateField); 
-        
+        fieldset.add(dateField);
+
         IntegerField intField = new IntegerField("int");
         form.add(intField);
 
         DoubleField doubleField = new DoubleField("double");
         form.add(doubleField);
-               
+
         Checkbox checkBox = new Checkbox("boolean");
-        form.add(checkBox);  
-        
+        form.add(checkBox);
+
         LongField telephoneField = new LongField("telephone");
         form.add(telephoneField);
-        
+
         HiddenField hidden = new HiddenField("hidden", String.class);
         form.add(hidden);
 
@@ -110,13 +109,13 @@ public class ExtrasClickUtilsTest extends TestCase {
         assertTrue(sampleObject.getInt() == intField.getInteger().intValue());
         assertTrue(sampleObject.getDouble() == doubleField.getDouble().doubleValue());
         assertTrue(sampleObject.isBoolean() == checkBox.isChecked());
-        
+
         // Test object path copying
-        
+
         User user = new User();
         user.setAddress(new Address());
         user.getAddress().setState(new State());
-        
+
         form = new Form();
         TextField codeField = new TextField("address.state.code");
         codeField.setValue("NSW");
@@ -128,7 +127,7 @@ public class ExtrasClickUtilsTest extends TestCase {
     public void testCopyObjectToForm() {
         // set up the form
         Form form = new Form("sample");
-        
+
         IntegerField idField = new IntegerField("id");
         form.add(idField);
 
@@ -137,22 +136,22 @@ public class ExtrasClickUtilsTest extends TestCase {
 
         TextField nameField = new TextField("name");
         fieldset.add(nameField);
-        
+
         DateField dateField = new DateField("dateOfBirth");
-        fieldset.add(dateField); 
-        
+        fieldset.add(dateField);
+
         IntegerField intField = new IntegerField("int");
         form.add(intField);
-                
+
         DoubleField doubleField = new DoubleField("double");
         form.add(doubleField);
-               
+
         Checkbox checkBox = new Checkbox("boolean");
         form.add(checkBox);
-        
+
         HiddenField hidden = new HiddenField("hidden", String.class);
         form.add(hidden);
-        
+
         // Populate object
         SampleObject sampleObject = new SampleObject();
         sampleObject.setId(ID);
@@ -172,20 +171,20 @@ public class ExtrasClickUtilsTest extends TestCase {
         assertTrue(sampleObject.getInt() == intField.getInteger().intValue());
         assertTrue(sampleObject.getDouble() == doubleField.getDouble().doubleValue());
         assertTrue(sampleObject.isBoolean() == checkBox.isChecked());
-        
+
         // Test object path copying
-        
+
         User user = new User();
         user.setAddress(new Address());
         user.getAddress().setState(new State());
         user.getAddress().getState().setCode("NSW");
-        
+
         form = new Form();
         TextField codeField = new TextField("address.state.code");
         form.add(codeField);
         form.copyFrom(user, true);
         assertEquals("NSW", codeField.getValueObject());
-        
+
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("name", "malcolm");
         form = new Form();
@@ -194,15 +193,15 @@ public class ExtrasClickUtilsTest extends TestCase {
         form.copyFrom(map, true);
         assertEquals("malcolm", nameField2.getValue());
     }
-    
+
     public void testCopyToNullNestedObject() {
         final String lineOne = "55 Dunkley Avenue";
         final String code = "NSW";
         final boolean active = false;
         final Boolean registered = Boolean.TRUE;
-        
+
         Form form = new Form();
-        
+
         IntegerField idField = new IntegerField("address.id");
         form.add(idField);
         TextField lineOneField = new TextField("address.lineOne");
@@ -217,15 +216,15 @@ public class ExtrasClickUtilsTest extends TestCase {
         TextField codeField = new TextField("address.state.code");
         codeField.setValue(code);
         form.add(codeField);
-        
-        User user = new User();        
+
+        User user = new User();
         form.copyTo(user, true);
-        
+
         assertNull(user.getAddress().getId());
-        assertEquals(lineOne, user.getAddress().getLineOne());        
-        assertEquals(active, user.getAddress().isActive()); 
+        assertEquals(lineOne, user.getAddress().getLineOne());
+        assertEquals(active, user.getAddress().isActive());
         assertEquals(registered, user.getAddress().isRegistered());
-        assertEquals(code, user.getAddress().getState().getCode());        
+        assertEquals(code, user.getAddress().getState().getCode());
     }
 
 }

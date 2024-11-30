@@ -170,7 +170,7 @@ public class EditableTreeOnServer extends BorderPage {
                         // Do an insert to the database
                         // Normally an ORM will generate the ID
                         String referenceNodeId = form.getField("referenceNodeId").getValue();
-                        File parentFile = (File) getFileSystemService().load(referenceNodeId);
+                        File parentFile = getFileSystemService().load(referenceNodeId);
 
                         // Only create new node if parent node allows children
                         if (parentFile instanceof Folder) {

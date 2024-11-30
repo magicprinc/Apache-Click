@@ -568,7 +568,8 @@ public class VelocityTemplateService implements TemplateService {
      * @param level the logging level
      * @param message the message to log
      */
-    @Override public void log(int level, String message) {
+    @Override @SuppressWarnings("DuplicateBranches")
+		public void log(int level, String message) {
       if (level < logLevel) {
         return;
       }
@@ -604,7 +605,8 @@ public class VelocityTemplateService implements TemplateService {
      * @param message the message to log
      * @param error the optional error to log
      */
-    @Override public void log(int level, String message, Throwable error) {
+    @Override @SuppressWarnings("DuplicateBranches")
+		public void log(int level, String message, Throwable error) {
       if (level < logLevel) { return;}
       if (level == TRACE_ID) {
         log.trace(MSG_PREFIX + message, error);
