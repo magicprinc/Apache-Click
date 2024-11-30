@@ -52,7 +52,7 @@ public class AbstractContainerFieldText extends TestCase {
             fail("AbstractContainerField#onProcess should not bind to request parameter");
         }
     }
-    
+
     /**
      * Check that overriding AbstractContainerField#insert(Control, int) will
      * still receive calls from AbstractContainerField#add(Control).
@@ -70,8 +70,7 @@ public class AbstractContainerFieldText extends TestCase {
     private void initMockContext() {
         MockServletContext servletContext = new MockServletContext();
         String servletName = "click-servlet";
-        MockServletConfig servletConfig = new MockServletConfig(servletName,
-            servletContext);
+        MockServletConfig servletConfig = new MockServletConfig(servletName, servletContext);
         ClickServlet servlet = new ClickServlet();
         MockResponse response = new MockResponse();
         MockRequest request = new MockRequest() {
@@ -87,7 +86,7 @@ public class AbstractContainerFieldText extends TestCase {
         };
         MockContext.initContext(servletConfig, request, response, servlet);
     }
-    
+
     class FeedbackBorder extends AbstractContainerField {
         private static final long serialVersionUID = 1L;
 

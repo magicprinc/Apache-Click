@@ -56,6 +56,7 @@ dependencies {
 
   // TEST
   testImplementation libs.bundles.junit
+	testImplementation(libs.javaxServletApi)
   testImplementation project(':click-velocity')
   testRuntimeOnly 'org.slf4j:slf4j-simple:1.7.+'
 }
@@ -79,11 +80,6 @@ test {
 }
 lombok { version = "latest.release" }
 sonarLint { ignoreFailures = true }
-tasks.named("sonarlintMain").configure {
-	onlyIf { // gradle build -Psonarlint=true  -or- -Dsonarlint=true
-		(project.hasProperty('sonarlint') && 'true'.equalsIgnoreCase(project.property('sonarlint').toString())) || 'true'.equalsIgnoreCase(System.getProperty('sonarlint'))
-	}
-}
 tasks.named("sonarlintTest").configure {
 	onlyIf {
 		(project.hasProperty('sonarlint') && 'true'.equalsIgnoreCase(project.property('sonarlint').toString())) || 'true'.equalsIgnoreCase(System.getProperty('sonarlint'))
