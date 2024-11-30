@@ -1,27 +1,8 @@
-/*
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package net.sf.clickclick.reload;
 
-import java.io.*;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.StringTokenizer;
+import org.apache.click.service.ConfigService;
+import org.apache.click.service.XmlConfigService;
+import org.apache.click.util.ClickUtils;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -30,9 +11,16 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import org.apache.click.service.ClickClickConfigService;
-import org.apache.click.service.ConfigService;
-import org.apache.click.util.ClickUtils;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 /**
  * ReloadClassFilter allows changes to class and resource bundles to be picked up
@@ -44,8 +32,8 @@ import org.apache.click.util.ClickUtils;
  * <li>Debug</li>
  * <li>Trace</li>
  * </ul>
- * 
- * This feature is made possible by replacing the context class loader 
+ *
+ * This feature is made possible by replacing the context class loader
  * with an instance of {@link ReloadClassLoader} for each incoming request.
  * <p/>
  * <h3>Configuration</h3>
@@ -88,7 +76,7 @@ import org.apache.click.util.ClickUtils;
  *       &lt;filter-name&gt;reload-filter&lt;/filter-name&gt;
  *       &lt;filter-class&gt;net.sf.clickclick.reload.ReloadClassFilter&lt;/filter-class&gt;
  *       &lt;init-param&gt;
- *           &lt;param-name&gt; 
+ *           &lt;param-name&gt;
  *               includes
  *            &lt;/param-name&gt;
  *           &lt;param-value&gt;
@@ -96,7 +84,7 @@ import org.apache.click.util.ClickUtils;
  *           &lt;/param-value&gt;
  *       &lt;/init-param&gt;
  *       &lt;init-param&gt;
- *           &lt;param-name&gt; 
+ *           &lt;param-name&gt;
  *               excludes
  *           &lt;/param-name&gt;
  *           &lt;param-value&gt;
@@ -147,7 +135,7 @@ public class ReloadClassFilter implements Filter {
     // -------------------------------------------------------- Constants
 
     private static final String INCLUDES = "includes";
-    
+
     private static final String EXCLUDES = "excludes";
 
     private static final String CLASSPATH = "classpath";
@@ -155,13 +143,13 @@ public class ReloadClassFilter implements Filter {
     // -------------------------------------------------------- Variables
 
     /** The application configuration service. */
-    protected ClickClickConfigService clickClickConfigService;
+    protected XmlConfigService clickClickConfigService;
 
     private ClassLoader reloadClassLoader = null;
 
     private URL[] classpath = null;
 
-    private List includeList = new ArrayList();
+    private final List<String> includeList = new ArrayList();
 
     private List excludeList = new ArrayList();
 
@@ -271,7 +259,7 @@ public class ReloadClassFilter implements Filter {
      *
      * @return the application configuration service
      */
-    protected ClickClickConfigService getConfigService() {
+    protected XmlConfigService getConfigService() {
         return clickClickConfigService;
     }
 
@@ -281,16 +269,16 @@ public class ReloadClassFilter implements Filter {
     protected void loadConfiguration() {
         ServletContext servletContext = getFilterConfig().getServletContext();
         ConfigService configService = ClickUtils.getConfigService(servletContext);
-        if (!(configService instanceof ClickClickConfigService)) {
+        if (!(configService instanceof XmlConfigService x)){
             throw new IllegalStateException(
                 "ReloadClassFilter can only be used " +
                 "in conjunction with ClickClickConfigService. Please see " +
                 "ReloadClassFilter JavaDoc on how to setup the ClickClickConfigService.");
         }
-        clickClickConfigService = (ClickClickConfigService) configService;
+        clickClickConfigService = x;
 
         // Add default package to the package list
-        includeList.addAll(clickClickConfigService.getPagesPackage());
+        includeList.addAll(clickClickConfigService.getPagePackages());
         configured = true;
 
         String message = "ReloadClassFilter initialized with: includes="
@@ -304,7 +292,7 @@ public class ReloadClassFilter implements Filter {
      * <p/>
      * This method uses the ReloadClassLoader as returned by
      * {@link #createReloadClassLoader()}.
-     * 
+     *
      * @param request
      * @param response
      * @param chain
@@ -349,13 +337,13 @@ public class ReloadClassFilter implements Filter {
         ReloadClassLoader loader = new ReloadClassLoader(classpath, parent, clickClickConfigService);
 
         // Add includes to class loader
-        for (Iterator it = includeList.iterator(); it.hasNext();) {
+        for (var it = includeList.iterator(); it.hasNext();) {
             String include = (String) it.next();
             loader.addInclude(include);
         }
 
         // Add excludes to class loader
-        for (Iterator it = excludeList.iterator(); it.hasNext();) {
+        for (var it = excludeList.iterator(); it.hasNext();) {
             String exclude = (String) it.next();
             loader.addExclude(exclude);
         }
