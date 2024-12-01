@@ -240,31 +240,6 @@ public interface Control extends Serializable {
   void setParent(Object parent);
 
   /**
-   * The on deploy event handler, which provides classes the
-   * opportunity to deploy static resources when the Click application is
-   * initialized.
-   * <p/>
-   * For example:
-   * <pre class="codeJava">
-   * <span class="kw">public void</span> onDeploy(ServletContext servletContext) <span class="kw">throws</span> IOException {
-   *     ClickUtils.deployFile
-   *         (servletContext, <span class="st">"/com/mycorp/control/custom.js"</span>, <span class="st">"click"</span>);
-   * } </pre>
-   * <b>Please note:</b> a common problem when overriding onDeploy in
-   * subclasses is forgetting to call <em>super.onDeploy</em>. Consider
-   * carefully whether you should call <em>super.onDeploy</em> or not.
-   * <p/>
-   * Click also supports an alternative deployment strategy which relies on
-   * packaging resource (stylesheets, JavaScript, images etc.) following a
-   * specific convention. See the section
-   * <a href="../../../../user-guide/html/ch05s03.html#deploying-custom-resources">Deploying Custom Resources</a>
-   * for further details.
-   *
-   * @param servletContext the servlet context
-   */
-  void onDeploy(ServletContext servletContext);
-
-  /**
    * The on initialize event handler. Each control will be initialized
    * before its {@link #onProcess()} method is called.
    * <p/>

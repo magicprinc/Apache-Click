@@ -15,7 +15,6 @@ import org.apache.click.util.ActionListenerAdaptor;
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
 
-import javax.servlet.ServletContext;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -508,23 +507,12 @@ public abstract class AbstractControl implements Control {
   @Override public void onDestroy() {}
 
   /**
-   * This method does nothing. Subclasses may override this method to deploy
-   * static web resources.
-   *
-   * @see org.apache.click.Control#onDeploy(ServletContext)
-   *
-   * @param servletContext the servlet context
-   */
-  @Override public void onDeploy (ServletContext servletContext){}
-
-  /**
    * This method does nothing. Subclasses may override this method to perform
    * pre rendering logic.
    *
    * @see org.apache.click.Control#onRender()
    */
-  @Override public void onRender() {
-  }
+  @Override public void onRender (){}
 
   /**
    * @deprecated use the new {@link #getHeadElements()} instead

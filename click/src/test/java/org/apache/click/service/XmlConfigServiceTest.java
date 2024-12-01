@@ -9,7 +9,6 @@ import org.apache.click.MockContainer;
 import org.apache.click.MockContext;
 import org.apache.click.Page;
 import org.apache.click.PageInterceptor;
-import org.apache.click.control.AbstractControl;
 import org.apache.click.pages.BinaryPage;
 import org.apache.click.pages.JspPage;
 import org.apache.click.pages.ListenerPage;
@@ -584,15 +583,6 @@ public class XmlConfigServiceTest extends TestCase {
     container.stop();
 
     deleteDir(tmpdir);
-  }
-
-  static public class MyControl extends AbstractControl {
-    private static final long serialVersionUID = 1L;
-
-    @Override
-    public void onDeploy(ServletContext servletContext) {
-      System.out.println("onDeploy");
-    }
   }
 
   public void testPageInterceptors() throws Exception {
