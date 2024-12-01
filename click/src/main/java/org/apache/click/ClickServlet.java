@@ -18,6 +18,7 @@ import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
@@ -125,7 +126,6 @@ public class ClickServlet extends HttpServlet {
 	protected static final String FORWARD_PAGE = "forward-page";
 
 
-
   /** The click application configuration service instance. Same as in ServletContext */
   @Getter protected ConfigService configService;
 
@@ -138,7 +138,6 @@ public class ClickServlet extends HttpServlet {
   /** The thread local page listeners. */
   private static final ThreadLocal<List<PageInterceptor>>THREAD_LOCAL_INTERCEPTORS = new ThreadLocal<>();
 
-  // --------------------------------------------------------- Public Methods
 
   /**
    * Initialize the Click servlet and the Velocity runtime.
@@ -148,48 +147,34 @@ public class ClickServlet extends HttpServlet {
    * @throws ServletException if the application configuration service could
    * not be initialized
    */
-  @Override public void init() throws ServletException {
+  @Override
+	public void init() throws ServletException {
     try {
-
       // Create and initialize the application config service
       configService = createConfigService(getServletContext());
-      initConfigService(getServletContext());
+      initConfigService();
       logger = configService.getLogService();
 
-      if (logger.isInfoEnabled()) {
-        logger.info("Click " + ClickUtils.getClickVersion()
-            + " initialized in " + configService.getApplicationMode()
-            + " mode");
+      if (logger.isInfoEnabled()){
+        logger.info("Click " + ClickUtils.getClickVersion() +" initialized in "+ configService.getApplicationMode() +" mode");
       }
 
       resourceService = configService.getResourceService();
 
-    } catch (Throwable e) {
-      // In mock mode this exception can occur if click.xml is not
-      // available.
-      if (getServletContext().getAttribute(MOCK_MODE_ENABLED) != null) {
+    } catch (Throwable e){
+      // In mock mode this exception can occur if click.xml is not available.
+      if (getServletContext().getAttribute(MOCK_MODE_ENABLED) != null){
         return;
       }
-
-      e.printStackTrace();
-
-      String msg = "error while initializing Click servlet; throwing "
-          + "javax.servlet.UnavailableException";
-
-      log(msg, e);
-
+      log("error while initializing Click servlet; throwing javax.servlet.UnavailableException", e);
       throw new UnavailableException(e.toString());
     }
   }
 
-  /**
-   * @see javax.servlet.GenericServlet#destroy()
-   */
+  /** @see javax.servlet.GenericServlet#destroy() */
   @Override
   public void destroy() {
-
     try {
-
       // Destroy the application config service
       destroyConfigService(getServletContext());
 
@@ -215,7 +200,6 @@ public class ClickServlet extends HttpServlet {
     super.destroy();
   }
 
-  // ------------------------------------------------------ Protected Methods
 
   /**
    * Handle HTTP GET requests. This method will delegate the request to
@@ -1826,7 +1810,6 @@ public class ClickServlet extends HttpServlet {
     logger.error("handleException: ", exception);
   }
 
-  // ------------------------------------------------ Package Private Methods
 
   /**
    * Create a Click application ConfigService instance.
@@ -1835,8 +1818,7 @@ public class ClickServlet extends HttpServlet {
    * @return a new application ConfigService instance
    * @throws Exception if an initialization error occurs
    */
-  ConfigService createConfigService(ServletContext servletContext) throws Exception {
-
+  ConfigService createConfigService (ServletContext servletContext) throws Exception {
     Class<? extends ConfigService> serviceClass = XmlConfigService.class;
 
     String classname = servletContext.getInitParameter(CONFIG_SERVICE_CLASS);
@@ -1861,18 +1843,18 @@ public class ClickServlet extends HttpServlet {
    * @throws RuntimeException if the configuration service cannot be
    * initialized
    */
-  void initConfigService(ServletContext servletContext) {
-
-    if (configService != null) {
+  void initConfigService () {
+    if (configService != null){
       try {
-
-        // Note this order is very important as components need to lookup
+				ServletContext servletContext = getServletContext();// <context-param> <param-name>/<param-value>
+				ServletConfig servletConfig = getServletConfig();// <servlet> <init-param> <param-name>/<param-value>
+				// Note this order is very important as components need to lookup
         // the configService out of the ServletContext while the service
         // is being initialized.
         servletContext.setAttribute(ConfigService.CONTEXT_NAME, configService);
 
         // Initialize the ConfigService instance
-        configService.onInit(servletContext);
+        configService.onInit(servletContext, servletConfig);
 
       } catch (RuntimeException e) {
         throw e;

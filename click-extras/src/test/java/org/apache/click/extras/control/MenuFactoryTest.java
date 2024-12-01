@@ -3,6 +3,8 @@ package org.apache.click.extras.control;
 import junit.framework.TestCase;
 import org.apache.click.MockContext;
 
+import java.util.Map;
+
 /**
  * Provide tests for MenuFactory.
  */
@@ -43,7 +45,7 @@ public class MenuFactoryTest extends TestCase {
    * Test that Menus are loaded and cached.
    */
   public void testMenuCache() {
-    MockContext.initContext();
+    MockContext.initContext(Map.of("mode", "profile"));
 
     MenuFactory menuFactory = new MenuFactory();
 

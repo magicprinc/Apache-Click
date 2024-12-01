@@ -1,6 +1,7 @@
 package org.apache.click.servlet;
 
 import junit.framework.TestCase;
+import lombok.val;
 import org.apache.click.Context;
 import org.apache.click.MockContext;
 
@@ -18,7 +19,6 @@ import java.util.HashMap;
  * Sanity checks for Mock package.
  */
 public class MockTests extends TestCase {
-
   /**
    * Sanity checks for MockContext.
    */
@@ -38,9 +38,8 @@ public class MockTests extends TestCase {
     final String servletName = "click servlet";
     final String key = "initKey";
     final String value = "initValue";
-    ServletContext servletContext = new MockServletContext();
-    MockServletConfig servletConfig = new MockServletConfig(servletName,
-        servletContext, new HashMap<>());
+    val servletContext = new MockServletContext();
+    MockServletConfig servletConfig = new MockServletConfig(servletName, servletContext, new HashMap<>());
 
     //test that the method is null safe
     servletConfig.addInitParameters(null);
@@ -147,11 +146,8 @@ public class MockTests extends TestCase {
     }
   }
 
-  /**
-   * Sanity check for deleting a directory recursively.
-   */
-  public void testDeleteDirectoryOnShutdown() {
-
+  /** Sanity check for deleting a directory recursively. */
+  public void testDeleteDirectoryOnShutdown () {
     try {
       final File tmpDir = new File(System.getProperty("java.io.tmpdir") + "/click-tests");
       tmpDir.mkdir();

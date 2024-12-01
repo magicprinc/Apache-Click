@@ -14,6 +14,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Provides a mock {@link org.apache.click.Context} object for unit testing.
@@ -153,6 +154,20 @@ public class MockContext extends Context {
     return initContext(servletConfig, request, response, servlet);
   }
 
+	public static MockContext initContext (Map<String,String> initParameters) {
+		val servletContext = new MockServletContext();
+		servletContext.addInitParameters(initParameters);
+		String servletName = "click-servlet";
+		val servletConfig = new MockServletConfig(servletName, servletContext);
+
+		val servlet = new ClickServlet();
+		val response = new MockResponse();
+		val session = new MockSession(servletContext);
+		val request = new MockRequest(Locale.getDefault(), MockServletContext.DEFAULT_CONTEXT_PATH, "/mock.htm", servletContext, session);
+
+		return initContext(servletConfig, request, response, servlet);
+	}
+
   /**
    * Creates and returns a new Context instance for the specified mock objects.
    *
@@ -192,7 +207,7 @@ public class MockContext extends Context {
       }
       boolean isPost = "POST".equalsIgnoreCase(request.getMethod());
 
-      val servletContext = (MockServletContext) servletConfig.getServletContext();
+      val servletContext = servletConfig.getServletContext();
 
       servletContext.setAttribute(ClickServlet.MOCK_MODE_ENABLED, Boolean.TRUE);
       request.setAttribute(ClickServlet.MOCK_MODE_ENABLED, Boolean.TRUE);

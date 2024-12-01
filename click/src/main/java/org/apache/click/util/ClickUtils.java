@@ -78,7 +78,6 @@ import static java.nio.charset.StandardCharsets.*;
  */
 @Slf4j
 public class ClickUtils {
-
   /**
    * The resource <tt>versioning</tt> request attribute: key: &nbsp;
    * <tt>enable-resource-version</tt>.
@@ -97,16 +96,14 @@ public class ClickUtils {
    * The default Click configuration filename: &nbsp;
    * "<tt>/WEB-INF/click.xml</tt>".
    */
-  public static final String DEFAULT_APP_CONFIG = "/WEB-INF/click.xml";
+  private static final String DEFAULT_APP_CONFIG = "/WEB-INF/click.xml";
 
   /** The version indicator separator string. */
   public static final String VERSION_INDICATOR_SEP = "_";
 
   /** The static web resource version number indicator string. */
-  public static final String RESOURCE_VERSION_INDICATOR =
-      VERSION_INDICATOR_SEP + getClickVersion();
+  public static final String RESOURCE_VERSION_INDICATOR = VERSION_INDICATOR_SEP + getClickVersion();
 
-  // ------------------------------------------------------ Private Constants
 
   /** The cached resource version indicator. */
   private static String cachedResourceVersionIndicator;
@@ -145,7 +142,6 @@ public class ClickUtils {
    * <tt>org.apache.commons.lang.Entities</tt> class.
    */
   private static final String[] HTML_ENTITIES = new String[9999];
-
   static {
     HTML_ENTITIES[34] = "&quot;";    // " - double-quote
     HTML_ENTITIES[38] = "&amp;";     // & - ampersand
@@ -437,7 +433,6 @@ public class ClickUtils {
    * <tt>org.apache.commons.lang.Entities</tt> class.
    */
   private static final String[] XML_ENTITIES = new String[63];
-
   static {
     XML_ENTITIES[34] = "&quot;"; // " - double-quote
     XML_ENTITIES[38] = "&amp;"; // & - ampersand
@@ -446,7 +441,6 @@ public class ClickUtils {
     XML_ENTITIES[62] = "&gt;"; // > - greater-than
   }
 
-  // --------------------------------------------------------- Public Methods
 
   /**
    * Perform an auto post redirect to the specified target using the given
@@ -1124,7 +1118,8 @@ public class ClickUtils {
    * @param name the name of the child element
    * @return the first child element for the given name and parent
    */
-  public static Element getChild(Element parent, String name) {
+	@Deprecated(forRemoval = true)
+  static Element getChild(Element parent, String name) {
     NodeList nodeList = parent.getChildNodes();
     for (int i = 0; i < nodeList.getLength(); i++) {
       Node node = nodeList.item(i);
@@ -1170,14 +1165,14 @@ public class ClickUtils {
    * @return the InputStream for the Click configuration file
    * @throws RuntimeException if the resource could not be found
    */
-  public static InputStream getClickConfig(ServletContext servletContext) {
+	@Deprecated(forRemoval = true)
+  static InputStream getClickConfig(ServletContext servletContext) {
     InputStream inputStream = servletContext.getResourceAsStream(DEFAULT_APP_CONFIG);
 
-    if (inputStream == null) {
+    if (inputStream == null){
       inputStream = getResourceAsStream("/click.xml", ClickUtils.class);
-      if (inputStream == null) {
-        throw new RuntimeException("could not find click app configuration file: "
-            + DEFAULT_APP_CONFIG + " or click.xml on classpath");
+      if (inputStream == null){
+        throw new RuntimeException("could not find click app configuration file: "+ DEFAULT_APP_CONFIG + " or click.xml on classpath");
       }
     }
     return inputStream;
@@ -1190,7 +1185,7 @@ public class ClickUtils {
    * @param servletContext the servlet context to get the config service instance
    * @return the application config service instance
    */
-  public static ConfigService getConfigService(ServletContext servletContext){
+  public static ConfigService getConfigService (ServletContext servletContext){
     ConfigService configService = (ConfigService) servletContext.getAttribute(ConfigService.CONTEXT_NAME);
 
     if (configService != null){
@@ -1204,18 +1199,16 @@ public class ClickUtils {
         return configService;
       }
     }
-
-    String msg =
-        "Could not find ConfigService in the ServletContext under the name '"+ ConfigService.CONTEXT_NAME +"'.\n" +
-            "This can occur if ClickUtils.getConfigService() is called before ClickServlet is initialized by the servlet container.\n"
-            + "To fix, ensure that ClickServlet is loaded at startup by editing your web.xml and setting the load-on-startup to 0:\n\n"
-            + " <servlet>\n"
-            + "   <servlet-name>ClickServlet</servlet-name>\n"
-            + "   <servlet-class>org.apache.click.ClickServlet</servlet-class>\n"
-            + "   <load-on-startup>0</load-on-startup>\n"
-            + " </servlet>\n";
-
-    throw new IllegalStateException(msg);
+    throw new IllegalStateException("""
+Could not find ConfigService in the ServletContext under the name '%s'.
+This can occur if ClickUtils.getConfigService() is called before ClickServlet is initialized by the servlet container.
+To fix, ensure that ClickServlet is loaded at startup by editing your web.xml and setting the load-on-startup to 0:
+<servlet>
+  <servlet-name>ClickServlet</servlet-name>
+	<servlet-class>org.apache.click.ClickServlet</servlet-class>
+	<load-on-startup>0</load-on-startup>
+</servlet>
+""".formatted(ConfigService.CONTEXT_NAME));
   }
 
   /**
@@ -1937,7 +1930,7 @@ public class ClickUtils {
   public static String encodeURL (@Nullable Object value) {
     if (value == null){ return "";}
 
-    return URLEncoder.encode(value.toString(), "UTF-8");// TO DO Java 8: Charset since 10
+    return URLEncoder.encode(value.toString(), UTF_8);// TO DO Java 8: Charset since 10
   }
 
   /**
@@ -1956,7 +1949,7 @@ public class ClickUtils {
   public static String decodeURL (@Nullable Object value) {
     if (value == null){ return "";}
 
-    return URLDecoder.decode(value.toString(), "UTF-8");// TO DO Java 8: Charset since 10
+    return URLDecoder.decode(value.toString(), UTF_8);// TO DO Java 8: Charset since 10
   }
 
   /**
@@ -2182,7 +2175,7 @@ public class ClickUtils {
   @Nullable public static String getMimeType (@NonNull String filenameOrExt) {
     String ext;
 
-    int index = filenameOrExt.lastIndexOf(".");
+    int index = filenameOrExt.lastIndexOf('.');
     if (index != -1) {
       ext = filenameOrExt.substring(index + 1);
     } else {
@@ -2763,13 +2756,12 @@ public class ClickUtils {
    */
   public static boolean isResourcesDeployable (ServletContext servletContext) {
     try {
-      return (servletContext.getRealPath("/") != null);
+      return servletContext.getRealPath("/") != null;
     } catch (Throwable e) {
       return false;
     }
   }
 
-  // -------------------------------------------------------- Package Methods
 
   /**
    * Append the escaped string for the given character value to the
@@ -2779,6 +2771,7 @@ public class ClickUtils {
    * @param aChar the character value to escape
    * @param buffer the string buffer to append the escaped value to
    */
+	@Deprecated
   static void appendEscapeChar(char aChar, HtmlStringBuffer buffer) {
     if ((int) aChar < XML_ENTITIES.length && XML_ENTITIES[aChar] != null) {
       buffer.append(XML_ENTITIES[aChar]);
@@ -3131,9 +3124,9 @@ public class ClickUtils {
     try {
       method.setAccessible(true);
     } catch (Throwable ignore){
-//      try {
-//        method.trySetAccessible();
-//      } catch (Throwable ignored){}
+      try {
+        method.trySetAccessible();
+      } catch (Throwable ignored){}
     }
   }
 

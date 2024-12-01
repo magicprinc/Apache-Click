@@ -3,6 +3,7 @@ package org.apache.click.service;
 import junit.framework.TestCase;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.val;
 import org.apache.click.Context;
 import org.apache.click.MockContainer;
 import org.apache.click.MockContext;
@@ -72,41 +73,44 @@ public class XmlConfigServiceTest extends TestCase {
   public void testLocale() throws Exception {
     File tmpdir = makeTmpDir();
 
-    PrintStream pstr = makeXmlStream(tmpdir, "WEB-INF/click.xml");
-    pstr.println("<click-app charset='iso8859-1' locale='en_GB'>");
-    pstr.println(" <pages package='org.apache.click.pages'/>");
-    //pstr.println(" <mode value='trace'/>");
-    pstr.println("</click-app>");
-    pstr.close();
+//    PrintStream pstr = makeXmlStream(tmpdir, "WEB-INF/click.xml");
+//    pstr.println("<click-app charset='iso8859-1' locale='en_GB'>");
+//    pstr.println(" <pages package='org.apache.click.pages'/>");
+//    //pstr.println(" <mode value='trace'/>");
+//    pstr.println("</click-app>");
+//    pstr.close();
 
-    MockContainer container = new MockContainer(tmpdir.getAbsolutePath());
+    val container = new MockContainer(tmpdir.getAbsolutePath());
+		container.getServletContext().addInitParameter("locale", "en_GB");
     container.start();
     ConfigService config = ClickUtils.getConfigService(container.getServletContext());
 
     assertEquals(Locale.UK, config.getLocale());
-    assertEquals("iso8859-1", config.getCharset());
+    assertEquals("UTF-8", config.getCharset());// iso8859-1
 
     container.stop();
 
     deleteDir(tmpdir);
   }
 
-  public void testExcludes() throws Exception {
+  public void testExcludes () throws Exception {
     File tmpdir = makeTmpDir();
 
-    PrintStream pstr = makeXmlStream(tmpdir, "WEB-INF/click.xml");
-    pstr.println("<click-app charset='iso8859-1' locale='en_GB'>");
-    pstr.println(" <pages package='org.apache.click.pages'>");
-    pstr.println("  <excludes pattern='BinaryPage.htm'/>");
-    pstr.println(" </pages>");
-    pstr.println("</click-app>");
-    pstr.close();
+//    PrintStream pstr = makeXmlStream(tmpdir, "WEB-INF/click.xml");
+//    pstr.println("<click-app charset='iso8859-1' locale='en_GB'>");
+//    pstr.println(" <pages package='org.apache.click.pages'>");
+//    pstr.println("  <excludes pattern='BinaryPage.htm'/>");
+//    pstr.println(" </pages>");
+//    pstr.println("</click-app>");
+//    pstr.close();
 
     PrintStream f = new PrintStream(makeFile(tmpdir, "BinaryPage.htm"));
     f.print("template");
     f.close();
 
-    MockContainer container = new MockContainer(tmpdir.getAbsolutePath());
+    val container = new MockContainer(tmpdir.getAbsolutePath()).pages("org.apache.click.pages");
+		container.getServletContext().addInitParameter("locale", "en_GB");
+		container.getServletContext().addInitParameter("excludes", "BinaryPage.htm");
     container.start();
     ConfigService config = ClickUtils.getConfigService(container.getServletContext());
 
@@ -121,17 +125,18 @@ public class XmlConfigServiceTest extends TestCase {
     deleteDir(tmpdir);
   }
 
-  public void testProduction() throws Exception {
+  public void testProduction () throws Exception {
     File tmpdir = makeTmpDir();
 
-    PrintStream pstr = makeXmlStream(tmpdir, "WEB-INF/click.xml");
-    pstr.println("<click-app>");
-    pstr.println(" <pages package='org.apache.click.pages'/>");
-    pstr.println(" <mode value='production'/>");
-    pstr.println("</click-app>");
-    pstr.close();
+//    PrintStream pstr = makeXmlStream(tmpdir, "WEB-INF/click.xml");
+//    pstr.println("<click-app>");
+//    pstr.println(" <pages package='org.apache.click.pages'/>");
+//    pstr.println(" <mode value='production'/>");
+//    pstr.println("</click-app>");
+//    pstr.close();
 
-    MockContainer container = new MockContainer(tmpdir.getAbsolutePath());
+    val container = new MockContainer(tmpdir.getAbsolutePath());
+		container.getServletContext().addInitParameter("mode", "productioN");
     container.start();
     ConfigService config = ClickUtils.getConfigService(container.getServletContext());
 
@@ -146,14 +151,15 @@ public class XmlConfigServiceTest extends TestCase {
   public void testProfile() throws Exception {
     File tmpdir = makeTmpDir();
 
-    PrintStream pstr = makeXmlStream(tmpdir, "WEB-INF/click.xml");
-    pstr.println("<click-app>");
-    pstr.println(" <pages package='org.apache.click.pages'/>");
-    pstr.println(" <mode value='profile'/>");
-    pstr.println("</click-app>");
-    pstr.close();
+//    PrintStream pstr = makeXmlStream(tmpdir, "WEB-INF/click.xml");
+//    pstr.println("<click-app>");
+//    pstr.println(" <pages package='org.apache.click.pages'/>");
+//    pstr.println(" <mode value='profile'/>");
+//    pstr.println("</click-app>");
+//    pstr.close();
 
-    MockContainer container = new MockContainer(tmpdir.getAbsolutePath());
+    val container = new MockContainer(tmpdir.getAbsolutePath()).pages("org.apache.click.pages");
+		container.getServletContext().addInitParameter("mode", "profile");
     container.start();
     ConfigService config = ClickUtils.getConfigService(container.getServletContext());
 
@@ -219,16 +225,16 @@ public class XmlConfigServiceTest extends TestCase {
     deleteDir(tmpdir);
   }
 
-  public void testPageByClass() throws Exception {
+  public void testPageByClass () throws Exception {
     File tmpdir = makeTmpDir();
 
-    PrintStream pstr = makeXmlStream(tmpdir, "WEB-INF/click.xml");
-    pstr.println("<click-app>");
-    pstr.println(" <mode value='trace'/>");
-    pstr.println(" <pages package='org.apache.click.pages'/>");
-    pstr.println(" <pages package='org.apache.click'/>");
-    pstr.println("</click-app>");
-    pstr.close();
+//    PrintStream pstr = makeXmlStream(tmpdir, "WEB-INF/click.xml");
+//    pstr.println("<click-app>");
+//    pstr.println(" <mode value='trace'/>");
+//    pstr.println(" <pages package='org.apache.click.pages'/>");
+//    pstr.println(" <pages package='org.apache.click'/>");
+//    pstr.println("</click-app>");
+//    pstr.close();
 
     PrintStream f = new PrintStream(makeFile(tmpdir, "BinaryPage.htm"));
     f.println("template");
@@ -241,7 +247,7 @@ public class XmlConfigServiceTest extends TestCase {
     f2.println("template");
     f2.close();
 
-    MockContainer container = new MockContainer(tmpdir.getAbsolutePath());
+    val container = new MockContainer(tmpdir.getAbsolutePath()).pages("org.apache.click.pages,org.apache.click");
     container.start();
     ConfigService config = ClickUtils.getConfigService(container.getServletContext());
 
@@ -384,30 +390,27 @@ public class XmlConfigServiceTest extends TestCase {
   }
 
   /**
-   * Test that manually loaded pages that does not exist, throws appropriate
-   * exception.
+   * Test that manually loaded pages that does not exist, throws appropriate exception.
    *
    * CLK-704
    */
   public void testLoadManualNonExistentPageByClassname() throws Exception {
     File tmpdir = makeTmpDir();
 
-    PrintStream pstr = makeXmlStream(tmpdir, "WEB-INF/click.xml");
-    pstr.println("<click-app>");
-
-    // Declare the pages package
-    pstr.println("<pages package='org.apache.click.pages'/>");
-    pstr.println("<pages package='org.apache.click.pages'>");
-
-    // Check non existent page
-    pstr.println("  <page path='page.htm' classname='org.apache.click.pages.noSuchPage'/>");
-    pstr.println("</pages>");
-    pstr.println("</click-app>");
-    pstr.close();
+//    PrintStream pstr = makeXmlStream(tmpdir, "WEB-INF/click.xml");
+//    pstr.println("<click-app>");
+//    pstr.println("<pages package='org.apache.click.pages'/>");// Declare the pages package
+//    pstr.println("<pages package='org.apache.click.pages'>");
+//    // Check non existent page
+//    pstr.println("  <page path='page.htm' classname='org.apache.click.pages.noSuchPage'/>");
+//    pstr.println("</pages>");
+//    pstr.println("</click-app>");
+//    pstr.close();
 
     MockContainer container = null;
     try {
       container = new MockContainer(tmpdir.getAbsolutePath());
+			container.getServletContext().addInitParameter("page", "page.htm=org.apache.click.pages.noSuchPage");
       container.start();
       fail("No class called NoSuchPage exists. Container should fail to start up");
     } catch (Exception expected) {
@@ -418,26 +421,27 @@ public class XmlConfigServiceTest extends TestCase {
     deleteDir(tmpdir);
   }
 
-  public void testHeaders() throws Exception {
+  public void testHeaders () throws Exception {
     File tmpdir = makeTmpDir();
 
-    PrintStream pstr = makeXmlStream(tmpdir, "WEB-INF/click.xml");
-    pstr.println("<click-app>");
-    pstr.println(" <pages package='org.apache.click.pages'/>");
-    pstr.println(" <headers>");
-    pstr.println("  <header name='Header1' value='Value'/>");
-    pstr.println("  <header name='Header2' value='Value' type='String'/>");
-    pstr.println("  <header name='Header3' value='123' type='Integer'/>");
-    pstr.println("  <header name='Header4' value='1' type='Date'/>");
-    pstr.println(" </headers>");
-    pstr.println("</click-app>");
-    pstr.close();
+//    PrintStream pstr = makeXmlStream(tmpdir, "WEB-INF/click.xml");
+//    pstr.println("<click-app>");
+//    pstr.println(" <pages package='org.apache.click.pages'/>");
+//    pstr.println(" <headers>");
+//    pstr.println("  <header name='Header1' value='Value'/>");
+//    pstr.println("  <header name='Header2' value='Value' type='String'/>");
+//    pstr.println("  <header name='Header3' value='123' type='Integer'/>");
+//    pstr.println("  <header name='Header4' value='1' type='Date'/>");
+//    pstr.println(" </headers>");
+//    pstr.println("</click-app>");
+//    pstr.close();
 
     PrintStream f = new PrintStream(makeFile(tmpdir, "BinaryPage.htm"));
     f.println("template");
     f.close();
 
-    MockContainer container = new MockContainer(tmpdir.getAbsolutePath());
+    val container = new MockContainer(tmpdir.getAbsolutePath());
+		container.getServletContext().addInitParameter("headers", "Header1=Value;Header2=Value:String;Header3=123:Integer;Header4=1:Date");
     container.start();
 
     ConfigService config = ClickUtils.getConfigService(container.getServletContext());
@@ -448,7 +452,6 @@ public class XmlConfigServiceTest extends TestCase {
     assertEquals("Value", headers.get("Header2"));
     assertEquals(123, headers.get("Header3"));
     assertEquals(new Date(1), headers.get("Header4"));
-
 
     container.stop();
 
@@ -595,19 +598,22 @@ public class XmlConfigServiceTest extends TestCase {
   public void testPageInterceptors() throws Exception {
     File tmpdir = makeTmpDir();
 
-    PrintStream pstr = makeXmlStream(tmpdir, "WEB-INF/click.xml");
-    pstr.println("<click-app>");
-    pstr.println(" <pages/>");
-    pstr.println(" <page-interceptor classname='org.apache.click.service.XmlConfigServiceTest$MyPageInterceptor'>");
-    pstr.println("  <property name='type' value='std'/>");
-    pstr.println(" </page-interceptor>");
-    pstr.println(" <page-interceptor classname='org.apache.click.service.XmlConfigServiceTest$MyPageInterceptor' scope='application'>");
-    pstr.println("  <property name='type' value='app'/>");
-    pstr.println(" </page-interceptor>");
-    pstr.println("</click-app>");
-    pstr.close();
+//    PrintStream pstr = makeXmlStream(tmpdir, "WEB-INF/click.xml");
+//    pstr.println("<click-app>");
+//    pstr.println(" <pages/>");
+//    pstr.println(" <page-interceptor classname='org.apache.click.service.XmlConfigServiceTest$MyPageInterceptor'>");
+//    pstr.println("  <property name='type' value='std'/>");
+//    pstr.println(" </page-interceptor>");
+//    pstr.println(" <page-interceptor classname='org.apache.click.service.XmlConfigServiceTest$MyPageInterceptor' scope='application'>");
+//    pstr.println("  <property name='type' value='app'/>");
+//    pstr.println(" </page-interceptor>");
+//    pstr.println("</click-app>");
+//    pstr.close();
 
-    MockContainer container = new MockContainer(tmpdir.getAbsolutePath());
+    val container = new MockContainer(tmpdir.getAbsolutePath());
+		container.getServletContext().addInitParameter("page-interceptor", "org.apache.click.service.XmlConfigServiceTest$MyPageInterceptor;org.apache.click.service.XmlConfigServiceTest$MyPageInterceptor2");
+		container.getServletContext().addInitParameter("mpi1", "std");
+		container.getServletContext().addInitParameter("mpi2", "app");
     container.start();
 
     ConfigService config = ClickUtils.getConfigService(container.getServletContext());
@@ -621,36 +627,36 @@ public class XmlConfigServiceTest extends TestCase {
     deleteDir(tmpdir);
   }
 
+  public static class MyPageInterceptor implements PageInterceptor {
+    @Getter @Setter public String type;
 
-  static public class MyPageInterceptor implements PageInterceptor {
-    @Getter @Setter
-    public String type;
+		@Override
+		public void onInit (ServletContext servletContext) {
+			type = servletContext.getInitParameter("mpi1");
+		}
 
-    @Override public boolean postCreate(Page page) {
-      return false;
-    }
+		@Override public boolean postCreate (Page page){ return false; }
 
     @Override public void postDestroy(Page page) {}
 
-    @Override public boolean preCreate(Class<? extends Page> pageClass, Context context) {
-      return false;
-    }
+    @Override public boolean preCreate (Class<? extends Page> pageClass, Context context){ return false; }
 
-    @Override public boolean preResponse(Page page) {
-      return false;
-    }
+    @Override public boolean preResponse (Page page){ return false; }
 
-    @Override
-    public String toString() {
-      return type;
-    }
+    @Override public String toString (){ return type; }
   }
-
+	public static final class MyPageInterceptor2 extends MyPageInterceptor {
+		@Override
+		public void onInit (ServletContext servletContext) {
+			type = servletContext.getInitParameter("mpi2");
+		}
+	}
 
   public void testMessagesMap () {
     Locale.setDefault(new Locale("ru", "RU"));
     XmlConfigService.clearMessagesMapCache();
-    var context = MockContext.initContext();
+    var context = MockContext.initContext(Map.of("mode", "profile"));
+		assertEquals(ConfigService.Mode.PROFILE, context.getClickServlet().getConfigService().getApplicationMode());
 
     var map = context.createMessagesMap(this.getClass(), "fakeName");
     assertEquals(0, map.size());

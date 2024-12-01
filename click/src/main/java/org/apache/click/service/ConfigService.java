@@ -6,6 +6,7 @@ import org.apache.click.PageInterceptor;
 import org.apache.click.util.Format;
 
 import javax.annotation.Nullable;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import java.lang.reflect.Field;
 import java.util.List;
@@ -104,7 +105,7 @@ public interface ConfigService {
    * @param servletContext the application servlet context
    * @throws Exception if an error occurs initializing the ConfigurationService
    */
-  void onInit (ServletContext servletContext) throws Exception;
+  void onInit (ServletContext servletContext, ServletConfig servletConfig) throws Exception;
 
   /**
    * Destroy the ConfigurationService. This method will also invoke the

@@ -6,9 +6,7 @@
 
 	<display-name>Click Examples</display-name>
 
-	<!--
-	Spring configuration location.
-	-->
+	<!-- Spring configuration location -->
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
 		<param-value>WEB-INF/spring-beans.xml</param-value>
@@ -69,22 +67,18 @@
 		<filter-name>PerformanceFilter</filter-name>
 		<servlet-name>ClickServlet</servlet-name>
 	</filter-mapping>
-
 	<filter-mapping>
 		<filter-name>PerformanceFilter</filter-name>
 		<url-pattern>*.css</url-pattern>
 	</filter-mapping>
-
 	<filter-mapping>
 		<filter-name>PerformanceFilter</filter-name>
 		<url-pattern>*.js</url-pattern>
 	</filter-mapping>
-
 	<filter-mapping>
 		<filter-name>PerformanceFilter</filter-name>
 		<url-pattern>*.gif</url-pattern>
 	</filter-mapping>
-
 	<filter-mapping>
 		<filter-name>PerformanceFilter</filter-name>
 		<url-pattern>*.png</url-pattern>
@@ -113,9 +107,7 @@
 
 	<!-- Servlets -->
 
-	<!--
-	The Spring Click Servlet which handles *.htm requests.
-	-->
+	<!-- The Spring Click Servlet which handles *.htm requests -->
 	<servlet>
 		<servlet-name>ClickServlet</servlet-name>
 		<servlet-class>org.apache.click.extras.spring.SpringClickServlet</servlet-class>
@@ -123,9 +115,24 @@
        <param-name>inject-page-beans</param-name>
        <param-value>true</param-value>
     </init-param>
-    <load-on-startup>0</load-on-startup>
+		<init-param>
+			<param-name>pages</param-name>
+			<param-value>org.apache.click.examples.page</param-value>
+		</init-param>
+		<init-param>
+			<param-name>mode</param-name>
+			<param-value>trace</param-value>
+		</init-param>
+		<init-param>
+			<param-name>page-interceptor</param-name>
+			<param-value>org.apache.click.examples.interceptor.ProfilingInterceptor</param-value>
+		</init-param>
+		<init-param>
+			<param-name>property-service</param-name>
+			<param-value>org.apache.click.service.MVELPropertyService</param-value>
+		</init-param>
+		<load-on-startup>0</load-on-startup>
 	</servlet>
-
 	<servlet-mapping>
 		<servlet-name>ClickServlet</servlet-name>
 		<url-pattern>*.htm</url-pattern>
@@ -137,16 +144,13 @@
   Please note, you only need this mapping in restricted environments where Click
   cannot deploy resources to the file system.
   -->
-  <!-- -->
 	<servlet-mapping>
 		<servlet-name>ClickServlet</servlet-name>
 		<url-pattern>/click/*</url-pattern>
-	</servlet-mapping> <!--  -->
+	</servlet-mapping>
 
 	<!-- Welcome Files -->
-
 	<welcome-file-list>
 		<welcome-file>redirect.html</welcome-file>
 	</welcome-file-list>
-
 </web-app>
