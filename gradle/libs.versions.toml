@@ -12,6 +12,8 @@
 # toolversion=libs.versions.checkstyle.get()
 [versions]
 
+jdk = "17"
+
 groovy = "3.0.22!!" # иначе в момент обновления в maven central глюки из-за разных версий разных модулей groovy
 spring = "5.+!!" # Spring 5.3.32 vs boot 2.7.18 → 5.3.31
 springBoot = "2.+"
@@ -19,7 +21,7 @@ jackson = "2.18.+!!"
 mssql = "12.8.1.jre11!!"
 eclipseCollections = "11.+"
 ebeanVersion = "latest.release"
-slf4jVersion = "1.7.36!!"
+slf4jVersion = "1.7.+!!"
 
 
 ########################################################################################################################
@@ -182,6 +184,7 @@ smallryeConfig = { module = "io.smallrye.config:smallrye-config-core", version="
 smallryeConfigSourceYaml = { module = "io.smallrye.config:smallrye-config-source-yaml", version="latest.release" }
 #smallryeConfigSourceHocon = { module = "io.smallrye.config:smallrye-config-source-hocon", version="latest.release" }
 smallryeConfigValidator = { module = "io.smallrye.config:smallrye-config-validator", version="latest.release" }
+jbossLogging = { module = "org.jboss.logging:jboss-logging", version="latest.release!!" }
 
 #todo SmallRye Fault Tolerance + Mutiny ? Vert.x CircuitBreaker ? Guava RateLimiter/commons-lang CircuitBreaker
 
@@ -264,7 +267,7 @@ springSecurity = ["springSecurityCore","springSecurityWeb","springSecurityConfig
 
 groovyMini = ["groovyCore","groovyTemplates"]
 
-smallryeConfig = ["smallryeConfig","smallryeConfigSourceYaml","snakeYaml","smallryeConfigValidator","jakarta-validationApi","jakarta-annotationApi"]
+smallryeConfig = ["smallryeConfig","smallryeConfigSourceYaml","snakeYaml","smallryeConfigValidator","jakarta-validationApi","jakarta-annotationApi","jbossLogging"]
 
 okHttp = ["okHttpClient","okhttpLoggingInterceptor","okio"]
 
