@@ -1,14 +1,10 @@
 package org.apache.click.service;
 
 import junit.framework.TestCase;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.val;
-import org.apache.click.Context;
 import org.apache.click.MockContainer;
 import org.apache.click.MockContext;
 import org.apache.click.Page;
-import org.apache.click.PageInterceptor;
 import org.apache.click.pages.BinaryPage;
 import org.apache.click.pages.JspPage;
 import org.apache.click.pages.ListenerPage;
@@ -17,13 +13,11 @@ import org.apache.click.util.ClickUtils;
 import org.apache.click.util.ErrorPage;
 import org.apache.click.util.Format;
 
-import javax.servlet.ServletContext;
 import java.io.File;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -584,63 +578,6 @@ public class XmlConfigServiceTest extends TestCase {
 
     deleteDir(tmpdir);
   }
-
-  public void testPageInterceptors() throws Exception {
-    File tmpdir = makeTmpDir();
-
-//    PrintStream pstr = makeXmlStream(tmpdir, "WEB-INF/click.xml");
-//    pstr.println("<click-app>");
-//    pstr.println(" <pages/>");
-//    pstr.println(" <page-interceptor classname='org.apache.click.service.XmlConfigServiceTest$MyPageInterceptor'>");
-//    pstr.println("  <property name='type' value='std'/>");
-//    pstr.println(" </page-interceptor>");
-//    pstr.println(" <page-interceptor classname='org.apache.click.service.XmlConfigServiceTest$MyPageInterceptor' scope='application'>");
-//    pstr.println("  <property name='type' value='app'/>");
-//    pstr.println(" </page-interceptor>");
-//    pstr.println("</click-app>");
-//    pstr.close();
-
-    val container = new MockContainer(tmpdir.getAbsolutePath());
-		container.getServletContext().addInitParameter("page-interceptor", "org.apache.click.service.XmlConfigServiceTest$MyPageInterceptor;org.apache.click.service.XmlConfigServiceTest$MyPageInterceptor2");
-		container.getServletContext().addInitParameter("mpi1", "std");
-		container.getServletContext().addInitParameter("mpi2", "app");
-    container.start();
-
-    ConfigService config = ClickUtils.getConfigService(container.getServletContext());
-
-    List<PageInterceptor> list = config.getPageInterceptors();
-    assertEquals(2, list.size());
-    assertEquals("std", list.get(0).toString());
-    assertEquals("app", list.get(1).toString());
-    container.stop();
-
-    deleteDir(tmpdir);
-  }
-
-  public static class MyPageInterceptor implements PageInterceptor {
-    @Getter @Setter public String type;
-
-		@Override
-		public void onInit (ServletContext servletContext) {
-			type = servletContext.getInitParameter("mpi1");
-		}
-
-		@Override public boolean postCreate (Page page){ return false; }
-
-    @Override public void postDestroy(Page page) {}
-
-    @Override public boolean preCreate (Class<? extends Page> pageClass, Context context){ return false; }
-
-    @Override public boolean preResponse (Page page){ return false; }
-
-    @Override public String toString (){ return type; }
-  }
-	public static final class MyPageInterceptor2 extends MyPageInterceptor {
-		@Override
-		public void onInit (ServletContext servletContext) {
-			type = servletContext.getInitParameter("mpi2");
-		}
-	}
 
   public void testMessagesMap () {
     Locale.setDefault(new Locale("ru", "RU"));

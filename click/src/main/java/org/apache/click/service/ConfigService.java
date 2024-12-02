@@ -2,7 +2,6 @@ package org.apache.click.service;
 
 import lombok.NonNull;
 import org.apache.click.Page;
-import org.apache.click.PageInterceptor;
 import org.apache.click.util.Format;
 
 import javax.annotation.Nullable;
@@ -322,13 +321,6 @@ public interface ConfigService {
    * @return an array bindable fields for the given page class
    */
   Field[] getPageFieldArray(Class<? extends Page> pageClass);
-
-  /**
-   * Return the list of configured PageInterceptors instances.
-   *
-   * @return the list of configured PageInterceptors instances
-   */
-  List<PageInterceptor> getPageInterceptors();
 
   /**
    * Return the page not found <tt>Page</tt> <tt>Class</tt>.

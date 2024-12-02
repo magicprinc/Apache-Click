@@ -2,20 +2,15 @@ package org.apache.click.service;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
-import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.SneakyThrows;
-import lombok.Value;
-import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.click.Context;
 import org.apache.click.Page;
-import org.apache.click.PageInterceptor;
 import org.apache.click.util.Bindable;
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.Format;
@@ -146,9 +141,6 @@ public class XmlConfigService implements ConfigService {
    */
 	@Getter(onMethod_=@Override) private Mode applicationMode = Mode.PRODUCTION;
 
-  /** The list of application page interceptor instances. */
-  private final List<PageInterceptorConfig> pageInterceptorConfigList = new ArrayList<>();
-
   /**
 	 The ServletContext instance.
 	 @see javax.servlet.ServletContext
@@ -227,9 +219,6 @@ public class XmlConfigService implements ConfigService {
 
 		// Load the Resource service
 		loadResourceService();
-
-		// Load the PageInterceptors
-		loadPageInterceptors();
   }
 
   /** @see ConfigService#onDestroy() */
@@ -586,19 +575,6 @@ public class XmlConfigService implements ConfigService {
     } else {
       return Collections.emptyMap();
     }
-  }
-
-  /**
-   * @see ConfigService#getPageInterceptors()
-   *
-   * @return the list of configured PageInterceptor instances
-   */
-  @Override
-	public List<PageInterceptor> getPageInterceptors() {
-    if (pageInterceptorConfigList.isEmpty()){
-      return Collections.emptyList();
-    }
-    return pageInterceptorConfigList.stream().map(PageInterceptorConfig::getPageInterceptor).toList();
   }
 
   /**
@@ -1076,25 +1052,6 @@ public class XmlConfigService implements ConfigService {
     fileUploadService.onInit(servletContext);
   }
 
-  private void loadPageInterceptors () throws Exception {
-    List<String> interceptorList = Splitter.on(';').omitEmptyStrings().trimResults().splitToList(opt("page-interceptor"));
-
-    for (String classname : interceptorList) {// Element interceptorElm . classname
-      //String scopeValue = interceptorElm.getAttribute("scope");
-      boolean applicationScope = true;// "application".equalsIgnoreCase(scopeValue);
-
-			Class<? extends PageInterceptor> interceptorClass = ClickUtils.classForName(classname);
-
-//			List<Property> propertyList = Collections.emptyList();//new ArrayList<>();
-//      Map<String, String> propertyMap = loadPropertyMap(interceptorElm);
-//      for (String name : propertyMap.keySet()){
-//        propertyList.add(new Property(name, propertyMap.get(name)));  }
-      val pageInterceptorConfig = new PageInterceptorConfig(interceptorClass, applicationScope, /*propertyList,*/ servletContext);
-
-      pageInterceptorConfigList.add(pageInterceptorConfig);
-    }
-  }
-
 	private String opt (String initParamName) {
 		String s = trim(servletConfig.getInitParameter(initParamName));// <servlet> <init-param> <param-name>/<param-value>
 		if (!s.isEmpty()){
@@ -1487,49 +1444,6 @@ public class XmlConfigService implements ConfigService {
     public String toString() {
       return getClass().getName() + "[fileSet=" + fileSet + ",pathSet=" + pathSet + "]";
     }
-  }
-
-	@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-  static final class PageInterceptorConfig {
-    final Class<? extends PageInterceptor> interceptorClass;
-    final boolean applicationScope;
-    //final List<Property> properties;
-		final ServletContext servletContext;
-    PageInterceptor pageInterceptor;
-
-    public PageInterceptor getPageInterceptor () {
-      // If cached interceptor not already created (application scope)
-      // or is scope request then create a new interceptor
-      if (pageInterceptor == null || !applicationScope){
-				PageInterceptor listener;
-        try {
-          listener = interceptorClass.newInstance();
-
-//          ConfigService configService = ClickUtils.getConfigService();
-//          PropertyService propertyService = configService.getPropertyService();
-//          for (Property property : properties) {
-//            propertyService.setValue(listener, property.name(), property.value());
-//          }
-					listener.onInit(servletContext);
-        } catch (Exception e){
-          throw new RuntimeException(e);
-        }
-
-        if (applicationScope){
-          pageInterceptor = listener;
-        }
-				return listener;
-
-      } else {
-        return pageInterceptor;
-      }
-    }
-  }
-
-  @Value @Accessors(fluent = true)
-  public static class Property {
-    String name;
-    String value;
   }
 
   /** Cache of resource bundle and locales which were not found, with support for multiple class loaders. */

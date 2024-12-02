@@ -32,7 +32,6 @@ import java.io.PrintWriter;
 import java.io.Serial;
 import java.io.Writer;
 import java.lang.reflect.Field;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
@@ -88,7 +87,6 @@ import java.util.TreeMap;
  */
 public class ClickServlet extends HttpServlet {
   @Serial private static final long serialVersionUID = -2529351634349647916L;
-
   /**
    * The <tt>mock page reference</tt> request attribute: key: &nbsp;
    * <tt>mock_page_reference</tt>.
@@ -125,7 +123,6 @@ public class ClickServlet extends HttpServlet {
    */
 	protected static final String FORWARD_PAGE = "forward-page";
 
-
   /** The click application configuration service instance. Same as in ServletContext */
   @Getter protected ConfigService configService;
 
@@ -134,10 +131,6 @@ public class ClickServlet extends HttpServlet {
 
   /** The application resource service. */
   protected ResourceService resourceService;
-
-  /** The thread local page listeners. */
-  private static final ThreadLocal<List<PageInterceptor>>THREAD_LOCAL_INTERCEPTORS = new ThreadLocal<>();
-
 
   /**
    * Initialize the Click servlet and the Velocity runtime.
@@ -196,10 +189,8 @@ public class ClickServlet extends HttpServlet {
       // Dereference the application config service
       configService = null;
     }
-
     super.destroy();
   }
-
 
   /**
    * Handle HTTP GET requests. This method will delegate the request to
@@ -328,18 +319,10 @@ public class ClickServlet extends HttpServlet {
       handleException(request, response, isPost, cause, pageClass);
 
     } finally {
-
       try {
-        if (page != null) {
+        if (page != null){
           processPageOnDestroy(page, startTime);
         }
-
-        for (PageInterceptor interceptor : getThreadLocalInterceptors()) {
-          interceptor.postDestroy(page);
-        }
-
-        setThreadLocalInterceptors(null);
-
       } finally {
         // Only clear the context when running in normal mode.
         if (request.getAttribute(MOCK_MODE_ENABLED) == null) {
@@ -731,16 +714,7 @@ public class ClickServlet extends HttpServlet {
    * @param actionResult the action result
    * @throws java.lang.Exception if error occurs
    */
-  protected void performRender(Page page, Context context, ActionResult actionResult)
-      throws Exception {
-
-    // Process page interceptors, and abort rendering if specified
-    for (PageInterceptor interceptor : getThreadLocalInterceptors()) {
-      if (!interceptor.preResponse(page)) {
-        return;
-      }
-    }
-
+  protected void performRender (Page page, Context context, ActionResult actionResult) throws Exception {
     final HttpServletRequest request = context.getRequest();
     final HttpServletResponse response = context.getResponse();
 
@@ -984,35 +958,17 @@ public class ClickServlet extends HttpServlet {
 
       return forwardPage;
     }
-
     Class<? extends Page> pageClass = configService.getPageClass(path);
 
     if (pageClass == null) {
       pageClass = configService.getNotFoundPageClass();
       path = ConfigService.NOT_FOUND_PATH;
     }
-    // Set thread local app page listeners
-    List<PageInterceptor> interceptors = configService.getPageInterceptors();
-    setThreadLocalInterceptors(interceptors);
-
-    for (PageInterceptor listener : interceptors) {
-      if (!listener.preCreate(pageClass, context)) {
-        return null;
-      }
-    }
-
     final Page page = initPage(path, pageClass, request);
 
     if (page.getFormat() == null) {
       page.setFormat(configService.createFormat());
     }
-
-    for (PageInterceptor listener : interceptors) {
-      if (!listener.postCreate(page)) {
-        return null;
-      }
-    }
-
     return page;
   }
 
@@ -1219,12 +1175,10 @@ public class ClickServlet extends HttpServlet {
    *
    * @param page the page whose fields are to be processed
    */
-  protected void processPageRequestParams(Page page) {
-
-    if (configService.getPageFields(page.getClass()).isEmpty()) {
+  protected void processPageRequestParams (Page page) {
+    if (configService.getPageFields(page.getClass()).isEmpty()){
       return;
     }
-
     ConfigService configService = ClickUtils.getConfigService();
     PropertyService propertyService = configService.getPropertyService();
     HttpServletRequest request = page.getContext().getRequest();
@@ -1714,9 +1668,7 @@ public class ClickServlet extends HttpServlet {
    * @param controlRegistry the control registry
    * @return true if the page should continue processing, false otherwise
    */
-  protected boolean processAjaxTargetControls(Context context,
-      ActionEventDispatcher eventDispatcher, ControlRegistry controlRegistry) {
-
+  protected boolean processAjaxTargetControls(Context context, ActionEventDispatcher eventDispatcher, ControlRegistry controlRegistry) {
     boolean continueProcessing = true;
 
     // Resolve the Ajax target control for this request
@@ -1908,16 +1860,6 @@ public class ClickServlet extends HttpServlet {
     }
   }
 
-  List<PageInterceptor> getThreadLocalInterceptors() {
-    List<PageInterceptor> listeners = THREAD_LOCAL_INTERCEPTORS.get();
-
-    return listeners != null ? listeners : Collections.emptyList();
-  }
-
-  void setThreadLocalInterceptors(List<PageInterceptor> listeners){
-    THREAD_LOCAL_INTERCEPTORS.set(listeners);
-  }
-
   /**
    * Retrieve a writer instance for the given context.
    *
@@ -1925,11 +1867,10 @@ public class ClickServlet extends HttpServlet {
    * @return a writer instance
    * @throws IOException if an input or output exception occurred
    */
-  Writer getWriter(HttpServletResponse response) throws IOException {
+  Writer getWriter (HttpServletResponse response) throws IOException {
     try {
       return response.getWriter();
-
-    } catch (IllegalStateException ignore) {
+    } catch (IllegalStateException ignore){
       // If writer cannot be retrieved fallback to OutputStream. CLK-644
       return new OutputStreamWriter(response.getOutputStream(), response.getCharacterEncoding());
     }
@@ -2037,7 +1978,6 @@ public class ClickServlet extends HttpServlet {
         logger.trace(buffer.toString());
       }
     }
-
     return ajaxTarget;
   }
 
@@ -2046,8 +1986,7 @@ public class ClickServlet extends HttpServlet {
    *
    * @param request the HTTP servlet request
    */
-  private void logRequestParameters(HttpServletRequest request) {
-
+  private void logRequestParameters (HttpServletRequest request) {
     Map<String, String[]> requestParams = new TreeMap<>();
 
     Enumeration<?> e = request.getParameterNames();
