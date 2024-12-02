@@ -13,7 +13,6 @@ import java.io.FileWriter;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.HashMap;
 
 /**
  * Sanity checks for Mock package.
@@ -31,15 +30,13 @@ public class MockTests extends TestCase {
     assertNotNull(servletContext);
   }
 
-  /**
-   * Some sanity checks for ServletConfig.
-   */
-  public void testMockServletConfig() {
+  /** Some sanity checks for ServletConfig. */
+  public void testMockServletConfig () {
     final String servletName = "click servlet";
     final String key = "initKey";
     final String value = "initValue";
     val servletContext = new MockServletContext();
-    MockServletConfig servletConfig = new MockServletConfig(servletName, servletContext, new HashMap<>());
+    val servletConfig = new MockServletConfig(servletName, servletContext);
 
     //test that the method is null safe
     servletConfig.addInitParameters(null);

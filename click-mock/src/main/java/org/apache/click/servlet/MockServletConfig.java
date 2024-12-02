@@ -1,43 +1,32 @@
 package org.apache.click.servlet;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 
+import javax.annotation.Nullable;
 import javax.servlet.ServletConfig;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Mock implementation of {@link javax.servlet.ServletConfig}.
  * <p/>
  * Implements all of the methods from the standard ServletConfig class plus
  * helper methods to aid setting up a config.
+ * @see MockServletContext
  */
 public class MockServletConfig implements ServletConfig {
 
 	/** The servlet context. */
-	@Setter private MockServletContext servletContext;
+	@Getter(onMethod_=@Override) @Setter private MockServletContext servletContext;
 
 	/** The servlet name. */
-	@Getter(onMethod_=@Override) @Setter private String servletName = "mock click servlet";
+	@Getter(onMethod_=@Override) @Setter private String servletName;
 
-	/**
-	 * Create a new MockServletConfig instance with the specified servletName.
-	 *
-	 * @param servletName the servlet name
-	 */
-	public MockServletConfig (String servletName) {
-		this(servletName, null);
-	}
-
-	/**
-	 * Create a new MockServletConfig instance with the specified servletContext.
-	 *
-	 * @param servletContext the servletContext
-	 */
-	public MockServletConfig (MockServletContext servletContext) {
-		this(null, servletContext);
-	}
+	private final Map<String,String> initParams = new ConcurrentHashMap<>();
 
 	/**
 	 * Create a new MockServletConfig instance with the specified servletName
@@ -46,32 +35,10 @@ public class MockServletConfig implements ServletConfig {
 	 * @param servletName the servlet name
 	 * @param servletContext the servlet context
 	 */
-	public MockServletConfig (String servletName, MockServletContext servletContext) {
-		this(servletName, servletContext, null);
-	}
-
-	/**
-	 * Create a new MockServletConfig instance with the specified servletName,
-	 * servletContext and initialization parameters.
-	 *
-	 * @param servletName the servlet name
-	 * @param servletContext the servlet context
-	 * @param initParameters the initialization parameters
-	 */
-	public MockServletConfig (String servletName, MockServletContext servletContext, Map<String,String> initParameters) {
+	public MockServletConfig (@NonNull String servletName, @NonNull MockServletContext servletContext) {
 		this.servletContext = servletContext;
 		this.servletName = servletName;
-		addInitParameters(initParameters);
-	}
-
-	@Override
-	public MockServletContext getServletContext () {
-		if (servletContext == null){
-			servletContext = new MockServletContext();
-			servletContext.addInitParameter("pages", "org.apache.click.pages");
-		}
-		return servletContext;
-	}
+	}//new
 
 	/**
 	 * Add an init parameter.
@@ -80,7 +47,7 @@ public class MockServletConfig implements ServletConfig {
 	 * @param value The parameter value
 	 */
 	public void addInitParameter (String name, String value) {
-		getServletContext().addInitParameter(name, value);
+		initParams.put(name, value);
 	}
 
 	/**
@@ -89,7 +56,7 @@ public class MockServletConfig implements ServletConfig {
 	 * @param initParameters A map of init parameters
 	 */
 	public void addInitParameters (Map<String, String> initParameters) {
-		getServletContext().addInitParameters(initParameters);
+		initParams.putAll(initParameters);
 	}
 
 	/**
@@ -101,7 +68,7 @@ public class MockServletConfig implements ServletConfig {
 	 */
 	@Override
 	public Enumeration<String> getInitParameterNames () {
-		return getServletContext().getInitParameterNames();
+		return Collections.enumeration(initParams.keySet());
 	}
 
 	/**
@@ -111,8 +78,8 @@ public class MockServletConfig implements ServletConfig {
 	 * @param name a String specifying the name of the initialization parameter
 	 * @return a String containing the value of the initialization parameter
 	 */
-	@Override
+	@Override  @Nullable
 	public String getInitParameter (String name) {
-		return getServletContext().getInitParameter(name);
+		return initParams.get(name);
 	}
 }
