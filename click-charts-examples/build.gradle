@@ -5,15 +5,25 @@ plugins {
   id 'idea'
 
   alias(libs.plugins.grettyWebContainer)
+	alias(libs.plugins.spring.boot)
+	alias(libs.plugins.spring.dependencyManagement)
 
 	alias(libs.plugins.lombok)
 	alias(libs.plugins.sonarlint)
 	alias(libs.plugins.errorprone)
+	alias(libs.plugins.gradleGitProperties)
 }
 
 repositories {
   mavenLocal()
   mavenCentral()
+}
+
+dependencyManagement {
+	imports {
+		//VAADIN: mavenBom "com.vaadin:vaadin-bom:${vaadinVersion}"
+		mavenBom org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES // SPRING
+	}
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -35,6 +45,7 @@ tasks.withType(JavaCompile).configureEach {
 
 dependencies {
   errorprone "com.google.errorprone:error_prone_core:latest.release"
+	implementation libs.jsr305
 
 	compileOnly libs.javaxServletApi
 
@@ -43,9 +54,16 @@ dependencies {
   implementation project(':click-velocity')
   implementation project(':click-charts')
 
+	implementation 'org.springframework.boot:spring-boot-starter'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-cache'
+	implementation 'org.springframework.boot:spring-boot-starter-data-rest'
+	implementation 'org.springframework.boot:spring-boot-starter-freemarker'
+	implementation(libs.springBootStarterValidation, libs.springBootStarterWeb, libs.bundles.upgradeBootApp)
+	implementation("org.apache.tomcat.embed:tomcat-embed-core:9.0.+", "org.apache.tomcat.embed:tomcat-embed-el:9.0.+", "org.apache.tomcat.embed:tomcat-embed-websocket:9.0.+")
+
   // we need to put it in .war
 	implementation(libs.slf4jApi, libs.slf4jJCL, libs.slf4jLog4j)
-	implementation libs.slf4jSimple
 
   //*** TEST TEST TEST
   testImplementation libs.bundles.junit
