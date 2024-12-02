@@ -597,7 +597,7 @@ public class MockContainer {
 				this.setClickServlet(new ClickServlet());
 			}
 
-			if (getServletConfig().getInitParameter("pages") == null){
+			if (getServletConfig().getInitParameter("pages") == null && getServletContext().getInitParameter("pages") == null){
 				getServletConfig().addInitParameter("pages", "org.apache.click.pages");
 			}
 
@@ -614,6 +614,7 @@ public class MockContainer {
 			if (locale == null) {
 				locale = Locale.getDefault();
 			}
+
 			if (getRequest() == null) {
 				setRequest(new MockRequest(locale, getServletContext(), getSession()));
 			}

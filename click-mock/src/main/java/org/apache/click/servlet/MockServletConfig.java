@@ -8,8 +8,8 @@ import javax.annotation.Nullable;
 import javax.servlet.ServletConfig;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Mock implementation of {@link javax.servlet.ServletConfig}.
@@ -26,7 +26,7 @@ public class MockServletConfig implements ServletConfig {
 	/** The servlet name. */
 	@Getter(onMethod_=@Override) @Setter private String servletName;
 
-	private final Map<String,String> initParams = new ConcurrentHashMap<>();
+	private final Map<String,String> initParams = new HashMap<>();
 
 	/**
 	 * Create a new MockServletConfig instance with the specified servletName
@@ -56,7 +56,9 @@ public class MockServletConfig implements ServletConfig {
 	 * @param initParameters A map of init parameters
 	 */
 	public void addInitParameters (Map<String, String> initParameters) {
-		initParams.putAll(initParameters);
+		if (initParameters != null){
+			initParams.putAll(initParameters);
+		}
 	}
 
 	/**
