@@ -1,16 +1,33 @@
-<web-app>
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+				 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				 xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee https://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+				 version="2.4">
 
 	<servlet>
 		<servlet-name>ClickServlet</servlet-name>
 		<servlet-class>org.apache.click.ClickServlet</servlet-class>
+		<!-- net.sf.click.chart.test -->
+		<init-param>
+			<param-name>pages</param-name>
+			<param-value>org.apache.click.examples.page</param-value>
+		</init-param>
 		<load-on-startup>0</load-on-startup>
 	</servlet>
-
 	<servlet-mapping>
 		<servlet-name>ClickServlet</servlet-name>
 		<url-pattern>*.htm</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>ClickServlet</servlet-name>
 		<url-pattern>*.js</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>ClickServlet</servlet-name>
 		<url-pattern>*.css</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>ClickServlet</servlet-name>
 		<url-pattern>*.png</url-pattern>
 	</servlet-mapping>
 
@@ -22,9 +39,8 @@
 		<session-timeout>120</session-timeout>
 	</session-config>
 
-	<init-param>
+	<!--init-param>
 		<param-name>cacheControl</param-name>
 		<param-value>max-age=0,public</param-value>
-	</init-param>
-
+	</init-param-->
 </web-app>
