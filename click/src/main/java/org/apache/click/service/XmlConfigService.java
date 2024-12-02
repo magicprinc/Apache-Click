@@ -605,15 +605,16 @@ public class XmlConfigService implements ConfigService {
       // Append period (.) after package:  packageName = 'org.apache.click.'
       packageName = pagesPackage + ".";
     }
-
     String className = "";
 
     // Strip off extension:  path = '/pages/edit-customer'
-    String path = pagePath.substring(0, pagePath.lastIndexOf('.'));// todo improve getExtension
-
+		int dotIndex = pagePath.lastIndexOf('.');
+		String path = dotIndex >= 0
+				? pagePath.substring(0, dotIndex)// todo improve getExtension
+		    : pagePath;
     // If page is excluded return the excluded class
     Class<? extends  Page> excludePageClass = getExcludesPageClass(path);
-    if (excludePageClass != null) {
+    if (excludePageClass != null){
       return excludePageClass;
     }
     // Build complete packageName:
