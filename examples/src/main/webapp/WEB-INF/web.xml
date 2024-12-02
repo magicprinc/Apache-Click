@@ -124,10 +124,6 @@
 			<param-value>trace</param-value>
 		</init-param>
 		<init-param>
-			<param-name>page-interceptor</param-name>
-			<param-value>org.apache.click.examples.interceptor.ProfilingInterceptor</param-value>
-		</init-param>
-		<init-param>
 			<param-name>property-service</param-name>
 			<param-value>org.apache.click.service.MVELPropertyService</param-value>
 		</init-param>
