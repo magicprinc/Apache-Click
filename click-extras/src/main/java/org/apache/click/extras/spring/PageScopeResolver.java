@@ -1,10 +1,12 @@
 package org.apache.click.extras.spring;
 
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.click.Page;
 import org.apache.click.util.ClickUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.AnnotationScopeMetadataResolver;
 import org.springframework.context.annotation.ScopeMetadata;
 import org.springframework.context.annotation.ScopeMetadataResolver;
 
@@ -60,7 +62,8 @@ import org.springframework.context.annotation.ScopeMetadataResolver;
  *
  * @see SpringClickServlet
  */
-public class PageScopeResolver implements ScopeMetadataResolver {
+@Slf4j
+public class PageScopeResolver extends AnnotationScopeMetadataResolver {
   /**
    * Return the scope meta data for the given bean definition. This scope meta
    * data resolver will resolve "prototype" scope for any Click Page bean
@@ -73,22 +76,22 @@ public class PageScopeResolver implements ScopeMetadataResolver {
    */
   @Override
 	public ScopeMetadata resolveScopeMetadata (BeanDefinition beanDef) {
-    val sm = new ScopeMetadata();// e.g: "singleton"
     try {
       Class<?> beanClass = ClickUtils.classForName(beanDef.getBeanClassName());
 
       if (Page.class.isAssignableFrom(beanClass)){
+				val sm = new ScopeMetadata();// e.g: "singleton"
         sm.setScopeName(ConfigurableBeanFactory.SCOPE_PROTOTYPE);
+				return sm;
 
       } else {
-        // TODO: see whether we can determine the default scope definition
-        // from the beanDef and return this instead.
-        sm.setScopeName(ConfigurableBeanFactory.SCOPE_SINGLETON);
+        // TODO: see whether we can determine the default scope definition from the beanDef and return this instead.
+        // sm.setScopeName(ConfigurableBeanFactory.SCOPE_SINGLETON);
+				return super.resolveScopeMetadata(beanDef);
       }
-      return sm;
-
     } catch (Exception e){
-      throw new RuntimeException("Could not load class for beanDef: "+ beanDef, e);
+			log.warn("Could not load class for beanDef: {}", beanDef, e);
+			return super.resolveScopeMetadata(beanDef);
     }
   }
 }
