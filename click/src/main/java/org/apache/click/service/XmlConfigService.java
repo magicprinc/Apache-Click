@@ -988,7 +988,7 @@ public class XmlConfigService implements ConfigService {
   private void loadMode () {
 		String modeValue = opt("mode");
 		if (modeValue.isEmpty()){
-			modeValue = "development";
+			modeValue = "production";
 		}
     modeValue = ClickUtils.sysEnv("click.mode", modeValue);
 

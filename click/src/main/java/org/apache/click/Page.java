@@ -1,6 +1,7 @@
 package org.apache.click;
 
 import lombok.NonNull;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.click.element.Element;
 import org.apache.click.util.ClickUtils;
@@ -158,8 +159,13 @@ public class Page implements Serializable {
   /** The forward path. */
   protected String forward;
 
-  /** The HTTP response headers. */
-  protected Map<String, Object> headers;
+  /** The HTTP response headers.
+	 * -- SETTER --
+	 *  Set the map of HTTP header to be set in the HttpServletResponse.
+	 *@param value the map of HTTP header to be set in the HttpServletResponse
+
+	 */
+  @Setter protected Map<String, Object> headers;
 
   /** The map of localized page resource messages. **/
   protected transient Map<String, String> messages;
@@ -592,35 +598,11 @@ public class Page implements Serializable {
    * @param name the name of the header
    * @param value the value of the header, either a String, Date or Integer
    */
-  public void setHeader(String name, Object value) {
-    if (name == null) {
-      throw new IllegalArgumentException("Null header name parameter");
-    }
-
+  public void setHeader (@NonNull String name, Object value) {
     getHeaders().put(name, value);
   }
 
-  /**
-   * Set the map of HTTP header to be set in the HttpServletResponse.
-   *
-   * @param value the map of HTTP header to be set in the HttpServletResponse
-   */
-  public void setHeaders(Map<String, Object> value) {
-    headers = value;
-  }
-
-  /**
-   * @deprecated use the new {@link #getHeadElements()} instead
-   *
-   * @return the HTML includes statements for the control stylesheet and
-   * JavaScript files
-   */
-  @Deprecated
-  public final String getHtmlImports() {
-    throw new UnsupportedOperationException("Use getHeadElements instead");
-  }
-
-  /**
+	/**
    * Return the list of HEAD {@link org.apache.click.element.Element elements}
    * to be included in the page. Example HEAD elements include
    * {@link org.apache.click.element.JsImport JsImport},
@@ -949,7 +931,7 @@ public class Page implements Serializable {
   @Deprecated
   public static boolean isStateful() { return false;}
 
-  /**
+  /*
    * Set whether the page is stateful and should be saved in the users
    * HttpSession between requests.
    * <p/>
@@ -972,13 +954,12 @@ public class Page implements Serializable {
    *         between user requests
    */
   @Deprecated
-  public void setStateful(boolean stateful) {
+  void setStateful(boolean stateful) {
     if (stateful) {
       log.error("setStateful(true): stateful pages are not supported anymore, use stateful Controls instead");
     }
 //        this.stateful = stateful;
-//        if (isStateful()) {
-//            getContext().getSession();
+//        if (isStateful()){ getContext().getSession();
   }
 
   /**

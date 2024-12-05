@@ -11,17 +11,18 @@ import org.apache.click.control.Table;
 import org.apache.click.extras.control.LinkDecorator;
 import org.apache.click.util.Bindable;
 
+import java.io.Serial;
+
 public class ViewCustomers extends BorderPage {
-    private static final long serialVersionUID = -8820573903081328643L;
+	@Serial private static final long serialVersionUID = -8820573903081328643L;
 
-	@Bindable public Table table = new Table();
-	@Bindable public PageLink editLink = new PageLink("Edit", EditCustomer.class);
-	@Bindable public ActionLink deleteLink = new ActionLink("Delete", this, "onDeleteClick");
+	@Bindable public final Table table = new Table();
+	@Bindable public final PageLink editLink = new PageLink("Edit", EditCustomer.class);
+	@Bindable public final ActionLink deleteLink = new ActionLink("Delete", this, "onDeleteClick");
 
-
-	public ViewCustomers() {
+	public ViewCustomers () {
 		// Set Page to stateful to preserve Table sort and paging state while editing customers
-		setStateful(true);
+		//× setStateful(true);
 
 		table.setClass(Table.CLASS_ORANGE1);
 		table.setPageSize(10);

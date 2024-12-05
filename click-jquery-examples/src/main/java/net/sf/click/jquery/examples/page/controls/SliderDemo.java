@@ -41,7 +41,8 @@ public class SliderDemo extends BorderPage {
         form.add(new Submit("submit"));
     }
 
-     public List getHeadElements() {
+     @Override
+		 public List getHeadElements() {
         if (headElements == null) {
             headElements = super.getHeadElements();
 

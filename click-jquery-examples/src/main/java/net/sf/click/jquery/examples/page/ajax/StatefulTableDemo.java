@@ -13,25 +13,24 @@ import org.apache.click.control.Table;
 import org.apache.click.dataprovider.PagingDataProvider;
 import org.apache.click.extras.control.TableInlinePaginator;
 
+import java.io.Serial;
 import java.util.List;
 
 public class StatefulTableDemo extends BorderPage {
-  private static final long serialVersionUID = -3077994465944158299L;
+  @Serial private static final long serialVersionUID = -3077994465944158299L;
 
   private final ActionLink link = new ActionLink("link", "Load Table");
-
   private Table table;
-
   private final TableAjaxBehavior tableAjaxBehavior  = new TableAjaxBehavior();
 
   public StatefulTableDemo() {
-    setStateful(true);
+    //setStateful(true);
 
     buildTable();
 
-    table.setDataProvider(new PagingDataProvider() {
-
-      @Override public List<Customer> getData() {
+    table.setDataProvider(new PagingDataProvider<Customer>(){
+      @Override
+			public List<Customer> getData() {
         int start = table.getFirstRow();
         int count = table.getPageSize();
         String sortColumn = table.getSortedColumn();
@@ -39,8 +38,8 @@ public class StatefulTableDemo extends BorderPage {
 
         return getCustomerService().getCustomersForPage(start, count, sortColumn, ascending);
       }
-
-      @Override public int size() {
+      @Override
+			public int size() {
         return getCustomerService().getNumberOfCustomers();
       }
     });
@@ -96,13 +95,13 @@ public class StatefulTableDemo extends BorderPage {
 
 
   private class TableAjaxBehavior extends JQBehavior {
-    private static final long serialVersionUID = -4306726090265011755L;
+    @Serial private static final long serialVersionUID = -4306726090265011755L;
 
-    @Override public ActionResult onAction(Control source, JQEvent event) {
+    @Override
+		public ActionResult onAction(Control source, JQEvent event) {
       JQTaconite actionResult = new JQTaconite();
 
-      // Note: table must be processed in order to update paging and
-      // sorting
+      // Note: table must be processed in order to update paging and sorting
       table.onProcess();
 
       // Replace the content of the element (with ID #target) with table
