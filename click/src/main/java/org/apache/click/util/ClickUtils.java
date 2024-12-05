@@ -816,7 +816,6 @@ public class ClickUtils {
    * @return true if the given control request value be bound, false otherwise
    */
   public static boolean canBind(Control control, Context context) {
-
     if (context.isForward()) {
       return false;
     }
@@ -858,13 +857,6 @@ public class ClickUtils {
 
     ClassLoader classLoader = ClickUtils.class.getClassLoader();
     return (Class<T>) Class.forName(classname, true, classLoader);
-  }
-
-  @SuppressWarnings({"unchecked", "deprecation"})
-  public static <T> T newClassForName (@NonNull String classname)
-      throws ClassNotFoundException, InstantiationException, IllegalAccessException
-  {
-    return (T) classForName(classname).newInstance();
   }
 
   /**

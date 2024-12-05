@@ -17,7 +17,6 @@ import org.apache.click.util.Format;
 import org.apache.click.util.HtmlStringBuffer;
 import org.apache.click.util.MessagesMap;
 import org.apache.commons.lang3.StringUtils;
-import org.w3c.dom.Element;
 
 import javax.annotation.Nullable;
 import javax.servlet.ServletConfig;
@@ -28,6 +27,7 @@ import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
@@ -94,7 +94,7 @@ public class XmlConfigService implements ConfigService {
   final Map<Class<? extends Page>,Object> pageByClassMap = new HashMap<>();
 
   /** The list of page packages. */
-  @Getter final List<String> pagePackages = new ArrayList<>();
+  @Getter final Set<String> pagePackages = new LinkedHashSet<>();
 
   /**
 	 The automatically bind controls, request parameters and models flag.
@@ -254,9 +254,7 @@ public class XmlConfigService implements ConfigService {
   }
 
   @Override
-	public boolean isProfileMode() {
-    return applicationMode == Mode.PROFILE;
-  }
+	public boolean isProfileMode (){ return applicationMode == Mode.PROFILE; }
 
   /**
    * @see ConfigService#isJspPage(String)
@@ -265,16 +263,15 @@ public class XmlConfigService implements ConfigService {
    * @return true if JSP exists for the given ".htm" path
    */
   @Override
-	public boolean isJspPage(String path) {
-    val buffer = new HtmlStringBuffer();
-    int index = StringUtils.lastIndexOf(path, ".");
-    if (index > 0) {
-      buffer.append(path.substring(0, index));
+	public boolean isJspPage (String path) {
+    final String buffer;
+    int index = path.lastIndexOf('.');
+    if (index > 0){
+      buffer = path.substring(0, index) +".jsp";
     } else {
-      buffer.append(path);
+      buffer = path +".jsp";
     }
-    buffer.append(".jsp");
-    return pageByPathMap.containsKey(buffer.toString());
+    return pageByPathMap.containsKey(buffer);
   }
 
   /**
@@ -460,11 +457,10 @@ public class XmlConfigService implements ConfigService {
    *
    * @return the list of configured page classes
    */
-  @Override public List<Class<? extends Page>> getPageClassList() {
-    List<Class<? extends Page>> classList = new ArrayList<>(pageByClassMap.size());
-
-    classList.addAll(ClickUtils.castUnsafe(pageByClassMap.keySet()));
-
+  @Override
+	public List<Class<? extends Page>> getPageClassList () {
+    val classList = new ArrayList<Class<? extends Page>>(pageByClassMap.size());
+    classList.addAll(pageByClassMap.keySet());
     return classList;
   }
 
@@ -594,24 +590,23 @@ public class XmlConfigService implements ConfigService {
    * @param pagesPackage the package of the page class
    * @return the page class for the specified pagePath and pagesPackage
    */
-  protected Class<? extends  Page> getPageClass (String pagePath, String pagesPackage) {
+  @Nullable
+	protected Class<? extends Page> getPageClass (String pagePath, String pagesPackage) {
     // To understand this method lets walk through an example as the code plays out.
     // Imagine this method is called with the arguments:
     // pagePath     = '/pages/edit-customer.htm'
     // pagesPackage = 'org.apache.click'
 
-    String packageName = "";
+    String packageName = "", className = "";
     if (StringUtils.isNotBlank(pagesPackage)) {
-      // Append period (.) after package:  packageName = 'org.apache.click.'
-      packageName = pagesPackage + ".";
+      // Append period (.) after package ⇒ packageName = 'org.apache.click.'
+      packageName = pagesPackage + '.';
     }
-    String className = "";
 
     // Strip off extension:  path = '/pages/edit-customer'
 		int dotIndex = pagePath.lastIndexOf('.');
-		String path = dotIndex >= 0
-				? pagePath.substring(0, dotIndex)// todo improve getExtension
-		    : pagePath;
+		String path = dotIndex >= 0 ? pagePath.substring(0, dotIndex)// todo improve getExtension
+		    	: pagePath;// no extension 🤷‍♀️
     // If page is excluded return the excluded class
     Class<? extends  Page> excludePageClass = getExcludesPageClass(path);
     if (excludePageClass != null){
@@ -620,67 +615,56 @@ public class XmlConfigService implements ConfigService {
     // Build complete packageName:
     // packageName = 'org.apache.click.pages.'
     // className   = 'edit-customer'
-    if (path.contains("/")) {
+    if (path.contains("/")){// ~ pagePath without .ext
       val tokenizer = new StringTokenizer(path, "/");
-      while (tokenizer.hasMoreTokens()) {
+      while (tokenizer.hasMoreTokens()){
         String token = tokenizer.nextToken();
-        if (tokenizer.hasMoreTokens()) {
-          packageName = packageName + token + ".";
-        } else {
+        if (tokenizer.hasMoreTokens())
+          packageName = packageName + token +'.';
+        else
           className = token;
-        }
       }
-    } else {
+
+    } else {// no / in path
       className = path;
     }
 
     // CamelCase className.
     // className = 'EditCustomer'
-    StringTokenizer tokenizer = new StringTokenizer(className, "_-");
+    val tokenizer = new StringTokenizer(className, "_-");
     className = "";
-    while (tokenizer.hasMoreTokens()) {
+    while (tokenizer.hasMoreTokens()){
       String token = ClickUtils.toPropertyName("", tokenizer.nextToken());// fooBar → FooBar
       className += token;
     }
 
     // className = 'org.apache.click.pages.EditCustomer'
     className = packageName + className;
-
-    Class<? extends Page> pageClass = null;
-    try {
-      // Attempt to load class.
-      pageClass = ClickUtils.classForName(className);
-
-      if (!Page.class.isAssignableFrom(pageClass)) {
-        throw new RuntimeException("Automapped page class " + className
-            + " is not a subclass of org.apache.click.Page");
-      }
-    } catch (ClassNotFoundException cnfe) {
-      boolean classFound = false;
-
+		Class<? extends Page> pageClass;
+		try {
+			pageClass = ClickUtils.classForName(className);// 1st Attempt to load class
+      if (!Page.class.isAssignableFrom(pageClass)){
+				throw new IllegalStateException("Automapped page class "+ className +" is not a subclass of org.apache.click.Page, but "+ pageClass);
+			}
+    } catch (ClassNotFoundException cnfe){
       // Append "Page" to className and attempt to load class again.
       // className = 'org.apache.click.pages.EditCustomerPage'
-      if (!className.endsWith("Page")) {
+      if (!className.endsWith("Page")){
         String classNameWithPage = className + "Page";
         try {
-          // Attempt to load class.
-          pageClass = ClickUtils.classForName(classNameWithPage);
-
-          if (!Page.class.isAssignableFrom(pageClass)) {
-            throw new RuntimeException("Automapped page class " + classNameWithPage
-                + " is not a subclass of org.apache.click.Page");
+          pageClass = ClickUtils.classForName(classNameWithPage);// 2nd Attempt to load class
+          if (!Page.class.isAssignableFrom(pageClass)){
+            throw new IllegalStateException("Automapped page class "+ classNameWithPage +" is not a subclass of org.apache.click.Page, but "+pageClass);
           }
-          classFound = true;
-
-        } catch (ClassNotFoundException ignore) {// cnfe2
-        }
-      }
-      if (classFound) {
-        logService.trace("getPageClass: {} -> found {}", pagePath, className);
+        } catch (ClassNotFoundException ignore){
+					logService.debug("getPageClass: {} → CLASS NOT FOUND {}", pagePath, className);
+					return null;
+				}
       } else {
-        logService.debug("getPageClass: {} → CLASS NOT FOUND {}", pagePath, className);
-      }
+				return null;
+			}
     }
+		logService.trace("getPageClass: {} -> found {}", pagePath, className);
     return pageClass;
   }
 
@@ -739,16 +723,15 @@ public class XmlConfigService implements ConfigService {
 
       String pagesPackage = trim(page);
       if (pagesPackage.endsWith(".") && pagesPackage.length() > 1){
-        pagesPackage = pagesPackage.substring(0, pagesPackage.length() - 2);
+        pagesPackage = pagesPackage.substring(0, pagesPackage.length() - 2).trim();
       }
 
       // Add the pages package to the list of page packages
       pagePackages.add(pagesPackage);
 
-      if (automap) {
+      if (automap)
         buildAutoPageMapping(pagesPackage, templates);
-      }
-    }//f
+    }//f usually 1 package
 		buildManualPageMapping();
 
 		buildClassMap();
@@ -787,7 +770,7 @@ public class XmlConfigService implements ConfigService {
    * @param pagesPackage the pages package prefix
    * @param templates the list of templates to map to Page classes
    */
-  void buildAutoPageMapping (String pagesPackage, List<String> templates) throws ClassNotFoundException {
+  void buildAutoPageMapping (final String pagesPackage, List<String> templates) {
     excludesList.clear();// Build list of automap path page class overrides
 		List<String> excludesStr = Splitter.on(';').omitEmptyStrings().trimResults().splitToList(opt("excludes"));
 		for (String pattern : excludesStr){
@@ -796,25 +779,31 @@ public class XmlConfigService implements ConfigService {
     logService.debug("buildAutoPageMapping: automapped pages:");
 
     for (String pagePath : templates){
-      if (!pageByPathMap.containsKey(pagePath)){
-
-        Class<? extends Page> pageClass = getPageClass(pagePath, pagesPackage);
-        if (pageClass != null){
-          PageElm page = new PageElm(pagePath, pageClass, commonHeaders, autoBindingMode);
-
-          pageByPathMap.put(page.getPath(), page);
-          logService.debug("buildAutoPageMapping: {} → {}", pagePath, pageClass.getName());
-        }
-      }
+			tryCreateAndAddPage(pagesPackage, pagePath);
+			if (pagePath.startsWith("/click/")){// META-INF/resources/click/test.htm in spring boot gives /click/test.htm
+				tryCreateAndAddPage(pagesPackage, pagePath.substring(7));
+			}
     }//f
   }
 
-  /**
+	private void tryCreateAndAddPage (String pagesPackage, String pagePath) {
+		if (!pageByPathMap.containsKey(pagePath)){// for each page package × template.htm
+			Class<? extends Page> pageClass = getPageClass(pagePath, pagesPackage);
+			if (pageClass != null){
+				val page = new PageElm(pagePath, pageClass, commonHeaders, autoBindingMode);
+				pageByPathMap.put(page.getPath(), page);
+				logService.debug("buildAutoPageMapping: {} → {}", pagePath, pageClass.getName());
+			}
+		}
+	}
+
+	/**
+	 Build pages by class map
+
    * Build the {@link #pageByClassMap} from the {@link #pageByPathMap} and
    * delegate to {@link #addToClassMap(PageElm)}.
    */
   void buildClassMap () {
-    // Build pages by class map
     for (PageElm page : pageByPathMap.values()){
       addToClassMap(page);
     }
@@ -829,12 +818,12 @@ public class XmlConfigService implements ConfigService {
   void addToClassMap (PageElm page) {
     Object value = pageByClassMap.get(page.pageClass);
     if (value == null){
-      pageByClassMap.put(page.pageClass, page);
+      pageByClassMap.put(page.pageClass, page);// 1st
 
-    } else if (value instanceof List list){
+    } else if (value instanceof List list){// 3+
       list.add(page);
 
-    } else if (value instanceof PageElm p){
+    } else if (value instanceof PageElm p){// 2nd: 1+1
       val list = new ArrayList<PageElm>();
       list.add(p);
       list.add(page);
@@ -960,7 +949,7 @@ public class XmlConfigService implements ConfigService {
    * @param prefix the file prefix that must be removed when the file is
    * deployed
    */
-  private void deployFile(String file, String prefix) {
+  private void deployFile (String file, String prefix) {
     // Only deploy resources containing the prefix
     int pathIndex = file.indexOf(prefix);
     if (pathIndex == 0) {
@@ -979,9 +968,7 @@ public class XmlConfigService implements ConfigService {
       }
 
       // Copy resources to web folder
-      ClickUtils.deployFile(servletContext,
-          file,
-          targetDir);
+      ClickUtils.deployFile(servletContext, file, targetDir);
     }
   }
 
@@ -1096,8 +1083,7 @@ public class XmlConfigService implements ConfigService {
 //  private String getElementAttributeValue (@Nullable Element el, String nodeName, String attrName){
 //    String value = el != null
 //				?  el.getAttribute(attrName) // "classname" → "org.apache.click.service.VelocityTemplateService"
-//          : null;
-//
+//        : null;
 //    return trim(sysEnv("click."+nodeName+'.'+attrName, value));// click.template-service.classname
 //  }
 
@@ -1106,7 +1092,7 @@ public class XmlConfigService implements ConfigService {
 
     if ( StringUtils.isNotBlank(className) ){
       // to do MVELTemplateService.class as default... | ClassCastException is not found!
-      templateService = ClickUtils.newClassForName(className);
+      templateService = (TemplateService) ClickUtils.classForName(className).newInstance();
       //loadPropertyMapInto(el);
     } else {
       templateService = loadServiceClass(TemplateService.class);
@@ -1114,7 +1100,7 @@ public class XmlConfigService implements ConfigService {
 
     if (templateService == null){
       log.warn("Implementation of TemplateService in 'template-service' NOT found. Fallback to Velocity");
-      templateService = ClickUtils.newClassForName("org.apache.click.service.VelocityTemplateService");
+      templateService = (TemplateService) ClickUtils.classForName("org.apache.click.service.VelocityTemplateService").newInstance();
     } else {
       log.debug("initializing TemplateService: ({}) {}", templateService.getClass().getTypeName(), templateService);
     }
@@ -1122,9 +1108,7 @@ public class XmlConfigService implements ConfigService {
   }
 //  private void loadPropertyMapInto (Element el) {
 //    Map<String,String> propertyMap = loadPropertyMap(el);
-//    for (String name : propertyMap.keySet()){
-//      getPropertyService().setValue(templateService, name, propertyMap.get(name));
-//    }
+//    for (String name : propertyMap.keySet()){ getPropertyService().setValue(templateService, name, propertyMap.get(name)); }
 //  }
 
   private static <T> T loadServiceClass (Class<T> serviceClass){
@@ -1146,18 +1130,15 @@ public class XmlConfigService implements ConfigService {
     return factories.get(0);// 1st one
   }
 
-  private static Map<String, String> loadPropertyMap(Element parentElm) {
-    Map<String, String> propertyMap = new HashMap<>();
-
-    for (Element property : ClickUtils.getChildren(parentElm, "property")) {
-      String name = property.getAttribute("name");
-      String value = property.getAttribute("value");
-
-      propertyMap.put(name, value);
-    }
-
-    return propertyMap;
-  }
+//  private static Map<String, String> loadPropertyMap(Element parentElm) {
+//    Map<String, String> propertyMap = new HashMap<>();
+//    for (Element property : ClickUtils.getChildren(parentElm, "property")) {
+//      String name = property.getAttribute("name");
+//      String value = property.getAttribute("value");
+//      propertyMap.put(name, value);
+//    }
+//    return propertyMap;
+//  }
 
   private void loadLocale () {
     String value = opt("locale");
@@ -1187,7 +1168,7 @@ public class XmlConfigService implements ConfigService {
    * @return list of all templates within the web application
    */
   private List<String> getTemplateFiles () {
-    List<String> fileList = new ArrayList<>();
+    val fileList = new HashSet<String>();
 
     Set<String> resources = servletContext.getResourcePaths("/");
     if (onGoogleAppEngine){
@@ -1207,23 +1188,17 @@ public class XmlConfigService implements ConfigService {
       if (isTemplate(resource)){// .htm or .jsp
         fileList.add(resource);
 
-      } else if (resource.endsWith("/")){
-        if (!"/WEB-INF/".equalsIgnoreCase(resource)){
-          processDirectory(resource, fileList);
-        }
+      } else if (resource.endsWith("/") && !"/WEB-INF/".equalsIgnoreCase(resource)){// dir, but not protected
+				processDirectory(resource, fileList);
       }
     }
-    Collections.sort(fileList);
-
-    return fileList;
+    return fileList.stream().sorted().toList();
   }
-
-  private void processDirectory (String dirPath, List<String> fileList) {
+  private void processDirectory (String dirPath, Collection<String> fileList) {
     Set<String> resources = servletContext.getResourcePaths(dirPath);
-
     if (resources != null){
       for (String resource : resources){
-        if (isTemplate(resource)){
+        if (isTemplate(resource)){// .htm or .jsp
           fileList.add(resource);
 
         } else if (resource.endsWith("/")){
@@ -1234,7 +1209,7 @@ public class XmlConfigService implements ConfigService {
   }
 
 	@Nullable
-  private Class<? extends Page> getExcludesPageClass(String path) {
+  private Class<? extends Page> getExcludesPageClass (String path) {
     for (ExcludesElm override : excludesList) {
       if (override.isMatch(path)){
         return override.getPageClass();
@@ -1258,26 +1233,26 @@ public class XmlConfigService implements ConfigService {
 
       // Add public fields
       Field[] publicFields = pageClass.getFields();
-      for (Field field : publicFields) {
+      for (Field field : publicFields){
         fieldMap.put(field.getName(), field);
       }
       // Copy the field map values into a field list
       Field[] fieldArray = new Field[fieldMap.size()];
 
       int i = 0;
-      for (Field field : fieldMap.values()) {
+      for (Field field : fieldMap.values()){
         fieldArray[i++] = field;
       }
       return fieldArray;
 
-    } else if (mode == AutoBinding.ANNOTATION) {
+    } else if (mode == AutoBinding.ANNOTATION){
       Map<String, Field> fieldMap = getAnnotatedBindableFields(pageClass);
 
       // Copy the field map values into a field list
       Field[] fieldArray = new Field[fieldMap.size()];
 
       int i = 0;
-      for (Field field : fieldMap.values()) {
+      for (Field field : fieldMap.values()){
         fieldArray[i++] = field;
       }
       return fieldArray;
