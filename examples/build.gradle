@@ -5,10 +5,13 @@ plugins {
   id 'idea'
 
   alias(libs.plugins.grettyWebContainer)
+	alias(libs.plugins.spring.boot)
+	alias(libs.plugins.spring.dependencyManagement)
 
 	alias(libs.plugins.lombok)
 	alias(libs.plugins.sonarlint)
 	alias(libs.plugins.errorprone)
+	alias(libs.plugins.gradleGitProperties)
 }
 //java { // https://docs.gradle.org/current/userguide/toolchains.html
 //  toolchain { languageVersion = JavaLanguageVersion.of(8) }}
@@ -23,6 +26,13 @@ repositories {
     url "https://repository.jboss.org/nexus/content/repositories/thirdparty-releases/"
   }
   mavenCentral()
+}
+
+dependencyManagement {
+	imports {
+		//VAADIN: mavenBom "com.vaadin:vaadin-bom:${vaadinVersion}"
+		mavenBom org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES // SPRING
+	}
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -67,8 +77,13 @@ dependencies {
   implementation("opensymphony:oscache:2.4.1")// "javax.jms:jms:1.1"
   implementation("taglibs:standard:1.1.2")
 
-  // we need to put it in .war
-  implementation libs.slf4jSimple
+	implementation 'org.springframework.boot:spring-boot-starter'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-cache'
+	implementation 'org.springframework.boot:spring-boot-starter-data-rest'
+	implementation 'org.springframework.boot:spring-boot-starter-freemarker'
+	implementation(libs.springBootStarterValidation, libs.springBootStarterWeb, libs.bundles.upgradeBootApp)
+	implementation("org.apache.tomcat.embed:tomcat-embed-core:9.0.+", "org.apache.tomcat.embed:tomcat-embed-el:9.0.+", "org.apache.tomcat.embed:tomcat-embed-websocket:9.0.+")
 
   //*** TEST TEST TEST
   testImplementation libs.bundles.junit
