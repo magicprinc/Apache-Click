@@ -1,0 +1,68 @@
+package org.apache.click.examples;
+
+import lombok.val;
+import org.apache.click.ClickServlet;
+import org.apache.click.extras.spring.PageScopeResolver;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.ServletRegistrationBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.HashMap;
+
+@SpringBootApplication // (scanBasePackageClasses = { LunaApplication.class, RemoteMvelConsoleController.class })
+@EnableWebMvc
+@ComponentScan(// == <context:component-scan base-package="org.apache.click.examples" scope-resolver="org.apache.click.extras.spring.PageScopeResolver"/>
+		basePackages = "org.apache.click.examples",
+		scopeResolver = PageScopeResolver.class
+)
+public class ExamplesApplication implements WebMvcConfigurer {
+
+  public static void main (String[] args) {
+		System.out.println(" *** main thread started *** "+Thread.currentThread());
+    SpringApplication.run(ExamplesApplication.class, args);
+    System.err.println(" *** main thread finishes *** "+Thread.currentThread());
+  }
+
+	private static final String[] CLASSPATH_RESOURCE_LOCATIONS = {
+			"classpath:/META-INF/resources/",// todo classpath*:
+			"classpath:/META-INF/resources/click/",
+			"classpath:/resources/",
+			"classpath:/resources/click/",
+			"classpath:/static/",
+			"classpath:/static/click/",
+			"classpath:/public/"
+	};
+
+	@Override
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+		registry.addResourceHandler("/**").addResourceLocations(CLASSPATH_RESOURCE_LOCATIONS);
+	}
+
+	@Bean
+	public ServletRegistrationBean<ClickServlet> clickServlet () {
+		val reg = new ServletRegistrationBean<>(new ClickServlet(), "*.htm", "/click/*");
+		reg.setName("ClickServlet");
+		reg.setLoadOnStartup(0);
+
+		// Set init parameters
+		val params = new HashMap<String,String>();
+		params.put("pages", "net.sf.click.examples.page");
+		params.put("mode", "trace");
+		params.put("deployFiles", "disable");
+		reg.setInitParameters(params);
+
+		return reg;
+	}
+
+	@Override
+	public void addViewControllers(ViewControllerRegistry registry) {
+		registry.addViewController("/").setViewName("forward:/home.htm");
+	}
+
+}
