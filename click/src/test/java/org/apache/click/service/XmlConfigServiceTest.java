@@ -27,29 +27,26 @@ import static org.apache.click.util.ClickTestUtils.makeFile;
 import static org.apache.click.util.ClickTestUtils.makeTmpDir;
 import static org.apache.click.util.ClickTestUtils.makeXmlStream;
 
-/**
- * Tests for the XmlConfigService class.
- */
+/** Tests for the XmlConfigService class */
 public class XmlConfigServiceTest extends TestCase {
-
   public void testDefaults() throws Exception {
     File tmpdir = makeTmpDir();
 
-    PrintStream pstr = makeXmlStream(tmpdir, "WEB-INF/click.xml");
-    pstr.println("<click-app charset='UTF-8'>");
-    pstr.println(" <pages package='org.apache.click.pages'/>");
-    pstr.println("</click-app>");
-    pstr.close();
+//    PrintStream pstr = makeXmlStream(tmpdir, "WEB-INF/click.xml");
+//    pstr.println("<click-app charset='UTF-8'>");
+//    pstr.println(" <pages package='org.apache.click.pages'/>");
+//    pstr.println("</click-app>");
+//    pstr.close();
 
-    MockContainer container = new MockContainer(tmpdir.getAbsolutePath());
+    val container = new MockContainer(tmpdir.getAbsolutePath());
     container.start();
     ConfigService config = ClickUtils.getConfigService(container.getServletContext());
 
     assertEquals(ErrorPage.class, config.getErrorPageClass());
     assertEquals(Page.class, config.getNotFoundPageClass());
-    assertEquals(ConfigService.Mode.DEVELOPMENT, config.getApplicationMode());
+    assertEquals(ConfigService.Mode.PRODUCTION, config.getApplicationMode());
     assertEquals("UTF-8", config.getCharset());
-    assertFalse(config.isProductionMode());
+    assertTrue(config.isProductionMode());
     assertFalse(config.isProfileMode());
     assertEquals(Format.class, config.createFormat().getClass());
     assertEquals(AutoBinding.DEFAULT, config.getAutoBindingMode());
@@ -167,14 +164,15 @@ public class XmlConfigServiceTest extends TestCase {
   public void testDebug() throws Exception {
     File tmpdir = makeTmpDir();
 
-    PrintStream pstr = makeXmlStream(tmpdir, "WEB-INF/click.xml");
-    pstr.println("<click-app>");
-    pstr.println(" <pages package='org.apache.click.pages'/>");
-    pstr.println(" <mode value='debug'/>");
-    pstr.println("</click-app>");
-    pstr.close();
+//    PrintStream pstr = makeXmlStream(tmpdir, "WEB-INF/click.xml");
+//    pstr.println("<click-app>");
+//    pstr.println(" <pages package='org.apache.click.pages'/>");
+//    pstr.println(" <mode value='debug'/>");
+//    pstr.println("</click-app>");
+//    pstr.close();
 
-    MockContainer container = new MockContainer(tmpdir.getAbsolutePath());
+    val container = new MockContainer(tmpdir.getAbsolutePath());
+		container.getServletContext().addInitParameter("mode", "debug");
     container.start();
     ConfigService config = ClickUtils.getConfigService(container.getServletContext());
 
