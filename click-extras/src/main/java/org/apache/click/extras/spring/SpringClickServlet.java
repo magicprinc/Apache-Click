@@ -10,6 +10,7 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.web.context.ContextLoader;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.servlet.ServletContext;
@@ -17,6 +18,7 @@ import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletRequest;
 import java.beans.Introspector;
+import java.io.Serial;
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -24,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static org.apache.click.util.ClickUtils.trim;
 
 /**
  * Provides a Spring framework integration <tt>SpringClickServlet</tt>.
@@ -316,7 +320,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @see PageScopeResolver
  */
 public class SpringClickServlet extends ClickServlet {
-  private static final long serialVersionUID = -735025234764027175L;
+  @Serial private static final long serialVersionUID = -735025234764027175L;
 
   /**
    * The Servlet initialization parameter name for the option to have the
@@ -367,20 +371,20 @@ public class SpringClickServlet extends ClickServlet {
   @Override
 	public void init () throws ServletException {
     super.init();
-
     ServletContext servletContext = getServletContext();
     applicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
-
+		if (applicationContext == null){
+			applicationContext = ContextLoader.getCurrentWebApplicationContext();
+		}
     if (applicationContext == null){
-      String springPath = getInitParameter(SPRING_PATH);
-      if (springPath == null){
+      String springPath = trim(getInitParameter(SPRING_PATH));
+      if (springPath.isEmpty()){
         throw new UnavailableException(SPRING_PATH + " servlet init parameter not defined");
       }
-
       applicationContext = new ClassPathXmlApplicationContext(springPath);
     }
 
-    String injectPageBeans = getInitParameter(INJECT_PAGE_BEANS);
+    String injectPageBeans = trim(getInitParameter(INJECT_PAGE_BEANS));
     if ("true".equalsIgnoreCase(injectPageBeans)){
       // Process page classes looking for setter methods which match beans available in the applicationContext
       List<Class<? extends Page>> pageClassList = getConfigService().getPageClassList();
@@ -407,12 +411,11 @@ public class SpringClickServlet extends ClickServlet {
    */
   @Override
   protected Page newPageInstance(String path, Class<? extends Page> pageClass, HttpServletRequest request) throws Exception {
-		String beanName = toBeanName(pageClass);
-		Page page;
-    if (getApplicationContext().containsBean(beanName)) {
+		String beanName = toBeanName(pageClass);  Page page;
+    if (getApplicationContext().containsBean(beanName)){
       page = (Page) getApplicationContext().getBean(beanName);
 
-    } else if (getApplicationContext().containsBean(pageClass.getName())) {
+    } else if (getApplicationContext().containsBean(pageClass.getName())){
       page = (Page) getApplicationContext().getBean(pageClass.getName());
 
     } else {
