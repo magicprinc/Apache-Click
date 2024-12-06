@@ -3227,4 +3227,34 @@ To fix, ensure that ClickServlet is loaded at startup by editing your web.xml an
 	public static boolean isEmpty (@Nullable Collection<?> list) {
 		return list == null || list.isEmpty();
 	}
+
+	public static boolean isEmpty (@Nullable CharSequence s) {
+		return s == null || s.isEmpty();
+	}
+
+	public static long parseLong (@Nullable CharSequence s, long ifError) {
+		if (s == null || s.isEmpty()){
+			return ifError;
+		}
+		long result = 0;  boolean negative = false;
+		for (int i = 0, len = s.length(); i < len; i++){
+			char c = s.charAt(i);
+			if (Character.isSpaceChar(c) || Character.isWhitespace(c) || c == '_' || c == '+'){
+				continue;
+			} else if (c == '-'){
+				negative = true;
+				continue;
+			}
+			int n = Character.digit(c, 10);
+			if (n >= 0)
+				result = result * 10 + n;
+			else
+				return ifError;
+
+			if (result < 0){
+				return ifError;// overflow
+			}
+		}//f
+		return negative ? -result : result;
+	}
 }

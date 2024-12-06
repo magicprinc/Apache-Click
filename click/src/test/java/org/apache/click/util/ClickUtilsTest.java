@@ -22,11 +22,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-/**
- * Tests for ClickUtils.
- */
+/** @see ClickUtils */
 public class ClickUtilsTest extends TestCase {
-
   /*
    * Define some test data.
    */
@@ -686,4 +683,18 @@ public class ClickUtilsTest extends TestCase {
     assertEquals("Nice!", ClickUtils.sysEnv("$$$\nz", "Nice!"));
     assertTrue(ClickUtils.sysEnv("File.Encoding"), ClickUtils.len(ClickUtils.sysEnv("File.Encoding"))>0);
   }
+
+	public void testParseLong () {
+		assertEquals(-3, ClickUtils.parseLong(null, -3));
+		assertEquals(-3, ClickUtils.parseLong("", -3));
+		assertEquals(0, ClickUtils.parseLong(" ", -3));
+		assertEquals(42, ClickUtils.parseLong(" +++ 4 _ 2 \r", -3));
+		assertEquals(42, ClickUtils.parseLong(" ++0+ 4 _ 2+ \r", -3));
+		assertEquals(-3, ClickUtils.parseLong("12345678901234567890123", -3));
+		assertEquals(-3, ClickUtils.parseLong("1x2", -3));
+		assertEquals(Long.MAX_VALUE, ClickUtils.parseLong(Long.toString(Long.MAX_VALUE), -3));
+		assertEquals(Long.MIN_VALUE+1, ClickUtils.parseLong(Long.toString(Long.MIN_VALUE+1), -3));// :-(
+		assertEquals(-3, ClickUtils.parseLong(Long.toString(Long.MIN_VALUE), -3));// :-(
+		assertEquals(-42, ClickUtils.parseLong(" ++0+ 4 _ 2+ -\r", -3));
+	}
 }
