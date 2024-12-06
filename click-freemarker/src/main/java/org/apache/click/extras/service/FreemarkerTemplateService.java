@@ -208,7 +208,7 @@ public class FreemarkerTemplateService implements TemplateService {
    * @throws TemplateException if template error occurs
    */
   @Override
-	public void renderTemplate (Page page, Map<String, ?> model, Writer writer) throws IOException, TemplateException {
+	public void renderTemplate (Page page, Map<String,Object> model, Writer writer) throws IOException, TemplateException {
     String templatePath = page.getTemplate();
 
     if (!deployedErrorTemplate && templatePath.equals(ERROR_PAGE_PATH)){
@@ -217,7 +217,6 @@ public class FreemarkerTemplateService implements TemplateService {
     if (!deployedErrorTemplate && templatePath.equals(NOT_FOUND_PAGE_PATH)){
       templatePath = "META-INF/resources"+ NOT_FOUND_PAGE_PATH;
     }
-
     // Get the template object
     Template template = configuration.getTemplate(templatePath);
 
@@ -239,10 +238,9 @@ public class FreemarkerTemplateService implements TemplateService {
    * @throws TemplateException if template error occurs
    */
   @Override
-	public void renderTemplate (String templatePath, Map<String, ?> model, Writer writer) throws IOException, TemplateException {
+	public void renderTemplate (String templatePath, Map<String,Object> model, Writer writer) throws IOException, TemplateException {
     // Get the template object
     Template template = configuration.getTemplate(templatePath);
-
     // Merge the data-model and the template
     try {
       template.process(model, writer);

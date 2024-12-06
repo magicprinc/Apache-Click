@@ -55,10 +55,8 @@ import static java.nio.charset.StandardCharsets.*;
  * @author Tim Fennell
  */
 class DeployUtils<T> {
-
   /** The magic header that indicates a JAR (ZIP) file. */
   private static final byte[] JAR_MAGIC = { 'P', 'K', 3, 4 };
-
 
   /** The set of matches being accumulated. */
   private final List<String> matches = new ArrayList<>();
@@ -86,11 +84,10 @@ class DeployUtils<T> {
     classloader = null;
   }//new
 
-
-  public DeployUtils (LogService logService, ClassLoader classloader){
-    this.logService = logService;
-    this.classloader = classloader;
-  }//new
+//  public DeployUtils (LogService logService, ClassLoader classloader){
+//    this.logService = logService;
+//    this.classloader = classloader;
+//  }//new
 
 
   /**
@@ -108,11 +105,10 @@ class DeployUtils<T> {
    * @return the ClassLoader that will be used to scan for classes
    */
   public ClassLoader getClassLoader (){
-    if (classloader != null){ return classloader;}// explicit
-
-    return ClickUtils.getClassLoader();
-  }
-
+		return classloader != null
+				? classloader // explicit
+				: ClickUtils.classLoader();
+	}
 
   /**
    * Attempt to discover resources inside the given directory. Accumulated
@@ -491,13 +487,13 @@ class DeployUtils<T> {
     }
   }
 
-  // ---------------------------------------------------------- Inner classes
 
   /**
    * A simple interface that specifies how to test classes to determine if they
    * are to be included in the results produced by the ResolverUtil.
    */
-  interface Test {
+	@FunctionalInterface
+	interface Test {
     /**
      * Will be called repeatedly with candidate classes. Must return True if a class
      * is to be included in the results, false otherwise.

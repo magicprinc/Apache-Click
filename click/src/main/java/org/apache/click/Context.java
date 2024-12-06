@@ -2,6 +2,8 @@ package org.apache.click;
 
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.apache.click.service.ConfigService;
 import org.apache.click.service.LogService;
 import org.apache.click.service.TemplateService;
@@ -29,8 +31,8 @@ import java.util.Map;
  * object can be obtained from the thread local variable via the
  * {@link Context#getThreadLocalContext()} method.
  */
+@Slf4j
 public class Context {
-
   /** The user's session Locale key: &nbsp; <tt>locale</tt>. */
   public static final String LOCALE = "locale";
 
@@ -158,7 +160,7 @@ public class Context {
    * @return true if the HTTP request method is "GET"
    */
   public boolean isGet() {
-    return !isPost && getRequest().getMethod().equalsIgnoreCase("GET");
+    return !isPost && "GET".equalsIgnoreCase(getRequest().getMethod());
   }
 
   /**
@@ -475,16 +477,6 @@ public class Context {
     return clickServlet.getConfigService().getPageClass(path);
   }
 
-//  /**
-//   * Return the Click application mode value: &nbsp;
-//   * <tt>["production", "profile", "development", "debug", "trace"]</tt>.
-//   *
-//   * @return the application mode value
-//   */
-//  public String getApplicationMode() {
-//    return clickServlet.getConfigService().getApplicationMode();
-//  }
-
   /**
    * Return the Click application charset or ISO-8859-1 if not is defined.
    * <p/>
@@ -634,11 +626,9 @@ public class Context {
    * @return rendered Velocity template merged with the model data
    * @throws RuntimeException if an error occurs
    */
-  public String renderTemplate (@NonNull Class<?> templateClass, Map<String,?> model){
+  public String renderTemplate (@NonNull Class<?> templateClass, Map<String,Object> model){
     String templatePath = templateClass.getName();
-
-    templatePath = '/' + templatePath.replace('.', '/') + ".htm";
-
+    templatePath = '/'+ templatePath.replace('.', '/') +".htm";
     return renderTemplate(templatePath, model);
   }
 
@@ -657,24 +647,17 @@ public class Context {
    * @return rendered Velocity template merged with the model data
    * @throws RuntimeException if an error occurs
    */
-  public String renderTemplate (@NonNull String templatePath, @NonNull Map<String, ?> model) {
-    StringWriter stringWriter = new StringWriter(1024);
-
+  public String renderTemplate (@NonNull String templatePath, @NonNull Map<String,Object> model) {
+    val stringWriter = new StringWriter(1024);
     TemplateService templateService = clickServlet.getConfigService().getTemplateService();
-
     try {
       templateService.renderTemplate(templatePath, model, stringWriter);
-
     } catch (Exception e){
-      String msg = "Error occurred rendering template: "+ templatePath + "\n";
-      clickServlet.getConfigService().getLogService().error(msg, e);
-
-      throw new RuntimeException(e);
+			log.error("Error occurred rendering template: {} @ {}\n", templatePath, model, e);
+      throw new IllegalStateException(e);
     }
-
     return stringWriter.toString();
   }
-
 
 
   /**

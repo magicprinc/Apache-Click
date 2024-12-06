@@ -92,7 +92,7 @@ public class ColorPicker extends Field {
    * <li>3 - is the localized error message for pattern validation</li>
    * </ul>
    */
-  final static String VALIDATE_COLORPICKER_FUNCTION =
+	static final String VALIDATE_COLORPICKER_FUNCTION =
       "function validate_{0}() '{'\n"
           + "   var msg = validateColorPicker(\n"
           + "         ''{0}'',{1}, [''{2}'',''{3}'']);\n"
@@ -331,18 +331,15 @@ public class ColorPicker extends Field {
     }
   }
 
-  // Protected Methods ------------------------------------------------------
-
   /**
    * Render a Velocity template for the given data model.
    *
    * @param buffer the specified buffer to render the template output to
    * @param model the model data to merge with the template
    */
-  protected void renderTemplate(HtmlStringBuffer buffer, Map<String, ?> model) {
+  protected void renderTemplate(HtmlStringBuffer buffer, Map<String,Object> model) {
     buffer.append(Context.getThreadLocalContext().renderTemplate(ColorPicker.class, model));
   }
-
 
   private boolean isColor(String value) {
     if (value == null) {

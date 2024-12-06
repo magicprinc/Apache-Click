@@ -1,6 +1,7 @@
 package org.apache.click.extras.control;
 
 import lombok.NonNull;
+import lombok.val;
 import org.apache.click.Context;
 import org.apache.click.extras.security.AccessController;
 import org.apache.click.extras.security.RoleAccessController;
@@ -15,6 +16,7 @@ import org.w3c.dom.NodeList;
 
 import javax.servlet.ServletContext;
 import java.io.InputStream;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Map;
@@ -126,11 +128,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @see Menu
  */
 public class MenuFactory implements Serializable {
-  private static final long serialVersionUID = 1823013139251272272L;
-
-  /**
-   * The default root menu name: &nbsp; "<tt>rootMenu</tt>".
-   */
+  @Serial private static final long serialVersionUID = 1823013139251272272L;
+  /** The default root menu name: &nbsp; "<tt>rootMenu</tt>" */
   public final static String DEFAULT_ROOT_MENU_NAME = "rootMenu";
 
   /**
@@ -372,8 +371,8 @@ public class MenuFactory implements Serializable {
         }*/
 
     String pagesValue = menuElement.getAttribute("pages");
-    if (StringUtils.isNotBlank(pagesValue)) {
-      StringTokenizer tokenizer = new StringTokenizer(pagesValue, ",");
+    if (StringUtils.isNotBlank(pagesValue)){
+      val tokenizer = new StringTokenizer(pagesValue, ",");
       while (tokenizer.hasMoreTokens()) {
         String path = tokenizer.nextToken().trim();
         path = path.startsWith("/") ? path : "/" + path;
@@ -382,8 +381,8 @@ public class MenuFactory implements Serializable {
     }
 
     String rolesValue = menuElement.getAttribute("roles");
-    if (StringUtils.isNotBlank(rolesValue)) {
-      StringTokenizer tokenizer = new StringTokenizer(rolesValue, ",");
+    if (StringUtils.isNotBlank(rolesValue)){
+      val tokenizer = new StringTokenizer(rolesValue, ",");
       while (tokenizer.hasMoreTokens()) {
         menu.getRoles().add(tokenizer.nextToken().trim());
       }
@@ -453,50 +452,35 @@ public class MenuFactory implements Serializable {
   ){
     String webinfFileName = null;
     boolean absolute = fileName.startsWith("/");
-    if (!absolute) {
-      fileName = '/' + fileName;
-      webinfFileName = "/WEB-INF" + fileName;
+    if (!absolute){
+      fileName = '/'+ fileName;
+      webinfFileName = "/WEB-INF"+ fileName;
     }
 
     Context context = Context.getThreadLocalContext();
 
-    Menu menu;
-    if (menuClass == null) {
-      menu = new Menu();
-    } else {
-      menu = createMenu(menuClass);
-    }
-
-    menu.setName(name);
+    Menu menu = menuClass == null
+				? new Menu()
+				: createMenu(menuClass);
+		menu.setName(name);
     menu.setAccessController(accessController);
 
     ServletContext servletContext = context.getServletContext();
-    InputStream inputStream;
+    InputStream inputStream = absolute
+				? servletContext.getResourceAsStream(fileName)
+				: servletContext.getResourceAsStream(webinfFileName);
 
-    if (absolute) {
-      inputStream = servletContext.getResourceAsStream(fileName);
-    } else {
-      inputStream = servletContext.getResourceAsStream(webinfFileName);
-    }
-
-    if (inputStream == null){
-      if (absolute) {
-        inputStream = ClickUtils.getResourceAsStream(fileName, MenuFactory.class);
-        if (inputStream == null){
-          throw new RuntimeException("could not find configuration file:"+ fileName+ " on classpath");
-        }
+		if (inputStream == null){
+			inputStream = ClickUtils.getResourceAsStream(fileName.substring(1), MenuFactory.class);
+			if (absolute){
+				if (inputStream == null) throw new IllegalArgumentException("could not find configuration file:"+ fileName +" on classpath");
       } else {
-        inputStream = ClickUtils.getResourceAsStream(fileName, MenuFactory.class);
-        if (inputStream == null) {
-          throw new RuntimeException("could not find configuration file:"+ webinfFileName+ " or " + fileName + " on classpath");
-        }
+				if (inputStream == null) throw new IllegalArgumentException("could not find configuration file:"+ webinfFileName +" or "+ fileName +" on classpath");
       }
     }
 
     Document document = ClickUtils.buildDocument(inputStream);
-
     Element rootElm = document.getDocumentElement();
-
     NodeList list = rootElm.getChildNodes();
 
     for (int i = 0; i < list.getLength(); i++){
@@ -506,7 +490,6 @@ public class MenuFactory implements Serializable {
         menu.add(childMenu);
       }
     }
-
     return menu;
   }
 
@@ -539,8 +522,6 @@ public class MenuFactory implements Serializable {
     if (menu.getName() == null) {
       throw new IllegalArgumentException("Menu name cannot be null");
     }
-
     getMenuCache().put(menu.getName(), menu);
   }
-
 }
