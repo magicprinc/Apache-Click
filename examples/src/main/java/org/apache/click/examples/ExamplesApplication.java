@@ -38,16 +38,18 @@ public class ExamplesApplication implements WebMvcConfigurer {
 	private static final String[] CLASSPATH_RESOURCE_LOCATIONS = {
 			"classpath:/META-INF/resources/",// todo classpath*:
 			"classpath:/META-INF/resources/click/",
-			//"classpath:/resources/",
-			//"classpath:/resources/click/",
+			"classpath:/resources/",
+			"classpath:/resources/click/",
 			"classpath:/static/",
-			//"classpath:/static/click/",
+			"classpath:/static/click/",
 			"classpath:/public/"
 	};
 
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 		registry.addResourceHandler("/**").addResourceLocations(CLASSPATH_RESOURCE_LOCATIONS);
+		registry.addResourceHandler("/static/**").addResourceLocations("classpath*:/static/").setCachePeriod(3600);// .resourceChain(true)
+		registry.addResourceHandler("/resources/**").addResourceLocations("classpath:/resources/", "classpath:/static/", "classpath:/public/").setCachePeriod(3600).resourceChain(true);
 	}
 
 	/**
