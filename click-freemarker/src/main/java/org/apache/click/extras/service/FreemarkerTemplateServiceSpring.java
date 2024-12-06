@@ -58,9 +58,7 @@ public class FreemarkerTemplateServiceSpring extends FreemarkerTemplateService {
 		// Templates are stored in the root of the classpath.
 		val classLoader0 = new ClassTemplateLoader(getClass(), "/");
 		val classLoader1 = new ClassTemplateLoader(getClass(), "/static");
-    //for my templates (raw servlets) WEBroot/WEB-INF/ftl/
-    val webLoaderApr = new WebappTemplateLoader(servletContext, "/WEB-INF/ftl");
-    val webLoaderStatic = new WebappTemplateLoader(servletContext, "/static");
+		val classLoader2 = new ClassTemplateLoader(getClass(), "/templates");
 
     //click uses WEBroot/click and (fallback) classpath:/META-INF/resources/click
 
@@ -73,8 +71,8 @@ public class FreemarkerTemplateServiceSpring extends FreemarkerTemplateService {
     } catch (Throwable ignore){}
 
     val loaders = fileLoader != null
-      ? new TemplateLoader[]{fileLoader, webLoaderRoot, classLoader0, classLoader1, webLoaderApr, webLoaderStatic}
-      : new TemplateLoader[]{            webLoaderRoot, classLoader0, classLoader1, webLoaderApr, webLoaderStatic};
+      ? new TemplateLoader[]{fileLoader, webLoaderRoot, classLoader0, classLoader1, classLoader2}
+      : new TemplateLoader[]{            webLoaderRoot, classLoader0, classLoader1, classLoader2};
     configuration.setTemplateLoader(new MultiTemplateLoader(loaders));
 
     // Set the template cache duration in seconds

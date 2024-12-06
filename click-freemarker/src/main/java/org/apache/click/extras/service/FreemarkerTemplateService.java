@@ -150,9 +150,11 @@ public class FreemarkerTemplateService implements TemplateService {
     // Templates are stored in the root of the classpath.
     val classLoader0 = new ClassTemplateLoader(getClass(), "/");
     val classLoader1 = new ClassTemplateLoader(getClass(), "/static");
+    val classLoader2 = new ClassTemplateLoader(getClass(), "/templates");
 
-    val multiLoader = new MultiTemplateLoader(new TemplateLoader[]{webLoader, classLoader0, classLoader1});
-    configuration.setTemplateLoader(multiLoader);
+    configuration.setTemplateLoader(new MultiTemplateLoader(new TemplateLoader[]{
+				webLoader, classLoader0, classLoader1, classLoader2
+		}));
 
     // Set the template cache duration in seconds
     if (configService.isProductionMode() || configService.isProfileMode())
