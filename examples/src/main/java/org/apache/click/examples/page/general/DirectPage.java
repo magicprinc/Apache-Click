@@ -52,7 +52,8 @@ public class DirectPage extends Page {
       setPath(null);
 
       if (getContext().hasRequestParameter("more")){
-        writer.println("#\n# More:\n#\n");
+				writer.println("#".repeat(160));
+        writer.println("##### More #####\n\n");
         writer.println(System.getProperty("user.dir"));// ~ C:\opt\github\click
         writer.println(Paths.get(".").toAbsolutePath());// ~ C:\Users\magic\.gradle\daemon\7.6\.
 
@@ -60,8 +61,17 @@ public class DirectPage extends Page {
             .map(ClickUtils::<Map.Entry<String,String>>castUnsafe)
             .sorted(Map.Entry.comparingByKey())
             .forEach(e -> writer.println(e.getKey()+" = "+e.getValue()));
-      }
 
+				writer.println("-".repeat(160));
+				val servletConfig = getContext().getServletConfig();
+				servletConfig.getInitParameterNames().asIterator().forEachRemaining(paramName->
+						writer.println(paramName+" = "+servletConfig.getInitParameter(paramName))
+				);
+				writer.println("-".repeat(160));
+				context.getInitParameterNames().asIterator().forEachRemaining(paramName->
+						writer.println(paramName+" = "+context.getInitParameter(paramName))
+				);
+      }
     } catch (IOException ioe){
       throw new UncheckedIOException(ioe);
     }
@@ -84,5 +94,4 @@ public class DirectPage extends Page {
       }
     }
   }
-
 }
