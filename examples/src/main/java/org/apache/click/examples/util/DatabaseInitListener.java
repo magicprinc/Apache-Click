@@ -1,6 +1,8 @@
 package org.apache.click.examples.util;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.apache.cayenne.access.DataContext;
 import org.apache.cayenne.access.DataDomain;
 import org.apache.cayenne.access.DataNode;
@@ -15,13 +17,8 @@ import org.apache.click.examples.domain.PostCode;
 import org.apache.click.examples.domain.StudentHouse;
 import org.apache.click.examples.domain.SystemCode;
 import org.apache.click.examples.domain.User;
-import org.apache.click.examples.quartz.ExampleJob;
-import org.apache.click.examples.quartz.SchedulerService;
 import org.apache.click.util.ClickUtils;
 import org.apache.commons.lang.WordUtils;
-import org.quartz.JobDetail;
-import org.quartz.ee.servlet.QuartzInitializerListener;
-import org.quartz.impl.StdSchedulerFactory;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -46,8 +43,8 @@ import java.util.TimerTask;
  * <p/>
  * This listener also provides a customer reloading task which runs every 15 minutes.
  */
+@Slf4j
 public class DatabaseInitListener implements ServletContextListener {
-
   private static final long RELOAD_TIMER_INTERVAL = 1000 * 60 * 5;
 
   private final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
@@ -55,38 +52,22 @@ public class DatabaseInitListener implements ServletContextListener {
   private final Timer reloadTimer = new Timer(true);
 
 
-
   /**
    * @see ServletContextListener#contextInitialized(ServletContextEvent)
    */
-  @Override public void contextInitialized(ServletContextEvent sce) {
+  @Override
+	public void contextInitialized(ServletContextEvent sce) {
     ServletContext servletContext = sce.getServletContext();
-
     ServletUtil.initializeSharedConfiguration(servletContext);
-
     try {
-      DataDomain cayenneDomain =
-          Configuration.getSharedConfiguration().getDomain();
+      DataDomain cayenneDomain = Configuration.getSharedConfiguration().getDomain();
       DataMap dataMap = cayenneDomain.getMap("cayenneMap");
       DataNode dataNode = cayenneDomain.getNode("cayenneNode");
 
       initDatabaseSchema(dataNode, dataMap);
 
       loadDatabase();
-
-      StdSchedulerFactory schedulerFactory = (StdSchedulerFactory)
-          servletContext.getAttribute(QuartzInitializerListener.QUARTZ_FACTORY_KEY);
-
-      SchedulerService schedulerService = new SchedulerService(schedulerFactory);
-
-      loadQuartzJobs(schedulerService);
-
-      reloadTimer.schedule(new ReloadTask(schedulerService, this),
-          10_000, RELOAD_TIMER_INTERVAL);
-
-
-    } catch (Exception e) {
-      e.printStackTrace();
+    } catch (Exception e){
       throw new RuntimeException("Error creating database", e);
     }
   }
@@ -108,8 +89,7 @@ public class DatabaseInitListener implements ServletContextListener {
    * @throws Exception
    */
   private void initDatabaseSchema(DataNode dataNode, DataMap dataMap) throws Exception {
-
-    DbGenerator generator = new DbGenerator(dataNode.getAdapter(), dataMap);
+    val generator = new DbGenerator(dataNode.getAdapter(), dataMap);
     generator.setShouldCreateFKConstraints(true);
     generator.setShouldCreatePKSupport(true);
     generator.setShouldCreateTables(true);
@@ -178,7 +158,7 @@ public class DatabaseInitListener implements ServletContextListener {
 
   private void loadUsers(final DataContext dataContext) throws IOException {
     loadFile("users.txt", dataContext, (line, context)->{
-      StringTokenizer tokenizer = new StringTokenizer(line, ",");
+      val tokenizer = new StringTokenizer(line, ",");
 
       User user = new User();
 
@@ -194,7 +174,7 @@ public class DatabaseInitListener implements ServletContextListener {
   private void loadCustomers(final DataContext dataContext) throws IOException {
     // Load customers data file
     loadFile("customers.txt", dataContext, (line, context)->{
-      StringTokenizer tokenizer = new StringTokenizer(line, ",");
+      val tokenizer = new StringTokenizer(line, ",");
 
       Customer customer = new Customer();
       customer.setName(next(tokenizer));
@@ -297,30 +277,12 @@ public class DatabaseInitListener implements ServletContextListener {
     }
   }
 
-  private static void loadQuartzJobs(SchedulerService schedulerService) {
-
-    // Create Submission Synchronize Job
-    if (!schedulerService.hasJob(ExampleJob.class.getSimpleName())) {
-      JobDetail jobDetail = new JobDetail();
-
-      jobDetail.setName(ExampleJob.class.getSimpleName());
-      jobDetail.setDescription("Demonstration job write Hello World");
-      jobDetail.setJobClass(ExampleJob.class);
-
-      // 5 minute interval
-      final long fiveMinutesInMs = 24 * 60 * 60 * 1000;
-
-      schedulerService.scheduleJob(jobDetail, new Date(), null, -1, fiveMinutesInMs);
-    }
-  }
-
-
-  private interface LineProcessor {
+  @FunctionalInterface
+	private interface LineProcessor {
     void processLine(String line, DataContext dataContext);
   }
   @AllArgsConstructor
   private static class ReloadTask extends TimerTask {
-    private final SchedulerService schedulerService;
     private final DatabaseInitListener databaseInitListener;
 
     @Override @SuppressWarnings("unchecked")
@@ -340,10 +302,8 @@ public class DatabaseInitListener implements ServletContextListener {
           dataContext.commitChanges();
         }
 
-        loadQuartzJobs(schedulerService);
-
       } catch (Throwable t) {
-        t.printStackTrace();
+        log.warn("failed", t);
 
         if (dataContext != null) {
           dataContext.rollbackChanges();

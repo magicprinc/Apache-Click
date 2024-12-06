@@ -6,7 +6,6 @@ import org.apache.click.extras.cayenne.DataContextFilter;
 import org.apache.click.extras.filter.PerformanceFilter;
 import org.apache.click.extras.spring.PageScopeResolver;
 import org.apache.click.extras.spring.SpringClickServlet;
-import org.quartz.ee.servlet.QuartzInitializerListener;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -77,12 +76,6 @@ public class ExamplesApplication implements WebMvcConfigurer {
 	@Override
 	public void addViewControllers(ViewControllerRegistry registry) {
 		registry.addViewController("/").setViewName("forward:/home.htm");
-	}
-
-	/** The Quartz initialization listener which loads the Quartz scheduler */
-	@Bean
-	public QuartzInitializerListener quartzListener() {
-		return new QuartzInitializerListener();
 	}
 
 	/**

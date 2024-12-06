@@ -68,7 +68,6 @@ dependencies {
 
   implementation 'org.apache.cayenne:cayenne-server:3.0.2'
   implementation("org.apache.poi:poi:3.6")
-  implementation("opensymphony:quartz:1.6.+")
   implementation("org.objectstyle.ashwood:ashwood:2.0")
 	implementation('commons-collections:commons-collections:3.+')
 
