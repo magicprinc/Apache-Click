@@ -64,12 +64,29 @@ public class DirectPage extends Page {
 
 				writer.println("-".repeat(160));
 				val servletConfig = getContext().getServletConfig();
+				writer.println(servletConfig.getServletName());// ClickServlet
 				servletConfig.getInitParameterNames().asIterator().forEachRemaining(paramName->
 						writer.println(paramName+" = "+servletConfig.getInitParameter(paramName))
 				);
+
+				writer.println("-".repeat(160));
+				writer.println(context.getContextPath());
+				writer.println(context.getServerInfo());// Apache Tomcat/9.0.97
+				writer.println(context.getServletContextName());// application
+				writer.println(context.getVirtualServerName());// Tomcat/localhost
+				writer.println(context.getRequestCharacterEncoding());// null
+				writer.println(context.getResponseCharacterEncoding());// null
+				writer.println(context.getResourcePaths("/"));// /click/, /edit-customer.htm, /home.htm, /readme.txt, /tree/, /pageflow/, /general/, /quartz/, /springsecurity/, /security/, /form/, /cayenne/, /macro.vm, /control/, /border-template.jsp, /table/, /velocity/, /border-template.htm, /org/, /panel/, /introduction/, /wizard/, /ajax/, /source-viewer.htm, /jsp/
+				writer.println(context.getResourcePaths("/static"));// null
+				writer.println(context.getRealPath("/"));// C:\TMP\tomcat-docbase.8080.17536303169165444844\
+				writer.println(context.getRealPath("/static"));// C:\TMP\tomcat-docbase.8080.17536303169165444844\static
 				writer.println("-".repeat(160));
 				context.getInitParameterNames().asIterator().forEachRemaining(paramName->
 						writer.println(paramName+" = "+context.getInitParameter(paramName))
+				);
+				writer.println("-".repeat(160));
+				context.getAttributeNames().asIterator().forEachRemaining(paramName->
+						writer.println(paramName+" = "+context.getAttribute(paramName))
 				);
       }
     } catch (IOException ioe){
