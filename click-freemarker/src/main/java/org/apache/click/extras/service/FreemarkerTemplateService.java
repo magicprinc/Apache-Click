@@ -1,21 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.click.extras.service;
 
 import freemarker.cache.ClassTemplateLoader;
@@ -31,6 +13,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.apache.click.Page;
 import org.apache.click.service.ConfigService;
 import org.apache.click.service.TemplateException;
@@ -38,6 +21,7 @@ import org.apache.click.service.TemplateService;
 import org.apache.click.util.ClickUtils;
 
 import javax.servlet.ServletContext;
+import java.io.IOError;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
@@ -119,13 +103,18 @@ import java.util.Map;
  */
 @Slf4j
 public class FreemarkerTemplateService implements TemplateService {
-
+	static {
+		try {
+			Logger.selectLoggerLibrary(Logger.LIBRARY_SLF4J);
+		} catch (ClassNotFoundException e){
+			e.printStackTrace();
+			throw new IOError(e);
+		}
+	}
   /** The click error page template path. */
   protected static final String ERROR_PAGE_PATH = "/click/error.htm";
-
   /** The click not found page template path. */
   protected static final String NOT_FOUND_PAGE_PATH = "/click/not-found.htm";
-
 
   /** The Freemarker engine configuration. */
   protected Configuration configuration;
@@ -135,8 +124,7 @@ public class FreemarkerTemplateService implements TemplateService {
    *
    * cacheDuration the template cache duration in seconds to use when the application is in "production" or "profile" mode.
    */
-  @Getter @Setter
-  protected int cacheDuration = 60 * 60 * 24;
+  @Getter @Setter protected int cacheDuration = 60 * 60 * 24;
 
   /** The application configuration service. */
   protected ConfigService configService;
@@ -147,45 +135,39 @@ public class FreemarkerTemplateService implements TemplateService {
   /** The /click/not-found.htm page template has been deployed. */
   protected boolean deployedNotFoundTemplate;
 
-
   /**
    * @see TemplateService#onInit(javax.servlet.ServletContext)
    *
    * @param servletContext the application servlet context
    * @throws ClassNotFoundException if an error occurs initializing the Template Service
    */
-  @Override public void onInit (@NonNull ServletContext servletContext) throws ClassNotFoundException {
+  @Override
+	public void onInit (@NonNull ServletContext servletContext) throws ClassNotFoundException {
     configService = ClickUtils.getConfigService(servletContext);
-
-    Logger.selectLoggerLibrary(Logger.LIBRARY_SLF4J);
-
     configuration = new Configuration();
-
     // Templates are stored in the / directory of the Web app.
-    WebappTemplateLoader webloader = new WebappTemplateLoader(servletContext);
+    val webLoader = new WebappTemplateLoader(servletContext);
     // Templates are stored in the root of the classpath.
-    ClassTemplateLoader classLoader = new ClassTemplateLoader(getClass(), "/");
+    val classLoader0 = new ClassTemplateLoader(getClass(), "/");
+    val classLoader1 = new ClassTemplateLoader(getClass(), "/static");
 
-    TemplateLoader[] loaders = new TemplateLoader[] { webloader, classLoader };
-    MultiTemplateLoader multiLoader = new MultiTemplateLoader(loaders);
-
+    val multiLoader = new MultiTemplateLoader(new TemplateLoader[]{webLoader, classLoader0, classLoader1});
     configuration.setTemplateLoader(multiLoader);
 
     // Set the template cache duration in seconds
-    if (configService.isProductionMode() || configService.isProfileMode()) {
+    if (configService.isProductionMode() || configService.isProfileMode())
       configuration.setTemplateUpdateDelay(getCacheDuration());
-    } else {
+    else
       configuration.setTemplateUpdateDelay(1);
-    }
 
-    // Set an error handler that prints errors, so they are readable with a HTML browser.
+    // Set an error handler that prints errors, so they are readable with an HTML browser
     configuration.setTemplateExceptionHandler(TemplateExceptionHandler.HTML_DEBUG_HANDLER);
 
     // Use beans wrapper (recommended for most applications)
     configuration.setObjectWrapper(ObjectWrapper.BEANS_WRAPPER);
 
     String charset = configService.getCharset();
-    if (charset != null) {
+    if (charset != null){
       // Set the default charset of the template files
       configuration.setDefaultEncoding(charset);
 
@@ -196,7 +178,7 @@ public class FreemarkerTemplateService implements TemplateService {
     }
 
     // Set the default locale
-    if (configService.getLocale() != null) {
+    if (configService.getLocale() != null){
       configuration.setLocale(configService.getLocale());
     }
 
@@ -204,17 +186,15 @@ public class FreemarkerTemplateService implements TemplateService {
     try {
       configuration.getTemplate(ERROR_PAGE_PATH);
       deployedErrorTemplate = true;
-    } catch (IOException ignore) {
-    }
+    } catch (IOException ignore){}
     try {
       configuration.getTemplate(NOT_FOUND_PAGE_PATH);
       deployedNotFoundTemplate = true;
-    } catch (IOException ignore) {
-    }
+    } catch (IOException ignore){}
   }
 
   /** @see TemplateService#onDestroy */
-  @Override public void onDestroy() {}
+  @Override public void onDestroy (){}
 
   /**
    * @see TemplateService#renderTemplate(Page, Map, Writer)
@@ -225,15 +205,15 @@ public class FreemarkerTemplateService implements TemplateService {
    * @throws IOException if an IO error occurs
    * @throws TemplateException if template error occurs
    */
-  @Override public void renderTemplate (Page page, Map<String, ?> model, Writer writer) throws IOException, TemplateException {
-
+  @Override
+	public void renderTemplate (Page page, Map<String, ?> model, Writer writer) throws IOException, TemplateException {
     String templatePath = page.getTemplate();
 
-    if (!deployedErrorTemplate && templatePath.equals(ERROR_PAGE_PATH)) {
-      templatePath = "META-INF/resources" + ERROR_PAGE_PATH;
+    if (!deployedErrorTemplate && templatePath.equals(ERROR_PAGE_PATH)){
+      templatePath = "META-INF/resources"+ ERROR_PAGE_PATH;
     }
-    if (!deployedErrorTemplate && templatePath.equals(NOT_FOUND_PAGE_PATH)) {
-      templatePath = "META-INF/resources" + NOT_FOUND_PAGE_PATH;
+    if (!deployedErrorTemplate && templatePath.equals(NOT_FOUND_PAGE_PATH)){
+      templatePath = "META-INF/resources"+ NOT_FOUND_PAGE_PATH;
     }
 
     // Get the template object
@@ -242,7 +222,6 @@ public class FreemarkerTemplateService implements TemplateService {
     // Merge the data-model and the template
     try {
       template.process(model, writer);
-
     } catch (freemarker.template.TemplateException fmte){
       throw new TemplateException(fmte);
     }
@@ -257,18 +236,16 @@ public class FreemarkerTemplateService implements TemplateService {
    * @throws IOException if an IO error occurs
    * @throws TemplateException if template error occurs
    */
-  @Override public void renderTemplate (String templatePath, Map<String, ?> model, Writer writer) throws IOException, TemplateException {
-
+  @Override
+	public void renderTemplate (String templatePath, Map<String, ?> model, Writer writer) throws IOException, TemplateException {
     // Get the template object
     Template template = configuration.getTemplate(templatePath);
 
     // Merge the data-model and the template
     try {
       template.process(model, writer);
-
-    } catch (freemarker.template.TemplateException fmte) {
+    } catch (freemarker.template.TemplateException fmte){
       throw new TemplateException(fmte);
     }
   }
-
 }
