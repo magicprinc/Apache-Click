@@ -1,6 +1,7 @@
 package org.apache.click.util;
 
 import junit.framework.TestCase;
+import lombok.NonNull;
 import org.apache.click.Context;
 import org.apache.click.MockContext;
 import org.apache.click.Page;
@@ -14,7 +15,9 @@ import org.apache.click.control.TextField;
 import org.apache.click.fileupload.MockFileItem;
 import org.apache.click.servlet.MockRequest;
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.io.IOUtils;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.GregorianCalendar;
@@ -24,9 +27,7 @@ import java.util.Map;
 
 /** @see ClickUtils */
 public class ClickUtilsTest extends TestCase {
-  /*
-   * Define some test data.
-   */
+  /* Define some test data */
   private static final java.util.Date DATE_OF_BIRTH;
   private static final String NAME = "john smith";
   private static final Integer ID = new Integer(1234);
@@ -35,7 +36,6 @@ public class ClickUtilsTest extends TestCase {
   private static final double DOUBLE = -87.23;
   private static final String TELEPHONE = "9877262";
   private static final FileItem FILEITEM = new MockFileItem();
-
   static {
     Calendar calendar = new GregorianCalendar(2000, 01, 02);
     DATE_OF_BIRTH = calendar.getTime();
@@ -696,5 +696,40 @@ public class ClickUtilsTest extends TestCase {
 		assertEquals(Long.MIN_VALUE+1, ClickUtils.parseLong(Long.toString(Long.MIN_VALUE+1), -3));// :-(
 		assertEquals(-3, ClickUtils.parseLong(Long.toString(Long.MIN_VALUE), -3));// :-(
 		assertEquals(-42, ClickUtils.parseLong(" ++0+ 4 _ 2+ -\r", -3));
+	}
+
+	static String fileName (@NonNull Object o){
+		String s = o.toString().replace('\\','/');
+		System.out.println(s);
+		int i = s.lastIndexOf('/');
+		return s.substring(i + 1);
+	}
+
+	public void testGetResource () {
+		// file:/C:/TEMP/Apache-Click/click/out/test/resources/click-page.properties
+		assertEquals("click-page.properties", fileName(ClickUtils.getResource("click-page.properties", getClass())));
+		assertEquals("click-page.properties", fileName(Thread.currentThread().getContextClassLoader().getResource("click-page.properties")));
+		assertNull(Thread.currentThread().getContextClassLoader().getResource("/click-page.properties"));// Class loaders supports only absolute without /
+		assertNull(getClass().getResource("click-page.properties"));// Class supports relative and /absolute
+		assertEquals("click-page.properties", fileName(getClass().getResource("/click-page.properties")));
+
+		assertNull("click-page.properties", ClickUtils.getResource("static/testResAbs.xxx", getClass()));// not found (not exists)
+
+		assertEquals("testResAbs.txt", fileName(ClickUtils.getResource("static/testResAbs.txt", getClass())));
+		assertEquals("TestPage.properties", fileName(ClickUtils.getResource("TestPage.properties", getClass())));
+	}
+
+	public void testGetResourceAsStream () throws IOException {
+		// file:/C:/TEMP/Apache-Click/click/out/test/resources/click-page.properties
+		assertEquals("version=Version 0.21", IOUtils.toString(ClickUtils.getResourceAsStream("click-page.properties", getClass())));
+		assertEquals("version=Version 0.21", IOUtils.toString(Thread.currentThread().getContextClassLoader().getResourceAsStream("click-page.properties")));
+		assertNull(Thread.currentThread().getContextClassLoader().getResourceAsStream("/click-page.properties"));// Class loaders supports only absolute without /
+		assertNull(getClass().getResourceAsStream("click-page.properties"));// Class supports relative and /absolute
+		assertEquals("version=Version 0.21", IOUtils.toString(getClass().getResourceAsStream("/click-page.properties")));
+
+		assertNull("click-page.properties", ClickUtils.getResourceAsStream("static/testResAbs.xxx", getClass()));// not found (not exists)
+
+		assertEquals("ABS", IOUtils.toString(ClickUtils.getResourceAsStream("static/testResAbs.txt", getClass())));
+		assertEquals("title=Title", IOUtils.toString(ClickUtils.getResourceAsStream("TestPage.properties", getClass())));
 	}
 }

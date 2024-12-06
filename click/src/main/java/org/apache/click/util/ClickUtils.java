@@ -1098,8 +1098,7 @@ public class ClickUtils {
    * @throws MissingResourceException if no resource bundle for the specified base name can be found
    */
   public static ResourceBundle getBundle(String baseName, Locale locale) {
-    ClassLoader classLoader = getClassLoader();
-    return ResourceBundle.getBundle(baseName, locale, classLoader);
+    return ResourceBundle.getBundle(baseName, locale, classLoader());
   }
 
   /**
@@ -2437,36 +2436,40 @@ To fix, ensure that ClickServlet is loaded at startup by editing your web.xml an
    *     not found using the current <tt>Thread</tt> context <tt>ClassLoader</tt>.
    * @return the input stream of the resource if found or null otherwise
    */
-  public static InputStream getResourceAsStream (@NonNull String name, @NonNull Class<?> aClass) {
-    InputStream is;
-    ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-
+  @Nullable
+	public static InputStream getResourceAsStream (@NonNull String name, @NonNull Class<?> aClass) {
+		if (name.startsWith("/")){
+			log.warn("getResourceAsStream: name must be relative, but: {} @ {}", name, aClass);
+			name = name.substring(1);
+		}
+    val classLoader = Thread.currentThread().getContextClassLoader();
     if (classLoader != null){
-      is = classLoader.getResourceAsStream(name);
-      if (is != null){ return is;}
+			InputStream is = classLoader.getResourceAsStream(name);
+      if (is != null){ return is; }
     }
 
-    is = aClass.getClassLoader().getResourceAsStream(name);
-    if (is != null){ return is;}
+		val cl2 = aClass.getClassLoader();
+		if (classLoader != cl2){
+			InputStream is = cl2.getResourceAsStream(name);
+			if (is != null){ return is; }
+		}
 
     // relative?
-
-    is = aClass.getResourceAsStream(name);
-    if (is != null){ return is;}
+		InputStream is = aClass.getResourceAsStream(name);
+    if (is != null){ return is; }
 
     return ClickUtils.class.getResourceAsStream(name);
   }
 
-  /** Get best ClassLoader.
-
+  /**
+	 Get best ClassLoader.
    Get {@link Thread#getContextClassLoader Thread.currentThread().getContextClassLoader()}.
    If null then fallback to {@link Class#getClassLoader() Throw.class::getClassLoader}*/
-  public static ClassLoader getClassLoader (){
+  public static ClassLoader classLoader (){
     var cl = Thread.currentThread().getContextClassLoader();
     return cl != null ? cl    // <^ ~ Objects.requireNonNullElseGet
         : ClickUtils.class.getClassLoader();
   }
-
 
   /**
    * Finds a resource with a given name. This method returns null if no
@@ -2481,23 +2484,29 @@ To fix, ensure that ClickServlet is loaded at startup by editing your web.xml an
    *     not found using the current <tt>Thread</tt> context <tt>ClassLoader</tt>.
    * @return the URL of the resource if found or null otherwise
    */
-  public static URL getResource (@NonNull String name, @NonNull Class<?> aClass){
-    ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-
-    URL url;
-    if (classLoader != null){
-      url = classLoader.getResource(name);
-      if (url != null){ return url;}
+  @Nullable
+	public static URL getResource (@NonNull String name, Class<?> aClass) {
+		if (name.startsWith("/")){
+			log.warn("getResource: name must be relative, but: {} @ {}", name, aClass);
+			name = name.substring(1);
+		}
+    val classLoader = Thread.currentThread().getContextClassLoader();
+    if (classLoader != null){//1 current thread ClassLoader
+			URL url = classLoader.getResource(name);// resource must be absolute without leading /
+      if (url != null){ return url; }
     }
+		if (aClass != null){//2 caller class ClassLoader
+			val cl2 = aClass.getClassLoader();
+			if (cl2 != classLoader){
+				URL url = cl2.getResource(name);// ^ but another classLoader
+				if (url != null){ return url; }
+			}
 
-    url = aClass.getClassLoader().getResource(name);
-    if (url != null){ return url;}
-
-
-    url = aClass.getResource(name);
-    if (url != null){ return url;}
-
-    return ClickUtils.class.getResource(name);
+			// relative?
+			URL url = aClass.getResource(name);//3 caller class
+			if (url != null){ return url; }
+		}
+    return ClickUtils.class.getResource(name);//4 click-lib class
   }
 
   /**
@@ -2512,14 +2521,12 @@ To fix, ensure that ClickServlet is loaded at startup by editing your web.xml an
     if (controlName == null){
       throw new IllegalStateException(ClassUtils.getShortClassName(control.getClass()) +" name has not been set. State cannot be removed until the name is set");
     }
-
     String resourcePath = context.getResourcePath();
     val pageMap = getPageState(resourcePath, context);
     if (pageMap != null) {
       Object pop = pageMap.remove(controlName);
 
-      if (pageMap.isEmpty()) {
-        // If this was the last state for the page, remove the page state map
+      if (pageMap.isEmpty()){// If this was the last state for the page, remove the page state map
         context.removeSessionAttribute(resourcePath);
       } else {
         // Check if control state was removed
@@ -3217,19 +3224,13 @@ To fix, ensure that ClickServlet is loaded at startup by editing your web.xml an
   }
 
   public static String sysEnv (CharSequence key, String ifNone){
-    var v = sysEnv(key);
-    if (v != null && v.length() > 0){
-      return v;
-    }
-    return ifNone;
+    String v = sysEnv(key);
+		return StringUtils.isEmpty(v) ? ifNone : v;
   }
 
+	/** @see StringUtils#isEmpty(CharSequence) */
 	public static boolean isEmpty (@Nullable Collection<?> list) {
 		return list == null || list.isEmpty();
-	}
-
-	public static boolean isEmpty (@Nullable CharSequence s) {
-		return s == null || s.isEmpty();
 	}
 
 	public static long parseLong (@Nullable CharSequence s, long ifError) {
