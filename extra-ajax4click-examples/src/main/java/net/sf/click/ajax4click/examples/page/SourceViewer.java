@@ -12,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Serial;
 import java.nio.charset.StandardCharsets;
 
 import static org.apache.click.util.ClickUtils.trim;
@@ -22,7 +23,7 @@ import static org.apache.click.util.ClickUtils.trim;
  * @author Malcolm Edgar
  */
 public class SourceViewer extends BorderPage {
-  private static final long serialVersionUID = 1761309857296092283L;
+  @Serial private static final long serialVersionUID = 1761309857296092283L;
 
   private static final String[] HTML_KEYWORDS = { "html", "head", "style",
       "script", "title", "link", "body", "h1", "h2", "h3", "h4", "h5",
@@ -97,7 +98,7 @@ public class SourceViewer extends BorderPage {
       //3. in classpath?
       if (in == null){// && filename.endsWith(".java")
         if (filename.startsWith("/")){ filename = filename.substring(1);}// without / in ClassPath
-        in = ClickUtils.getClassLoader().getResourceAsStream(filename);
+        in = ClickUtils.getResourceAsStream(filename, getClass());
       }
 
       if (in == null){// WEB-INF/classes/net/sf/click/examples/page/SourceViewer.java
@@ -107,7 +108,7 @@ public class SourceViewer extends BorderPage {
           filename = filename.substring(17);
         }
         //4. in class-path without WEB-INF/classes prefix?
-        in = ClickUtils.getClassLoader().getResourceAsStream(filename);
+        in = ClickUtils.getResourceAsStream(filename, getClass());
 
         //5. in subproject - in file system?
         if (in == null){// ok. There are no sources... Maybe we are still under gradle?
