@@ -15,8 +15,6 @@ import java.io.InputStreamReader;
 import java.io.Serial;
 import java.nio.charset.StandardCharsets;
 
-import static org.apache.click.util.ClickUtils.trim;
-
 /**
  * Provides a Java source code, HTML and XML examples rendering page.
  *
@@ -56,89 +54,73 @@ public class SourceViewer extends BorderPage {
       "#macro(", "#foreach", "#foreach(", "##", "#*", "*#", "#" };
 
   private boolean isJava = false;
-
   private boolean isXml = false;
-
   private boolean isHtml = false;
 
-  /**
-   * @see Page#onGet()
-   */
-  @Override public void onGet (){
+  /** @see Page#onGet() */
+  @Override
+	public void onGet (){
     HttpServletRequest request = getContext().getRequest();
 
     String filename = request.getParameter("filename");
 
-    if (filename != null) {
-      loadFilename(filename.replace('\\','/'));
-
-      getModel().put("title", "Source Viewer : " + filename); // ?
+    if (StringUtils.isNotBlank(filename)){
+      loadFilename(filename.trim().replace('\\','/'));
+      getModel().put("title", "Source Viewer : "+ filename); // ?
     } else {
       addModel("error", "filename not defined");
     }
   }
 
-  private void loadFilename (String filename){
+  private void loadFilename (String fileName){
     ServletContext context = getContext().getServletContext();
 
-    // Orion server requires '/' prefix to find resources
-    String resourceFilename = filename.charAt(0) != '/' ? "/" + filename : filename;
+		if (fileName.charAt(0) != '/'){
+			fileName = '/'+ fileName;// Orion server requires '/' prefix to find resources
+		}
 
     InputStream in = null;
     try {
-      //1. web root
-      in = context.getResourceAsStream(resourceFilename);
+      //1. web root /
+      in = context.getResourceAsStream(fileName);
 
       //2. web root, but .htm→.jsp?
-      if (in == null && filename.endsWith(".htm")){
-        resourceFilename = resourceFilename.substring(0, resourceFilename.length()-4) +".jsp";
-
-        in = context.getResourceAsStream(resourceFilename);
+      if (in == null && fileName.endsWith(".htm")){
+        in = context.getResourceAsStream(fileName.substring(0, fileName.length()-4) +".jsp");
       }
+
       //3. in classpath?
       if (in == null){// && filename.endsWith(".java")
-        if (filename.startsWith("/")){ filename = filename.substring(1);}// without / in ClassPath
-        in = ClickUtils.getResourceAsStream(filename, getClass());
+				fileName = fileName.substring(1);// cut leading / for ClassPath
+        in = ClickUtils.getResourceAsStream(fileName, getClass());
       }
 
       if (in == null){// WEB-INF/classes/net/sf/click/examples/page/SourceViewer.java
-        if (filename.startsWith("WEB-INF/classes/")){
-          filename = filename.substring(16);
-        } else if (filename.startsWith("/WEB-INF/classes/")){
-          filename = filename.substring(17);
+				//4. in class-path without WEB-INF/classes prefix?
+        if (fileName.startsWith("WEB-INF/classes/")){
+					fileName = fileName.substring(16);
+					in = ClickUtils.getResourceAsStream(fileName, getClass());
         }
-        //4. in class-path without WEB-INF/classes prefix?
-        in = ClickUtils.getResourceAsStream(filename, getClass());
+				if (in == null){
+					in = ClickUtils.getResourceAsStream("static/"+fileName, getClass());// resources/static are served by Spring from ClassPath, not by Tomcat
+				}
 
-        //5. in subproject - in file system?
+        //6. in subproject - in file system?
         if (in == null){// ok. There are no sources... Maybe we are still under gradle?
           try {
-            in = new FileInputStream("./src/main/java/"+filename);
+            in = new FileInputStream("./src/main/java/"+fileName);
           } catch (IOException ignore){}// just best-effort last attempt..
-
-          //6. in root project - in file system?
-          if (in == null){// gradle + project root? ~ catalina.home = C:\opt\github\click\examples\build\tmp\tomcatRunWar
-            String catalina = trim(System.getProperty("catalina.base")).replace('\\','/');
-            int i = catalina.indexOf("/build/");
-            if (i>0){
-              try {
-                in = new FileInputStream(catalina.substring(0,i)+"/src/main/java/"+filename);
-              } catch (IOException ignore){}// just best-effort last attempt..
-            }
-          }
         }
       }
 
       if (in != null){
-        loadResource(in, filename);
-
+        loadResource(in, fileName);
       } else {
-        addModel("error", "File " + filename + " not found");
+        addModel("error", "File "+ fileName +" not found");
       }
 
     } catch (IOException e){
-      addModel("error", "Could not read "+ filename);
-
+      addModel("error", "Could not read "+ fileName+" with error "+e);
     } finally {
       ClickUtils.close(in);
     }
