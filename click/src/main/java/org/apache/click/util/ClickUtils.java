@@ -2417,23 +2417,20 @@ To fix, ensure that ClickServlet is loaded at startup by editing your web.xml an
   }
 
   /**
-   * Finds a resource with a given name. This method returns null if no
-   * resource with this name is found.
+   * Finds a resource with a given name. This method returns {@code null} if no resource with this name is found.
    * <p>
-   * This method uses the current <tt>Thread</tt> context <tt>ClassLoader</tt> to find
-   * the resource. If the resource is not found the class loader of the given
-   * class is then used to find the resource.
-   *
+   * This method uses the current <tt>Thread</tt> context <tt>ClassLoader</tt> to find the resource.
+	 * If the resource is not found the class loader of the given class is then used to find the resource.
+
    * @param name the name of the resource
-   * @param aClass the class lookup the resource against, if the resource is
-   *     not found using the current <tt>Thread</tt> context <tt>ClassLoader</tt>.
-   * @return the input stream of the resource if found or null otherwise
+   * @param aClass the class lookup the resource against, if the resource is not found using the current <tt>Thread</tt> context <tt>ClassLoader</tt>.
+   * @return the input stream of the resource if found or {@code null} otherwise
    */
   @Nullable
 	public static InputStream getResourceAsStream (@NonNull String name, @NonNull Class<?> aClass) {
 		if (name.startsWith("/")){
 			log.warn("getResourceAsStream: name must be relative, but: {} @ {}", name, aClass);
-			name = name.substring(1);
+			name = name.substring(1);// ~ /WEB-INF/foo ~ WEB-INF/foo
 		}
     val classLoader = Thread.currentThread().getContextClassLoader();
     if (classLoader != null){
@@ -2451,15 +2448,13 @@ To fix, ensure that ClickServlet is loaded at startup by editing your web.xml an
 		InputStream is = aClass.getResourceAsStream(name);
     if (is != null){ return is; }
 
-    is = ClickUtils.class.getResourceAsStream(name);
+    is = ClickUtils.class.getResourceAsStream(name);// fallback to lib class loader
 		if (is != null){ return is; }
 
-		if (name.startsWith("WEB-INF/")){// hack old Click to work with Boot
-			name = name.substring(8);// ^ cut
-			is = getResourceAsStream(name, aClass);
-			if (is != null){ return is; }
-
-			return getResourceAsStream("META-INF/resources/"+name, aClass);
+		if (name.startsWith("WEB-INF/")){// hack old Click to work with Boot ?WEB-INF/classes
+			return getResourceAsStream(name.substring(8), aClass);// no more WEB-INF ⇒ resource in /resources?
+		} else if (!name.startsWith("META-INF/resources/")){// try in pseudo "/WEB-INF/" ~ replace "/WEB-INF/" with real servlet-container location of resources
+			return getResourceAsStream("META-INF/resources/"+ name, aClass);
 		}
 		return null;// not found anywhere
   }
@@ -2468,9 +2463,9 @@ To fix, ensure that ClickServlet is loaded at startup by editing your web.xml an
 	 Get best ClassLoader.
    Get {@link Thread#getContextClassLoader Thread.currentThread().getContextClassLoader()}.
    If null then fallback to {@link Class#getClassLoader() Throw.class::getClassLoader}*/
-  public static ClassLoader classLoader (){
+  public static ClassLoader classLoader () {
     var cl = Thread.currentThread().getContextClassLoader();
-    return cl != null ? cl    // <^ ~ Objects.requireNonNullElseGet
+    return cl != null ? cl // <^ ~ Objects.requireNonNullElseGet
         : ClickUtils.class.getClassLoader();
   }
 

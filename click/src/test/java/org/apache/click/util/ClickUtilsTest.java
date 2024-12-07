@@ -41,19 +41,14 @@ public class ClickUtilsTest extends TestCase {
     DATE_OF_BIRTH = calendar.getTime();
   }
 
-  /**
-   * Setup a MockContext for each test.
-   */
+  /** Setup a MockContext for each test */
   @Override
   protected void setUp() {
     MockContext.initContext(Locale.ENGLISH);
   }
 
-  /**
-   * Sanity checks for ClickUtils.copyFormToObject.
-   */
+  /** Sanity checks for ClickUtils.copyFormToObject */
   public void testCopyFormToObject() {
-
     // set up the form
     Form form = new Form("sample");
 
@@ -578,7 +573,7 @@ public class ClickUtilsTest extends TestCase {
     assertEquals("steve", field.getValue());
 
     // assert that the form error was reset, leaving form in a valid state
-    assertEquals(null, form.getError());
+		assertNull(form.getError());
     assertTrue(form.isValid());
   }
 
@@ -738,6 +733,9 @@ public class ClickUtilsTest extends TestCase {
 		assertEquals("title=Title", IOUtils.toString(ClickUtils.getResourceAsStream("TestPage.properties", getClass())));
 		assertEquals("title=Title", IOUtils.toString(ClickUtils.getResourceAsStream("/WEB-INF/TestPage.properties", getClass())));
 		assertEquals("title=Title", IOUtils.toString(ClickUtils.getResourceAsStream("WEB-INF/TestPage.properties", getClass())));
-		assertTrue(IOUtils.toString(ClickUtils.getResource("/WEB-INF/click/table.css", getClass())).contains("table.blue1"));
+		assertTrue(IOUtils.toString(ClickUtils.getResourceAsStream("/WEB-INF/click/table.css", getClass())).contains("table.blue1"));
+		assertTrue(IOUtils.toString(ClickUtils.getResourceAsStream("WEB-INF/click/table.css", getClass())).contains("table.blue1"));
+		assertTrue(IOUtils.toString(ClickUtils.getResourceAsStream("/click/table.css", getClass())).contains("table.blue1"));
+		assertTrue(IOUtils.toString(ClickUtils.getResourceAsStream("click/table.css", getClass())).contains("table.blue1"));
 	}
 }
