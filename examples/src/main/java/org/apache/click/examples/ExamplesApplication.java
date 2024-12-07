@@ -1,5 +1,6 @@
 package org.apache.click.examples;
 
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.click.examples.util.DatabaseInitListener;
 import org.apache.click.extras.cayenne.DataContextFilter;
@@ -10,6 +11,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
+import org.springframework.context.Lifecycle;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -24,24 +26,23 @@ import java.util.Map;
 @SpringBootApplication // (scanBasePackageClasses = { LunaApplication.class, RemoteMvelConsoleController.class })
 @EnableWebMvc
 @ComponentScan(// == <context:component-scan base-package="org.apache.click.examples" scope-resolver="org.apache.click.extras.spring.PageScopeResolver"/>
-		basePackages = "org.apache.click.examples",
-		scopeResolver = PageScopeResolver.class
+	basePackages = "org.apache.click.examples",
+	scopeResolver = PageScopeResolver.class
 )
-public class ExamplesApplication implements WebMvcConfigurer {
-
-  public static void main (String[] args) {
+@Slf4j
+public class ExamplesApplication implements WebMvcConfigurer, Lifecycle {
+	public static void main (String[] args) {
 		System.out.println(" *** main thread started *** "+Thread.currentThread());
-    SpringApplication.run(ExamplesApplication.class, args);
-    System.err.println(" *** main thread finishes *** "+Thread.currentThread());
+		SpringApplication.run(ExamplesApplication.class, args);
+		System.err.println(" *** main thread finishes *** "+Thread.currentThread());
   }
-
 	private static final String[] CLASSPATH_RESOURCE_LOCATIONS = {
 			"classpath:/META-INF/resources/",// todo classpath*:
-			"classpath:/META-INF/resources/click/",
+			//"classpath:/META-INF/resources/click/",
 			"classpath:/resources/",
-			"classpath:/resources/click/",
+			//"classpath:/resources/click/",
 			"classpath:/static/",
-			"classpath:/static/click/",
+			//"classpath:/static/click/",
 			"classpath:/public/"
 	};
 
@@ -118,5 +119,21 @@ public class ExamplesApplication implements WebMvcConfigurer {
 		reg.addUrlPatterns("*.css", "*.js", "*.gif", "*.png");
 		reg.setServletNames(Collections.singletonList("ClickServlet"));
 		return reg;
+	}
+
+	@Override
+	public void start () {
+		log.warn("INFO: ✅ start is called");
+	}
+
+	@Override
+	public void stop () {
+		log.warn("INFO: ⛔ stop is called");
+	}
+
+	@Override
+	public boolean isRunning () {
+		log.warn("INFO: ❔ isRunning is called");
+		return false;
 	}
 }
