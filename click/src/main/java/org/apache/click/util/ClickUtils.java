@@ -2454,11 +2454,12 @@ To fix, ensure that ClickServlet is loaded at startup by editing your web.xml an
     is = ClickUtils.class.getResourceAsStream(name);
 		if (is != null){ return is; }
 
-		if (name.startsWith("/WEB-INF/")){// hack old Click to work with Boot
-			is = getResourceAsStream(name.substring(9), aClass);
+		if (name.startsWith("WEB-INF/")){// hack old Click to work with Boot
+			name = name.substring(8);// ^ cut
+			is = getResourceAsStream(name, aClass);
 			if (is != null){ return is; }
 
-			return getResourceAsStream("META-INF/resources"+name.substring(9), aClass);
+			return getResourceAsStream("META-INF/resources/"+name, aClass);
 		}
 		return null;// not found anywhere
   }
@@ -2508,7 +2509,17 @@ To fix, ensure that ClickServlet is loaded at startup by editing your web.xml an
 			URL url = aClass.getResource(name);//3 caller class
 			if (url != null){ return url; }
 		}
-    return ClickUtils.class.getResource(name);//4 click-lib class
+		URL url = ClickUtils.class.getResource(name);//4 click-lib class
+		if (url != null){ return url; }
+
+		if (name.startsWith("WEB-INF/")){// hack old Click to work with Boot
+			name = name.substring(8);// ^ cut
+			url = getResource(name, aClass);
+			if (url != null){ return url; }
+
+			return getResource("META-INF/resources/"+name, aClass);
+		}
+		return null;// not found anywhere
   }
 
   /**

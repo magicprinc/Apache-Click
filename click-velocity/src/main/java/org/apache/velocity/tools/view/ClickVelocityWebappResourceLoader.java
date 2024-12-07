@@ -78,7 +78,7 @@ public class ClickVelocityWebappResourceLoader extends ResourceLoader {
       throw new ResourceNotFoundException("WebappResourceLoader: No template name provided");
     }
     if (name.startsWith("/")){
-      name = name.substring(1).trim();
+      name = name.substring(1);
     }
 		try {
 			val is = servletContext.getResourceAsStream('/'+ name);// [META-INF/resources] /name
@@ -124,40 +124,44 @@ public class ClickVelocityWebappResourceLoader extends ResourceLoader {
 	 rootPath is null if the servlet container cannot translate the virtual path to a real path for any reason
 	 (such as when the content is being made available from a .war archive)
 
-   @param resource Resource the resource to check
+   @param templateResource Resource the resource to check
    @return long The time when the resource was last modified or 0 if the file can't be read
   */
   @Override
-  public long getLastModified (Resource resource) {
+  public long getLastModified (Resource templateResource) {
+		String name = templateResource.getName();
+		if (name.startsWith("/")){
+			name = name.substring(1);
+		}
 		try {
 			String rootPath = servletContext.getRealPath("/");
-			if (rootPath != null) return new File(rootPath, resource.getName()).lastModified();// ? cachedFile.canRead()
+			if (rootPath != null) return new File(rootPath, name).lastModified();// ? cachedFile.canRead()
 		} catch (Exception e){
-			log.warn("getLastModified: Could not get last modified time for {}", resource.getName(), e);
+			log.warn("getLastModified: Could not get last modified time for {}", name, e);
 		}
 		try {
-			URL url = servletContext.getResource('/'+resource.getName());// web /
+			URL url = servletContext.getResource('/'+name);// web /
 			if (url != null) return url.openConnection().getLastModified();
 		} catch (Exception e){
-			log.warn("getLastModified: Could not get last modified time for {}", resource.getName(), e);
+			log.warn("getLastModified: Could not get last modified time for {}", name, e);
 		}
 		try {
-			URL url = ClickUtils.getResource(resource.getName(), getClass());// /
+			URL url = ClickUtils.getResource(name, getClass());// /
 			if (url != null) return url.openConnection().getLastModified();
 		} catch (Exception e){
-			log.warn("getLastModified: Could not get last modified time for {}", resource.getName(), e);
+			log.warn("getLastModified: Could not get last modified time for {}", name, e);
 		}
 		try {
-			URL url = ClickUtils.getResource("templates/"+resource.getName(), getClass());
+			URL url = ClickUtils.getResource("templates/"+name, getClass());
 			if (url != null) return url.openConnection().getLastModified();
 		} catch (Exception e){
-			log.warn("getLastModified: Could not get last modified time for {}", resource.getName(), e);
+			log.warn("getLastModified: Could not get last modified time for {}", name, e);
 		}
 		try {
-			URL url = ClickUtils.getResource("static/"+ resource.getName(), getClass());
+			URL url = ClickUtils.getResource("static/"+ name, getClass());
 			if (url != null) return url.openConnection().getLastModified();
 		} catch (Exception e){
-			log.warn("getLastModified: Could not get last modified time for {}", resource.getName(), e);
+			log.warn("getLastModified: Could not get last modified time for {}", name, e);
 		}
 		return 0;
 	}

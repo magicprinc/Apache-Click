@@ -712,16 +712,21 @@ public class ClickUtilsTest extends TestCase {
 		assertNull(Thread.currentThread().getContextClassLoader().getResource("/click-page.properties"));// Class loaders supports only absolute without /
 		assertNull(getClass().getResource("click-page.properties"));// Class supports relative and /absolute
 		assertEquals("click-page.properties", fileName(getClass().getResource("/click-page.properties")));
+		assertEquals("click-page.properties", fileName(ClickUtils.getResource("/WEB-INF/click-page.properties", getClass())));
 
 		assertNull("click-page.properties", ClickUtils.getResource("static/testResAbs.xxx", getClass()));// not found (not exists)
 
 		assertEquals("testResAbs.txt", fileName(ClickUtils.getResource("static/testResAbs.txt", getClass())));
 		assertEquals("TestPage.properties", fileName(ClickUtils.getResource("TestPage.properties", getClass())));
+
+		assertEquals("table.css", fileName(ClickUtils.getResource("/WEB-INF/click/table.css", getClass())));
 	}
 
 	public void testGetResourceAsStream () throws IOException {
 		// file:/C:/TEMP/Apache-Click/click/out/test/resources/click-page.properties
 		assertEquals("version=Version 0.21", IOUtils.toString(ClickUtils.getResourceAsStream("click-page.properties", getClass())));
+		assertEquals("version=Version 0.21", IOUtils.toString(ClickUtils.getResourceAsStream("/WEB-INF/click-page.properties", getClass())));
+		assertEquals("version=Version 0.21", IOUtils.toString(ClickUtils.getResourceAsStream("WEB-INF/click-page.properties", getClass())));
 		assertEquals("version=Version 0.21", IOUtils.toString(Thread.currentThread().getContextClassLoader().getResourceAsStream("click-page.properties")));
 		assertNull(Thread.currentThread().getContextClassLoader().getResourceAsStream("/click-page.properties"));// Class loaders supports only absolute without /
 		assertNull(getClass().getResourceAsStream("click-page.properties"));// Class supports relative and /absolute
@@ -731,5 +736,8 @@ public class ClickUtilsTest extends TestCase {
 
 		assertEquals("ABS", IOUtils.toString(ClickUtils.getResourceAsStream("static/testResAbs.txt", getClass())));
 		assertEquals("title=Title", IOUtils.toString(ClickUtils.getResourceAsStream("TestPage.properties", getClass())));
+		assertEquals("title=Title", IOUtils.toString(ClickUtils.getResourceAsStream("/WEB-INF/TestPage.properties", getClass())));
+		assertEquals("title=Title", IOUtils.toString(ClickUtils.getResourceAsStream("WEB-INF/TestPage.properties", getClass())));
+		assertTrue(IOUtils.toString(ClickUtils.getResource("/WEB-INF/click/table.css", getClass())).contains("table.blue1"));
 	}
 }
