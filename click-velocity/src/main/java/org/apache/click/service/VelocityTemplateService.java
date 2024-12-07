@@ -15,8 +15,9 @@ import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.exception.TemplateInitException;
 import org.apache.velocity.io.VelocityWriter;
 import org.apache.velocity.runtime.RuntimeConstants;
+import org.apache.velocity.runtime.log.Slf4jLogChute;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
-import org.apache.velocity.tools.view.WebappResourceLoader;
+import org.apache.velocity.tools.view.ClickVelocityWebappResourceLoader;
 import org.apache.velocity.util.SimplePool;
 
 import javax.servlet.ServletContext;
@@ -31,7 +32,6 @@ import java.util.TreeMap;
 
 import static org.apache.click.util.ClickUtils.trim;
 import static org.apache.velocity.runtime.RuntimeConstants.RESOURCE_LOADER;
-import static org.apache.velocity.runtime.RuntimeConstants.RESOURCE_LOADER_CHECK_INTERVAL;
 
 /**
  * Provides a <a target="_blank" href="http://velocity.apache.org//">Velocity</a> TemplateService class.
@@ -168,9 +168,6 @@ import static org.apache.velocity.runtime.RuntimeConstants.RESOURCE_LOADER_CHECK
  */
 @Slf4j
 public class VelocityTemplateService implements TemplateService {
-  /** The default velocity properties filename: "<tt>/WEB-INF/velocity.properties</tt>". */
-  protected static final String DEFAULT_TEMPLATE_PROPS = "/WEB-INF/velocity.properties";
-
   /** The click error page template path. */
   protected static final String ERROR_PAGE_PATH = "/click/error.htm";
 
@@ -284,25 +281,29 @@ public class VelocityTemplateService implements TemplateService {
    * @throws MalformedURLException if a resource cannot be loaded
    */
   protected Properties getInitProperties () throws MalformedURLException {
-    val velProps = new Properties();
-    // Set default velocity runtime properties.
-    velProps.setProperty(RuntimeConstants.RESOURCE_LOADERS, "webapp,class");// ,file
-    velProps.setProperty(RESOURCE_LOADER+".webapp.class", WebappResourceLoader.class.getName());
-    velProps.setProperty(RESOURCE_LOADER+".class.class", ClasspathResourceLoader.class.getName());
-    //velProps.setProperty(RESOURCE_LOADER+"file.class", FileResourceLoader.class.getName());
+    val velProps = new Properties();// Set default velocity runtime properties.
+    velProps.setProperty(RuntimeConstants.RESOURCE_LOADER, "webapp,class");// ,file
+		val web = "webapp."+RESOURCE_LOADER;  val cls = "class."+RESOURCE_LOADER;
+    velProps.setProperty(web+".class", ClickVelocityWebappResourceLoader.class.getName());
+    velProps.setProperty(cls+".class", ClasspathResourceLoader.class.getName());
+    //velProps.setProperty("file."+RESOURCE_LOADER+".class", FileResourceLoader.class.getName());
 
     if (configService.isProductionMode() || configService.isProfileMode()){
-      velProps.setProperty(RESOURCE_LOADER+".webapp.cache", "true");
-			velProps.setProperty(RESOURCE_LOADER+".class.cache", "true");
-			velProps.setProperty(RESOURCE_LOADER+".webapp."+RESOURCE_LOADER_CHECK_INTERVAL, "3600");
-			velProps.setProperty(RESOURCE_LOADER+".class."+RESOURCE_LOADER_CHECK_INTERVAL, "3600");
+      velProps.setProperty(web+".cache", "true");
+			velProps.setProperty(cls+".cache", "true");
+			velProps.setProperty("webapp.resource.loader.modificationCheckInterval", "0");
+			velProps.setProperty("class.resource.loader.modificationCheckInterval", "0");
       velProps.setProperty(RuntimeConstants.VM_LIBRARY_AUTORELOAD, "false");
     } else {
-			velProps.setProperty(RESOURCE_LOADER+".webapp.cache", "false");
-			velProps.setProperty(RESOURCE_LOADER+".class.cache", "false");
+			velProps.setProperty(web+".cache", "false");
+			velProps.setProperty(cls+".cache", "false");
       velProps.setProperty(RuntimeConstants.VM_LIBRARY_AUTORELOAD, "true");
     }
-    // Use 'macro.vm' exists set it as default VM library
+		velProps.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS, Slf4jLogChute.class.getName());
+		velProps.setProperty(RuntimeConstants.DIRECTIVE_IF_TOSTRING_NULLCHECK, "false");
+
+
+		// Use 'macro.vm' exists set it as default VM library
     ServletContext servletContext = configService.getServletContext();
     URL macroURL = servletContext.getResource('/'+ MACRO_VM_FILE_NAME);
     if (macroURL != null){
@@ -319,32 +320,31 @@ public class VelocityTemplateService implements TemplateService {
         }
       }
     }
-    // Load user velocity properties.
-    Properties userProperties = new Properties();
-    String filename = DEFAULT_TEMPLATE_PROPS;
-    InputStream inputStream = servletContext.getResourceAsStream(filename);
-		if (inputStream == null){
-			inputStream = ClickUtils.getResourceAsStream("velocity.properties", getClass());
+    // Load user velocity properties
+    val userProperties = new Properties();
+    var defaultTemplateProps = "/WEB-INF/velocity.properties";
+    InputStream inputStream = servletContext.getResourceAsStream(defaultTemplateProps);
+		if (inputStream == null){// fallback to classpath
+			defaultTemplateProps = defaultTemplateProps.replace("/WEB-INF/","");
+			inputStream = ClickUtils.getResourceAsStream(defaultTemplateProps, getClass());
 		}
     if (inputStream != null){
       try {
         userProperties.load(inputStream);
       } catch (IOException ioe){
-        log.error("error loading velocity properties file: {} @ {}", filename, inputStream, ioe);
+        log.error("error loading velocity properties file: {} @ {}", defaultTemplateProps, inputStream, ioe);
       } finally {
         ClickUtils.close(inputStream);
       }
     }
     // Add user properties.
     for (Map.Entry<Object,Object> entry : userProperties.entrySet()){
-      Object pop = velProps.setProperty(trim(entry.getKey()), trim(entry.getValue()));
+      val pop = velProps.setProperty(trim(entry.getKey()), trim(entry.getValue()));
       if (pop != null && log.isDebugEnabled()){
 				log.debug("user defined velocity property '{}={}' replaced default property '{}={}'", entry.getKey(), entry.getValue(), entry.getKey(), pop);
       }
     }
-    if (log.isTraceEnabled()){
-      log.trace("velocity properties: {}", new TreeMap<>(velProps));
-    }
+    log.debug("velocity properties: {}", new TreeMap<>(velProps));
     return velProps;
   }
 

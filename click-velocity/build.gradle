@@ -49,7 +49,7 @@ dependencies {
 	api('commons-lang:commons-lang:2.+')
 	api('commons-collections:commons-collections:3.+')
 
-	api 'org.apache.velocity:velocity-engine-core:2.+'
+	api 'org.apache.velocity:velocity:1.+'
 
   implementation project(':click')
 	implementation(libs.slf4jApi, libs.slf4jJCL, libs.slf4jLog4j)
@@ -60,12 +60,6 @@ dependencies {
 
   testRuntimeOnly libs.slf4jSimple
 	testImplementation(libs.javaxServletApi)
-
-  modules {
-    module('velocity:velocity') {
-      replacedBy 'org.apache.velocity:velocity', 'Use 1.7 instead of 1.3'
-    }
-  }
 }
 configurations.configureEach { // .implementation  // https://tomgregory.com/how-to-exclude-gradle-dependencies/
 	exclude group: "velocity", module: "velocity" // 1.3 they come from somewhere..

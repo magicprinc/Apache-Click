@@ -2,11 +2,11 @@ package org.apache.velocity.tools.view;
 
 import lombok.val;
 import org.apache.click.MockContext;
+import org.apache.commons.collections.ExtendedProperties;
 import org.apache.commons.io.IOUtils;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.runtime.RuntimeServices;
 import org.apache.velocity.runtime.resource.Resource;
-import org.apache.velocity.util.ExtProperties;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -19,30 +19,30 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
-/** @see WebappResourceLoader */
+/** @see ClickVelocityWebappResourceLoader */
 public class WebappResourceLoaderTest {
   @Test
   public void basic () throws IOException {
     val ctx = MockContext.initContext();
-    val wrl = new WebappResourceLoader();
+    val wrl = new ClickVelocityWebappResourceLoader();
 
     //ExtendedProperties p = mock(ExtendedProperties.class);
     RuntimeServices rsvc = mock(RuntimeServices.class);
-		var ep = mock(ExtProperties.class);
+		ExtendedProperties p = mock(ExtendedProperties.class);
 
 		// eq(ServletContext.class.getName())
     when(rsvc.getApplicationAttribute(any())).thenReturn(ctx.getServletContext());
 
-    wrl.commonInit(rsvc, ep);
-    wrl.init(ep);
-    val is = wrl.getResourceReader("test.txt", "UTF-8");
+    wrl.commonInit(rsvc, p);
+    wrl.init(p);
+    val is = wrl.getResourceStream("test.txt");
     assertEquals("Hello there!", IOUtils.toString(is));
     is.close();
 
-    var e1 = assertThrows(ResourceNotFoundException.class, ()->wrl.getResourceReader("not_found!!!", "Utf-8"));
+    var e1 = assertThrows(ResourceNotFoundException.class, ()->wrl.getResourceStream("not_found!!!"));
     assertEquals("org.apache.velocity.exception.ResourceNotFoundException: WebappResourceLoader: Resource 'not_found!!!' not found!", e1.toString());
 
-    var e2 = assertThrows(ResourceNotFoundException.class, ()->wrl.getResourceReader("::/\\", "Utf-8"));
+    var e2 = assertThrows(ResourceNotFoundException.class, ()->wrl.getResourceStream("::/\\"));
     assertEquals("org.apache.velocity.exception.ResourceNotFoundException: WebappResourceLoader: Resource '::/\\' not found!", e2.toString());
 
     // file:////test.txt (windows) -or- file:/test.txt (github: linux?)
@@ -67,8 +67,6 @@ public class WebappResourceLoaderTest {
     assertFalse(wrl.isSourceModified(fileResource));
   }
 
-//  @Test
-//  public void utils () {
-//    assertEquals("x", WebappResourceLoader.cutLeadingSlash(" ////\\\\ x\t\n"));
-//  }
+//  @Test  public void utils () {
+//    assertEquals("x", WebappResourceLoader.cutLeadingSlash(" ////\\\\ x\t\n"));  }
 }

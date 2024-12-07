@@ -8,13 +8,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.runtime.resource.Resource;
 import org.apache.velocity.runtime.resource.loader.ResourceLoader;
-import org.apache.velocity.util.ExtProperties;
 
 import javax.servlet.ServletContext;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
 import java.net.URL;
 
 /**
@@ -34,7 +31,9 @@ import java.net.URL;
  * webapp.resource.loader.modificationCheckInterval properties need to be
  * set in the velocity.properties file ... auto-reloading of global macros
  * requires the webapp.resource.loader.cache property to be set to 'false'.
- *
+
+ todo cache resources or use spring capabilities
+
  * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
  * @author Nathan Bubna
  * @author <a href="mailto:claude@savoirweb.com">Claude Brisson</a>
@@ -42,7 +41,7 @@ import java.net.URL;
  @see org.apache.velocity.runtime.resource.loader.FileResourceLoader
  */
 @Slf4j
-public class WebappResourceLoader extends ResourceLoader {
+public class ClickVelocityWebappResourceLoader extends ResourceLoader {
   protected ServletContext servletContext;
 
   /**
@@ -54,7 +53,7 @@ public class WebappResourceLoader extends ResourceLoader {
    * @param configuration the {@link ExtendedProperties} associated with this resource loader.
    */
   @Override
-  public void init (ExtProperties configuration) {
+  public void init (ExtendedProperties configuration) {
     log.trace("WebappResourceLoader: initialization starting.");
     Object obj = rsvc.getApplicationAttribute(ServletContext.class.getName());
     if (obj instanceof ServletContext o)
@@ -74,7 +73,7 @@ public class WebappResourceLoader extends ResourceLoader {
    * @throws ResourceNotFoundException if template not found in classpath.
    */
   @Override
-	public Reader getResourceReader (String name, String encoding) throws ResourceNotFoundException {
+	public InputStream getResourceStream (String name) throws ResourceNotFoundException {
     if (StringUtils.isEmpty(name)){
       throw new ResourceNotFoundException("WebappResourceLoader: No template name provided");
     }
@@ -83,36 +82,29 @@ public class WebappResourceLoader extends ResourceLoader {
     }
 		try {
 			val is = servletContext.getResourceAsStream('/'+ name);// [META-INF/resources] /name
-			if (is != null){ return rdr(is, encoding); }
+			if (is != null){ return is; }
 		} catch (Exception e){
 			log.debug("ServletContext.getResourceAsStream failed: web {}", name, e);
 		}
 		try {
 			val is = ClickUtils.getResourceAsStream(name, getClass());// /resources/ name
-			if (is != null){ return rdr(is, encoding); }
+			if (is != null){ return is; }
 		} catch (Exception e){
 			log.debug("Class.getResourceAsStream failed: /{}", name, e);
 		}
 		try {
 			val is = ClickUtils.getResourceAsStream("templates/"+ name, getClass());// /resources/templates/ name ~ spring boot
-			if (is != null){ return rdr(is, encoding); }
+			if (is != null){ return is; }
 		} catch (Exception e){
 			log.debug("Class.getResourceAsStream failed: templates/{}", name, e);
 		}
 		try {
 			val is = ClickUtils.getResourceAsStream("static/"+ name, getClass());
-			if (is != null){ return rdr(is, encoding); }
+			if (is != null){ return is; }
 		} catch (Exception e){
 			log.debug("Class.getResourceAsStream failed: static/ {}", name, e);
 		}
 		throw new ResourceNotFoundException(NOT_FOUND.formatted(name));
-	}
-	private Reader rdr (InputStream is, String encoding) throws ResourceNotFoundException {
-		try {
-			return buildReader(is, encoding);
-		} catch (IOException e){// UnsupportedEncodingException
-			throw new ResourceNotFoundException("Unknown encoding: "+ encoding, e);
-		}
 	}
 
   /**
@@ -144,7 +136,7 @@ public class WebappResourceLoader extends ResourceLoader {
 			log.warn("getLastModified: Could not get last modified time for {}", resource.getName(), e);
 		}
 		try {
-			URL url = servletContext.getResource(resource.getName());// web /
+			URL url = servletContext.getResource('/'+resource.getName());// web /
 			if (url != null) return url.openConnection().getLastModified();
 		} catch (Exception e){
 			log.warn("getLastModified: Could not get last modified time for {}", resource.getName(), e);

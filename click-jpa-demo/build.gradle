@@ -79,12 +79,6 @@ dependencies {
   //*** TEST TEST TEST
   testImplementation libs.bundles.junit
   testImplementation project(':click-mock')
-
-  modules {
-    module('velocity:velocity') {
-      replacedBy 'org.apache.velocity:velocity', 'Use 1.7 instead of 1.3'
-    }
-  }
 }
 configurations.configureEach { // .implementation  // https://tomgregory.com/how-to-exclude-gradle-dependencies/
 	exclude group: "velocity", module: "velocity" // 1.3 they come from somewhere..
