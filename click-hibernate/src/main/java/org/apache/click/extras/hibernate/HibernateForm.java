@@ -1,5 +1,13 @@
 package org.apache.click.extras.hibernate;
 
+import io.ebean.DB;
+import io.ebean.Transaction;
+import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebeaninternal.server.deploy.BeanProperty;
+import jakarta.persistence.PersistenceException;
+import lombok.NonNull;
+import lombok.SneakyThrows;
+import lombok.val;
 import org.apache.click.control.Checkbox;
 import org.apache.click.control.Field;
 import org.apache.click.control.Form;
@@ -7,14 +15,9 @@ import org.apache.click.control.HiddenField;
 import org.apache.click.util.ClickUtils;
 import org.apache.click.util.HtmlStringBuffer;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.EntityMode;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.hibernate.metadata.ClassMetadata;
-import org.hibernate.type.Type;
 
+import javax.annotation.Nullable;
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -100,12 +103,13 @@ import java.io.Serializable;
  *        <span class="kw">return false</span>;
  *    }
  * } </pre>
- *
- * @see SessionContext
- * @see SessionFilter
+ @see io.ebeaninternal.server.deploy.BeanDescriptor
+ @see io.ebeaninternal.server.deploy.BeanDescriptorManager
+ @see io.ebean.bean.EntityBean
+ @see io.ebean.DB
  */
 public class HibernateForm extends Form {
-  private static final long serialVersionUID = -7134198516606088333L;
+  @Serial private static final long serialVersionUID = -7134198516606088333L;
 
   /** The form value object classname parameter name. */
   protected static final String FO_CLASS = "FO_CLASS";
@@ -113,140 +117,52 @@ public class HibernateForm extends Form {
   /** The form value object id parameter name. */
   protected static final String FO_ID = "FO_ID";
 
-  // ----------------------------------------------------- Instance Variables
-
   /** The value object class name hidden field. */
-  protected HiddenField classField;
+  protected final HiddenField classField;
 
   /** The value object identifier hidden field. */
-  protected HiddenField oidField;
+  protected final HiddenField oidField;
 
-  /** The Hibernate session. */
-  protected Session session;
-
-  /** The Hibernate session factory. */
-  protected SessionFactory sessionFactory;
-
-  /**
-   * The flag specifying that object validation meta data has been applied to
-   * the form fields.
-   */
+  /** The flag specifying that object validation meta data has been applied to the form fields. */
   protected boolean metaDataApplied = false;
 
-  // ----------------------------------------------------------- Constructors
-
   /**
-   * Create a new HibernateForm with the given form name and value object
-   * class.
+   * Create a new HibernateForm with the given form name and value object class.
    *
    * @param name the form name
    * @param valueClass the value object class
    */
-  public HibernateForm(String name, Class<?> valueClass) {
+  public HibernateForm (String name, @NonNull Class<?> valueClass, @NonNull Class<?> idClass) {
     super(name);
-
-    if (valueClass == null) {
-      throw new IllegalArgumentException("Null valueClass parameter");
-    }
-
     classField = new HiddenField(FO_CLASS, String.class);
-    classField.setValue(valueClass.getName());
+    classField.setValue(getClassname(valueClass));
     add(classField);
 
-    String classname = getClassname(valueClass);
-
-    ClassMetadata classMetadata =
-        getSessionFactory().getClassMetadata(classname);
-
-    Type identifierType = classMetadata.getIdentifierType();
-    oidField = new HiddenField(FO_ID, identifierType.getReturnedClass());
+    oidField = new HiddenField(FO_ID, idClass);
     add(oidField);
   }
 
-
-  // --------------------------------------------------------- Public Methods
-
-  /**
-   * Return the form Hibernate <tt>Session</tt>. If form session is not
-   * defined this method will obtain a session from the
-   * {@link SessionContext}.
-   * <p/>
-   * Applications using alternative Hibernate <tt>Session</tt> sources should
-   * set the form's session using the {@link #setSession(Session)} method.
-   *
-   * @return the form Hibernate session
-   */
-  public Session getSession() {
-    if (session == null) {
-      session = SessionContext.getSession();
-    }
-    return session;
-  }
-
-  /**
-   * Set the user's Hibernate <tt>Session</tt>.
-   *
-   * @param session the user's Hibernate session
-   */
-  public void setSession(Session session) {
-    this.session = session;
-  }
-
-  /**
-   * Return the application Hibernate <tt>SessionFactory</tt>.
-   * If session factory is not defined this method will obtain the session
-   * factory from the {@link SessionContext}.
-   * <p/>
-   * Applications using an alternative Hibernate <tt>SessionFactory</tt>
-   * sources should set the form's session factory using the
-   * {@link #setSessionFactory(SessionFactory)} method.
-   *
-   * @return the user's Hibernate session
-   */
-  public SessionFactory getSessionFactory() {
-    if (sessionFactory == null) {
-      sessionFactory = SessionContext.getSessionFactory();
-    }
-    return sessionFactory;
-  }
-
-  /**
-   * Set the form Hibernate <tt>SessionFactory</tt>.
-   *
-   * @param sessionFactory the Hibernate SessionFactory
-   */
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
-  }
-
-  /**
+	/**
    * Return a Hibernate value object from the form with the form field values
    * copied into the object's properties.
    *
    * @return the Hibernate object from the form with the form field values
    * applied to the object properties.
    */
-  public Object getValueObject() {
-    if (StringUtils.isNotBlank(classField.getValue())) {
-      try {
-        Class<?> valueClass = ClickUtils.classForName(classField.getValue());
+  @Nullable  @SneakyThrows
+	public Object getValueObject() {
+    if (StringUtils.isNotBlank(classField.getValue())){
+			Class<?> valueClass = ClickUtils.classForName(classField.getValue());
 
-        Serializable oid = (Serializable) oidField.getValueObject();
+			Serializable oid = (Serializable) oidField.getValueObject();
 
-        Object valueObject;
-        if (oid != null) {
-          valueObject = getSession().load(valueClass, oid);
-        } else {
-          valueObject = valueClass.newInstance();
-        }
+			Object valueObject = oid != null
+					? DB.find(valueClass, oid)
+					: valueClass.newInstance();
 
-        copyTo(valueObject);
+			copyTo(valueObject);
 
-        return valueObject;
-
-      } catch (Exception e) {
-        throw new RuntimeException(e);
-      }
+			return valueObject;
     }
     return null;
   }
@@ -257,21 +173,16 @@ public class HibernateForm extends Form {
    *
    * @param valueObject the Hibernate value object to set
    */
-  public void setValueObject(Object valueObject) {
-    if (valueObject != null) {
+  public void setValueObject (Object valueObject) {
+		if (valueObject != null){
+			// Extract the identifier value
+			Object identifier = DB.beanId(valueObject);
+			oidField.setValueObject(identifier);
 
-      String classname = getClassname(valueObject.getClass());
-
-      ClassMetadata classMetadata =
-          getSessionFactory().getClassMetadata(classname);
-
-      Object identifier =
-          classMetadata.getIdentifier(valueObject, EntityMode.POJO);
-      oidField.setValueObject(identifier);
-
-      copyFrom(valueObject);
-    }
-  }
+			// Perform a custom copy operation
+			copyFrom(valueObject);
+		}
+	}
 
   /**
    * Save or update the object to the database and return true.
@@ -295,31 +206,21 @@ public class HibernateForm extends Form {
    * @return true if the object was saved or false otherwise
    * @throws HibernateException if a persistence error occurred
    */
-  public boolean saveChanges() throws HibernateException {
+  public boolean saveChanges () {
     Object valueObject = getValueObject();
 
-    Transaction transaction = null;
+    Transaction transaction = DB.beginTransaction();
     try {
-      Session session = getSession();
-
-      transaction = session.beginTransaction();
-
-      session.saveOrUpdate(valueObject);
-
-      transaction.commit();
+      DB.save(valueObject);
 
       return true;
 
-    } catch (HibernateException he) {
-      if (transaction != null) {
-        try {
-          transaction.rollback();
-        } catch (HibernateException re) {
-          // ignore
-        }
-      }
+    } catch (PersistenceException he) {
+      transaction.rollback();
       throw he;
-    }
+    } finally {
+			transaction.commit();
+		}
   }
 
   /**
@@ -352,7 +253,6 @@ public class HibernateForm extends Form {
     super.render(buffer);
   }
 
-  // ------------------------------------------------------ Protected Methods
 
   /**
    * Applies the <tt>ClassMetadata</tt> validation database meta data to the
@@ -363,55 +263,44 @@ public class HibernateForm extends Form {
    * <li>required - is a mandatory field and cannot be null</li>
    * </ul>
    */
+	@SneakyThrows // ClassNotFoundException
   protected void applyMetaData() {
-    if (metaDataApplied) {
+    if (metaDataApplied){
       return;
     }
+		Class<?> valueClass = ClickUtils.classForName(classField.getValue());
+		String classname = getClassname(valueClass);
 
-    try {
-      Class<?> valueClass = ClickUtils.classForName(classField.getValue());
+//		var server = (SpiServer) DB.getDefault();
+//		BeanType<?> beanType = server.beanType(valueClass);
+		var server = (SpiEbeanServer) DB.getDefault();
 
-      String classname = getClassname(valueClass);
-
-      ClassMetadata metadata = getSessionFactory().getClassMetadata(classname);
-
-      String[] propertyNames = metadata.getPropertyNames();
-
-      boolean[] propertyNullability = metadata.getPropertyNullability();
-
-      for (int i = 0; i < propertyNames.length; i++) {
-        Field field = getField(propertyNames[i]);
-        if (field != null) {
-          boolean isMandatory = !propertyNullability[i];
-          if (!field.isRequired() && isMandatory) {
-            if (!(field instanceof Checkbox)) {
-              field.setRequired(true);
-            }
-          }
-        }
-      }
-
-    } catch (ClassNotFoundException cnfe) {
-      throw new RuntimeException(cnfe);
-    }
-
+		val beanDescriptor = server.descriptor(valueClass);
+	 	for (BeanProperty p : beanDescriptor.propertiesAll()){
+			Field field = getField(p.name());
+			if (field != null){
+				boolean isMandatory = !p.isNullable();
+				if (!field.isRequired() && isMandatory){
+					if (!(field instanceof Checkbox)){
+						field.setRequired(true);
+					}
+				}
+			}
+		}
     metaDataApplied = true;
   }
 
   /**
-   * Return the original classname for the given class removing any CGLib
-   * proxy information.
+   * Return the original classname for the given class removing any CGLib proxy information.
    *
-   * @param aClass the class to obtain the original name from
+   * @param aClass the class to get the original name from
    * @return the original classname for the given class
    */
   protected String getClassname(Class<?> aClass) {
-
     String classname = aClass.getName();
     if (classname.contains("$$")) {
-      classname = classname.substring(0, classname.indexOf("$"));
+      classname = classname.substring(0, classname.indexOf('$'));
     }
-
     return classname;
   }
 }

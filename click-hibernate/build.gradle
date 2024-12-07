@@ -3,14 +3,16 @@ plugins {
   id 'idea'
   id 'maven-publish'
 
+	alias(libs.plugins.ebean)
+
 	alias(libs.plugins.lombok)
-	alias(libs.plugins.sonarlint)
 	alias(libs.plugins.errorprone)
 }
 
 repositories {
   mavenLocal()
   mavenCentral()
+	maven { url 'https://jitpack.io' }
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -51,15 +53,15 @@ dependencies {
 
   implementation project(':click')
 	implementation(libs.slf4jApi, libs.slf4jJCL, libs.slf4jLog4j)
-
-  implementation 'org.hibernate:hibernate:3.2.7.ga'
-  implementation 'javax.transaction:jta:1.1'
+	api('com.github.magicprinc:hibean:1.8.3')
+	api("io.ebean:ebean-querybean:latest.release")
+	annotationProcessor("io.ebean:querybean-generator:latest.release")
+	implementation(libs.bundles.jackson)
 
   //*** TEST TEST TEST
   testImplementation libs.bundles.junit
 
   testRuntimeOnly libs.slf4jSimple
-
   testImplementation project(':click-mock')
 }
 configurations.configureEach { // .implementation  // https://tomgregory.com/how-to-exclude-gradle-dependencies/
@@ -93,14 +95,3 @@ test {
   Locale.setDefault(new Locale("en", "US"));
 }
 lombok { version = "latest.release" }
-sonarLint { ignoreFailures = true }
-tasks.named("sonarlintMain").configure {
-	onlyIf { // gradle build -Psonarlint=true  -or- -Dsonarlint=true
-		(project.hasProperty('sonarlint') && 'true'.equalsIgnoreCase(project.property('sonarlint').toString())) || 'true'.equalsIgnoreCase(System.getProperty('sonarlint'))
-	}
-}
-tasks.named("sonarlintTest").configure {
-	onlyIf {
-		(project.hasProperty('sonarlint') && 'true'.equalsIgnoreCase(project.property('sonarlint').toString())) || 'true'.equalsIgnoreCase(System.getProperty('sonarlint'))
-	}
-}
