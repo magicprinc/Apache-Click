@@ -3,7 +3,6 @@ package org.apache.click.service;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.click.util.ClickUtils;
-import org.apache.commons.io.IOUtils;
 
 import javax.annotation.Nullable;
 import javax.servlet.ServletContext;
@@ -12,7 +11,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -27,10 +25,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Slf4j
 public class ClickResourceService implements ResourceService {
-
   /** The click resources CACHE !!! CACHE !!!. */
   final Map<String, byte[]> resourceCache = new ConcurrentHashMap<>();
-
   /** The application configuration service. */
   private ConfigService configService;
 
@@ -40,14 +36,16 @@ public class ClickResourceService implements ResourceService {
    * @param servletContext the application servlet context
    * @throws IOException if an IO error occurs initializing the service
    */
-  @Override public void onInit (ServletContext servletContext) throws IOException {
+  @Override
+	public void onInit (ServletContext servletContext) throws IOException {
     configService = ClickUtils.getConfigService(servletContext);
   }
 
   /**
    * @see ResourceService#onDestroy()
    */
-  @Override public void onDestroy (){
+  @Override
+	public void onDestroy (){
     resourceCache.clear();
   }
 
@@ -57,7 +55,8 @@ public class ClickResourceService implements ResourceService {
    * @param request the servlet request
    * @return true if the request is for a static click resource
    */
-  @Override public boolean isResourceRequest (HttpServletRequest request) {
+  @Override
+	public boolean isResourceRequest (HttpServletRequest request) {
     String resourcePath = ClickUtils.getResourcePath(request);
 
     // If not a click page and not JSP and not a directory
@@ -71,8 +70,8 @@ public class ClickResourceService implements ResourceService {
    * @param response the servlet response
    * @throws IOException if an IO error occurs rendering the resource
    */
-  @Override public void renderResource (HttpServletRequest request, HttpServletResponse response) throws IOException {
-
+  @Override
+	public void renderResource (HttpServletRequest request, HttpServletResponse response) throws IOException {
     String resourcePath = ClickUtils.getResourcePath(request);
 
     byte[] resourceData = resourceCache.get(resourcePath);
@@ -107,10 +106,9 @@ public class ClickResourceService implements ResourceService {
     }
   }
 
-
   /**
    * Store the resource under the given resource path.
-   *
+
    * ! Only cache in production/profile mode !
    *
    * @param resourcePath the path to store the resource under
@@ -129,15 +127,12 @@ public class ClickResourceService implements ResourceService {
    *
    * @param resourcePath the path to the resource to load
    * @return the resource as a byte array
-   * @throws IOException if the resources cannot be loaded
    */
-  private byte[] loadResourceData(String resourcePath) throws IOException {
-
-    byte[] resourceData;
-
+  @Nullable
+	private byte[] loadResourceData(String resourcePath) {
     ServletContext servletContext = configService.getServletContext();
 
-    resourceData = getServletResourceData(servletContext, resourcePath);
+		byte[]resourceData = getServletResourceData(servletContext, resourcePath);
     if (resourceData != null){
       storeResourceData(resourcePath, resourceData);
 
@@ -148,7 +143,6 @@ public class ClickResourceService implements ResourceService {
         storeResourceData(resourcePath, resourceData);
       }
     }
-
     return resourceData;
   }
 
@@ -158,19 +152,17 @@ public class ClickResourceService implements ResourceService {
    * @param servletContext the application servlet context
    * @param resourcePath the path of the resource to load
    * @return the byte array for the given resource path
-   * @throws IOException if the resource could not be loaded
    */
-  private byte[] getServletResourceData (ServletContext servletContext, String resourcePath) throws IOException {
+  @Nullable
+	private byte[] getServletResourceData (ServletContext servletContext, String resourcePath) {
     InputStream inputStream = null;
     try {
-      inputStream = servletContext.getResourceAsStream(resourcePath);
-
-      if (inputStream != null) {
-        return IOUtils.toByteArray(inputStream);
-      } else {
-        return null;
-      }
-
+      inputStream = servletContext.getResourceAsStream(resourcePath);// with starting /
+			if (inputStream == null){ return null; }
+			return inputStream.readAllBytes();// ~ IOUtils.toByteArray(inputStream)
+		} catch (IOException e){
+			log.warn("getServletResourceData: failed to read WEB-INF {} @ {}", resourcePath, servletContext, e);
+			return null;
     } finally {
       ClickUtils.close(inputStream);
     }
@@ -181,21 +173,16 @@ public class ClickResourceService implements ResourceService {
    *
    * @param resourcePath the path of the resource to load
    * @return the byte array for the given resource path
-   * @throws IOException if the resource could not be loaded
    */
-  private byte[] getClasspathResourceData (@NonNull String resourcePath) throws IOException {
-    URL url = ClickUtils.getResource(resourcePath, getClass());
-    if (url == null){ return null;}
-
-    InputStream inputStream = url.openStream();
-    try {
-
-      if (inputStream != null) {
-        return IOUtils.toByteArray(inputStream);
-      } else {
-        return null;
-      }
-
+  @Nullable
+	private byte[] getClasspathResourceData (@NonNull String resourcePath) {
+		InputStream inputStream = ClickUtils.getResourceAsStream(resourcePath, getClass());
+    if (inputStream == null){ return null; }
+		try {
+			return inputStream.readAllBytes();// ~ IOUtils.toByteArray(inputStream)
+		} catch (IOException e){
+			log.warn("getClasspathResourceData: failed to read classpath {}", resourcePath, e);
+			return null;
     } finally {
       ClickUtils.close(inputStream);
     }

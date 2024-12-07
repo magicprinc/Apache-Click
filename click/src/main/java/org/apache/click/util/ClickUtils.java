@@ -92,12 +92,6 @@ public class ClickUtils {
    */
   public static final String ENABLE_RESOURCE_VERSION = "enable-resource-version";
 
-  /**
-   * The default Click configuration filename: &nbsp;
-   * "<tt>/WEB-INF/click.xml</tt>".
-   */
-  private static final String DEFAULT_APP_CONFIG = "/WEB-INF/click.xml";
-
   /** The version indicator separator string. */
   public static final String VERSION_INDICATOR_SEP = "_";
 
@@ -1158,12 +1152,11 @@ public class ClickUtils {
    */
 	@Deprecated(forRemoval = true)
   static InputStream getClickConfig(ServletContext servletContext) {
-    InputStream inputStream = servletContext.getResourceAsStream(DEFAULT_APP_CONFIG);
-
+    InputStream inputStream = servletContext.getResourceAsStream("/WEB-INF/click.xml");
     if (inputStream == null){
-      inputStream = getResourceAsStream("/click.xml", ClickUtils.class);
+      inputStream = getResourceAsStream("click.xml", ClickUtils.class);
       if (inputStream == null){
-        throw new RuntimeException("could not find click app configuration file: "+ DEFAULT_APP_CONFIG + " or click.xml on classpath");
+        throw new RuntimeException("could not find click app configuration file: /WEB-INF/click.xml or click.xml on classpath");
       }
     }
     return inputStream;
@@ -2458,7 +2451,16 @@ To fix, ensure that ClickServlet is loaded at startup by editing your web.xml an
 		InputStream is = aClass.getResourceAsStream(name);
     if (is != null){ return is; }
 
-    return ClickUtils.class.getResourceAsStream(name);
+    is = ClickUtils.class.getResourceAsStream(name);
+		if (is != null){ return is; }
+
+		if (name.startsWith("/WEB-INF/")){// hack old Click to work with Boot
+			is = getResourceAsStream(name.substring(9), aClass);
+			if (is != null){ return is; }
+
+			return getResourceAsStream("META-INF/resources"+name.substring(9), aClass);
+		}
+		return null;// not found anywhere
   }
 
   /**
