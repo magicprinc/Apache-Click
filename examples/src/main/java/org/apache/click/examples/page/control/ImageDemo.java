@@ -1,104 +1,99 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package org.apache.click.examples.page.control;
 
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import org.apache.click.Control;
 import org.apache.click.control.Form;
 import org.apache.click.control.ImageSubmit;
 import org.apache.click.control.Label;
 import org.apache.click.examples.page.BorderPage;
+import org.springframework.context.Lifecycle;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import java.io.Serial;
 
+/** Provides an ImageSubmit control example */
+@Component
+@Slf4j
+public class ImageDemo extends BorderPage implements Lifecycle {
+	@Serial private static final long serialVersionUID = 1L;
+	private final ImageSubmit colorSubmit = new ImageSubmit("save", "/assets/images/colors.gif");
 
-/**
- * Provides an ImageSubmit control example.
- */
-public class ImageDemo extends BorderPage {
+	public ImageDemo() {
+		val form = new Form("form");
+		addControl(form);
+		val buttonsForm = new Form("buttonsForm");
+		addControl(buttonsForm);
 
-    private static final long serialVersionUID = 1L;
+		// Buttons Form
+		val editSubmit = new ImageSubmit("edit", "/assets/images/edit.gif");
+		editSubmit.setActionListener(this::onEditClick);
+		editSubmit.setTitle("🔞 Edit");
+		buttonsForm.add(editSubmit);
 
-    private ImageSubmit colorSubmit;
+		val deleteSubmit = new ImageSubmit("delete", "/assets/images/delete.gif");
+		deleteSubmit.setActionListener(this::onDeleteClick);
+		deleteSubmit.setTitle("✖ Delete");
+		buttonsForm.add(deleteSubmit);
 
-    private Form buttonsForm = new Form("buttonsForm");
-    private Form form = new Form("form");
+		// Colors Form
+		form.add(new Label("label", "<b>Color Chooser</b>"));
 
-    // Constructor ------------------------------------------------------------
+		colorSubmit.setActionListener(this::onColorClick);
+		form.add(colorSubmit);
+	}
 
-    public ImageDemo() {
-        addControl(form);
-        addControl(buttonsForm);
+	public boolean onEditClick (Control source) {
+		addModel("buttonMsg", "Edit");
+		return true;
+	}
 
-        // Buttons Form
-        ImageSubmit editSubmit = new ImageSubmit("edit", "/assets/images/edit.gif");
-        editSubmit.setListener(this, "onEditClick");
-        editSubmit.setTitle("Edit");
-        buttonsForm.add(editSubmit);
+	public boolean onDeleteClick (Control source) {
+		addModel("buttonMsg", "Delete");
+		return true;
+	}
 
-        ImageSubmit deleteSubmit = new ImageSubmit("delete", "/assets/images/delete.gif");
-        deleteSubmit.setListener(this, "onDeleteClick");
-        deleteSubmit.setTitle("Delete");
-        buttonsForm.add(deleteSubmit);
+	public boolean onColorClick (Control source) {
+		int x = colorSubmit.getX();
+		int y = colorSubmit.getY();
+		String color = "no color";
 
-        // Colors Form
-        form.add(new Label("label", "<b>Color Chooser</b>"));
+		if (x > 3 && x < 31){
+			if (y > 3 && y < 31){
+				color = "Red";
+			} else if (y > 44 && y < 71){
+				color = "Green";
+			}
+		} else if (x > 44 && x < 71){
+			if (y > 3 && y < 31){
+				color = "Blue";
+			} else if (y > 44 && y < 71){
+				color = "White";
+			}
+		}
+		addModel("colorMsg", "<b>%s</b>. <p/> [ x=%d, y=%d ]".formatted(color, x, y));
+		return true;
+	}
 
-        colorSubmit = new ImageSubmit("save", "/assets/images/colors.gif");
-        colorSubmit.setListener(this, "onColorClick");
-        form.add(colorSubmit);
-    }
+	@PostConstruct
+	public void afterPropertiesSet () {
+		log.warn("INFO: ImageDemo afterPropertiesSet");
+	}
 
-    // Event Handlers ---------------------------------------------------------
+	@Override
+	public void start () {
+		log.warn("INFO: start ✅ is called");
+	}
 
-    public boolean onEditClick() {
-        addModel("buttonMsg", "Edit");
-        return true;
-    }
+	@Override
+	public void stop () {
+		log.warn("INFO: stop 🛑 is called");
+	}
 
-    public boolean onDeleteClick() {
-        addModel("buttonMsg", "Delete");
-        return true;
-    }
-
-    public boolean onColorClick() {
-        int x = colorSubmit.getX();
-        int y = colorSubmit.getY();
-
-        String color = "no color";
-
-        if (x > 3 && x < 31) {
-            if (y > 3 && y < 31) {
-                color = "Red";
-            } else if (y > 44 && y < 71) {
-                color = "Green";
-            }
-        } else if (x > 44 && x < 71) {
-            if (y > 3 && y < 31) {
-                color = "Blue";
-            } else if (y > 44 && y < 71) {
-                color = "White";
-            }
-        }
-
-        String colorMsg = "<b>" + color + "</b>. <p/> " +
-                          "[ x=" + x + ", y=" + y + " ]";
-
-        addModel("colorMsg", colorMsg);
-
-        return true;
-    }
+	@Override
+	public boolean isRunning () {
+		log.warn("INFO: isRunning ❔ is called");
+		return false;
+	}
 }
