@@ -7,6 +7,7 @@ plugins {
   alias(libs.plugins.grettyWebContainer)
 	alias(libs.plugins.spring.boot)
 	alias(libs.plugins.spring.dependencyManagement)
+	//alias(libs.plugins.ebean)
 
 	alias(libs.plugins.lombok)
 	alias(libs.plugins.sonarlint)
@@ -26,6 +27,7 @@ repositories {
     url "https://repository.jboss.org/nexus/content/repositories/thirdparty-releases/"
   }
   mavenCentral()
+	maven { url 'https://jitpack.io' }
 }
 
 dependencyManagement {
@@ -74,7 +76,6 @@ dependencies {
   implementation("hsqldb:hsqldb:1.8.0.10")
   implementation("javax.servlet:jstl:1.1.2")
   implementation("opensymphony:oscache:2.4.1")// "javax.jms:jms:1.1"
-  implementation("taglibs:standard:1.1.2")
 
 	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
@@ -82,6 +83,13 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-rest'
 	implementation 'org.springframework.boot:spring-boot-starter-freemarker'
 	implementation 'org.springframework.boot:spring-boot-starter-logging'
+//	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+//	implementation(libs.jdbc.h2)
+//	implementation('com.github.magicprinc:hibean:1.8.3')
+//	implementation("io.ebean:ebean-querybean:latest.release")
+//	implementation("io.ebean:ebean-platform-h2:latest.release")
+//	implementation(libs.bundles.jackson)
+//	annotationProcessor("io.ebean:querybean-generator:latest.release")
 	implementation libs.logback
 	implementation(libs.springBootStarterValidation, libs.springBootStarterWeb, libs.bundles.upgradeBootApp)
 	implementation("org.apache.tomcat.embed:tomcat-embed-core:9.0.+", "org.apache.tomcat.embed:tomcat-embed-el:9.0.+", "org.apache.tomcat.embed:tomcat-embed-websocket:9.0.+")
