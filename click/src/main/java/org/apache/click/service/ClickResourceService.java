@@ -81,6 +81,8 @@ public class ClickResourceService implements ResourceService {
 
       if (resourceData == null){
         response.sendError(HttpServletResponse.SC_NOT_FOUND);
+				if (log.isDebugEnabled())
+					log.debug("handleRequest: NOT FOUND {} {} → {}", request.getMethod(), request.getRequestURL(), resourcePath);
         return;
       }
     }
@@ -90,17 +92,14 @@ public class ClickResourceService implements ResourceService {
       response.setContentType(mimeType);
     }
 
-    if (log.isDebugEnabled()){
-      log.debug("handleRequest: {} {}", request.getMethod(), request.getRequestURL());
-    }
+    if (log.isDebugEnabled())
+      log.debug("handleRequest: {} {} → {}:{} L:{}", request.getMethod(), request.getRequestURL(), resourcePath, mimeType, resourceData.length);
     // renderResource(response, resourceData)
     OutputStream outputStream = null;
     try {
       response.setContentLength(resourceData.length);
-
       outputStream = response.getOutputStream();
       outputStream.write(resourceData);
-
     } finally {
       ClickUtils.flush(outputStream);
     }
