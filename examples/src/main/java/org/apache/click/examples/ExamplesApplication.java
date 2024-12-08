@@ -38,11 +38,8 @@ public class ExamplesApplication implements WebMvcConfigurer, Lifecycle {
   }
 	private static final String[] CLASSPATH_RESOURCE_LOCATIONS = {
 			"classpath:/META-INF/resources/",// todo classpath*:
-			//"classpath:/META-INF/resources/click/",
 			"classpath:/resources/",
-			//"classpath:/resources/click/",
 			"classpath:/static/",
-			//"classpath:/static/click/",
 			"classpath:/public/"
 	};
 

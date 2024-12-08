@@ -709,12 +709,17 @@ public class ClickUtilsTest extends TestCase {
 		assertEquals("click-page.properties", fileName(getClass().getResource("/click-page.properties")));
 		assertEquals("click-page.properties", fileName(ClickUtils.getResource("/WEB-INF/click-page.properties", getClass())));
 
-		assertNull("click-page.properties", ClickUtils.getResource("static/testResAbs.xxx", getClass()));// not found (not exists)
+		assertNull(ClickUtils.getResource("static/testResAbs.xxx", getClass()));// not found (not exists)
 
-		assertEquals("testResAbs.txt", fileName(ClickUtils.getResource("static/testResAbs.txt", getClass())));
-		assertEquals("TestPage.properties", fileName(ClickUtils.getResource("TestPage.properties", getClass())));
+		assertEquals("testResAbs.txt", fileName(ClickUtils.getResource("static/testResAbs.txt", getClass())));// click/src/test/resources/static/testResAbs.txt
+		assertEquals("testResAbs.txt", fileName(ClickUtils.getResource("WEB-INF/static/testResAbs.txt", getClass())));
+		assertEquals("TestPage.properties", fileName(ClickUtils.getResource("TestPage.properties", getClass())));// resources/org/apache/click/util/TestPage.properties
 
-		assertEquals("table.css", fileName(ClickUtils.getResource("/WEB-INF/click/table.css", getClass())));
+		assertEquals("table.css", fileName(ClickUtils.getResource("/WEB-INF/click/table.css", getClass())));// click/src/main/resources/META-INF/resources/click/table.css
+		assertEquals("table.css", fileName(ClickUtils.getResource("WEB-INF/click/table.css", getClass())));
+		assertEquals("table.css", fileName(ClickUtils.getResource("/click/table.css", getClass())));
+		assertEquals("table.css", fileName(ClickUtils.getResource("click/table.css", getClass())));
+		assertEquals("table.css", fileName(ClickUtils.getResource("META-INF/resources/click/table.css", getClass())));
 	}
 
 	public void testGetResourceAsStream () throws IOException {
@@ -727,7 +732,7 @@ public class ClickUtilsTest extends TestCase {
 		assertNull(getClass().getResourceAsStream("click-page.properties"));// Class supports relative and /absolute
 		assertEquals("version=Version 0.21", IOUtils.toString(getClass().getResourceAsStream("/click-page.properties")));
 
-		assertNull("click-page.properties", ClickUtils.getResourceAsStream("static/testResAbs.xxx", getClass()));// not found (not exists)
+		assertNull(ClickUtils.getResourceAsStream("static/testResAbs.xxx", getClass()));// not found (not exists)
 
 		assertEquals("ABS", IOUtils.toString(ClickUtils.getResourceAsStream("static/testResAbs.txt", getClass())));
 		assertEquals("title=Title", IOUtils.toString(ClickUtils.getResourceAsStream("TestPage.properties", getClass())));
@@ -736,6 +741,6 @@ public class ClickUtilsTest extends TestCase {
 		assertTrue(IOUtils.toString(ClickUtils.getResourceAsStream("/WEB-INF/click/table.css", getClass())).contains("table.blue1"));
 		assertTrue(IOUtils.toString(ClickUtils.getResourceAsStream("WEB-INF/click/table.css", getClass())).contains("table.blue1"));
 		assertTrue(IOUtils.toString(ClickUtils.getResourceAsStream("/click/table.css", getClass())).contains("table.blue1"));
-		assertTrue(IOUtils.toString(ClickUtils.getResourceAsStream("click/table.css", getClass())).contains("table.blue1"));
+		assertTrue(IOUtils.toString(ClickUtils.getResourceAsStream("click/table.css", getClass())).contains("table.blue1"));// click/src/main/resources/META-INF/resources/click/table.css
 	}
 }

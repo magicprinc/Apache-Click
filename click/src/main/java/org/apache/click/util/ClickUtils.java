@@ -2417,19 +2417,28 @@ To fix, ensure that ClickServlet is loaded at startup by editing your web.xml an
   }
 
   /**
-   * Finds a resource with a given name. This method returns {@code null} if no resource with this name is found.
-   * <p>
-   * This method uses the current <tt>Thread</tt> context <tt>ClassLoader</tt> to find the resource.
-	 * If the resource is not found the class loader of the given class is then used to find the resource.
+	 Finds a resource with a given name. This method returns {@code null} if no resource with this name is found.
+	 <p>
+	 This method uses the current <tt>Thread</tt> context <tt>ClassLoader</tt> to find the resource.
+	 If the resource is not found the class loader of the given class is then used to find the resource.
 
-   * @param name the name of the resource
-   * @param aClass the class lookup the resource against, if the resource is not found using the current <tt>Thread</tt> context <tt>ClassLoader</tt>.
-   * @return the input stream of the resource if found or {@code null} otherwise
+	 💡 to do Spring and SmallRyeConfig have very advanced functions to find/work with resources!
+
+	 @param name the name of the resource
+	 @param aClass the class lookup the resource against, if the resource is not found using the current <tt>Thread</tt> context <tt>ClassLoader</tt>.
+	 @return the input stream of the resource if found or {@code null} otherwise
+	 @see Class#getResourceAsStream(String)
+	 @see ClassLoader#getResourceAsStream(String)
+	 @see ClassLoader#getSystemResourceAsStream(String)
+	 @see javax.servlet.ServletContext#getResourceAsStream(String)
    */
   @Nullable
 	public static InputStream getResourceAsStream (String name, Class<?> aClass) {
-		if (StringUtils.isEmpty(name)){ return null; }// no resource
-		if (aClass == null){ aClass = ClickUtils.class; }
+		if (StringUtils.isEmpty(name)){
+			return null;// no resource
+		} else if (aClass == null){
+			aClass = ClickUtils.class;// fallback to this lib classloader
+		}
 		name = name.trim().replace('\\','/');
 		if (name.startsWith("/")){
 			log.warn("getResourceAsStream: `name` must be relative, but: {} @ {}", name, aClass);
@@ -2451,14 +2460,17 @@ To fix, ensure that ClickServlet is loaded at startup by editing your web.xml an
 		InputStream is = aClass.getResourceAsStream(name);
 		if (is != null){ return is; }
 
+		is = ClassLoader.getSystemResourceAsStream(name);
+		if (is != null){ return is; }
+
 		if (name.startsWith("WEB-INF/")){// hack old Click to work with Boot ?WEB-INF/classes
 			return getResourceAsStream(name.substring(8), aClass);// no more WEB-INF ⇒ resource in /resources?
 		} else if (!name.startsWith(WEB_INF_CLASSPATH)){// try in pseudo "/WEB-INF/" ~ replace "/WEB-INF/" with real servlet-container location of resources
 			return getResourceAsStream(WEB_INF_CLASSPATH+ name, aClass);
 		}
-		return ClassLoader.getSystemResourceAsStream(name);// not found anywhere
+		return null;// not found anywhere
 	}
-	public static final String WEB_INF_CLASSPATH = "META-INF/resources/";
+	public static final String WEB_INF_CLASSPATH = "META-INF/resources/";// servlet container 3.0+ docroot
 
   /**
 	 Get best ClassLoader.
@@ -2484,36 +2496,40 @@ To fix, ensure that ClickServlet is loaded at startup by editing your web.xml an
    * @return the URL of the resource if found or null otherwise
    */
   @Nullable
-	public static URL getResource (@NonNull String name, Class<?> aClass) {
-		if (name.startsWith("/")){
-			log.warn("getResource: name must be relative, but: {} @ {}", name, aClass);
-			name = name.substring(1);
+	public static URL getResource (String name, Class<?> aClass) {
+		if (StringUtils.isEmpty(name)){
+			return null;// no resource
+		} else if (aClass == null){
+			aClass = ClickUtils.class;// fallback to this lib classloader
 		}
-    val classLoader = Thread.currentThread().getContextClassLoader();
-    if (classLoader != null){//1 current thread ClassLoader
-			URL url = classLoader.getResource(name);// resource must be absolute without leading /
-      if (url != null){ return url; }
-    }
-		if (aClass != null){//2 caller class ClassLoader
-			val cl2 = aClass.getClassLoader();
-			if (cl2 != classLoader){
-				URL url = cl2.getResource(name);// ^ but another classLoader
-				if (url != null){ return url; }
-			}
-
-			// relative?
-			URL url = aClass.getResource(name);//3 caller class
+		name = name.trim().replace('\\','/');
+		if (name.startsWith("/")){
+			log.warn("getResource: `name` must be relative, but: {} @ {}", name, aClass);
+			name = name.substring(1);// ~ /WEB-INF/foo ~cut/~> WEB-INF/foo
+		}
+		val threadClassLoader = Thread.currentThread().getContextClassLoader();
+		if (threadClassLoader != null){
+			val url = threadClassLoader.getResource(name);
 			if (url != null){ return url; }
 		}
-		URL url = ClickUtils.class.getResource(name);//4 click-lib class
+
+		val classClassLoader = aClass.getClassLoader();
+		if (threadClassLoader != classClassLoader){
+			val url = classClassLoader.getResource(name);
+			if (url != null){ return url; }
+		}
+
+		// relative?
+		URL url = aClass.getResource(name);
 		if (url != null){ return url; }
 
-		if (name.startsWith("WEB-INF/")){// hack old Click to work with Boot
-			name = name.substring(8);// ^ cut
-			url = getResource(name, aClass);
-			if (url != null){ return url; }
+		url = ClassLoader.getSystemResource(name);
+		if (url != null){ return url; }
 
-			return getResource("META-INF/resources/"+name, aClass);
+		if (name.startsWith("WEB-INF/")){// hack old Click to work with Boot ?WEB-INF/classes
+			return getResource(name.substring(8), aClass);// no more WEB-INF ⇒ resource in /resources?
+		} else if (!name.startsWith(WEB_INF_CLASSPATH)){// try in pseudo "/WEB-INF/" ~ replace "/WEB-INF/" with real servlet-container location of resources
+			return getResource(WEB_INF_CLASSPATH+ name, aClass);
 		}
 		return null;// not found anywhere
   }
