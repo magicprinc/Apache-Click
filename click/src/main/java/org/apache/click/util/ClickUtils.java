@@ -2427,37 +2427,38 @@ To fix, ensure that ClickServlet is loaded at startup by editing your web.xml an
    * @return the input stream of the resource if found or {@code null} otherwise
    */
   @Nullable
-	public static InputStream getResourceAsStream (@NonNull String name, @NonNull Class<?> aClass) {
+	public static InputStream getResourceAsStream (String name, Class<?> aClass) {
+		if (StringUtils.isEmpty(name)){ return null; }// no resource
+		if (aClass == null){ aClass = ClickUtils.class; }
+		name = name.trim().replace('\\','/');
 		if (name.startsWith("/")){
-			log.warn("getResourceAsStream: name must be relative, but: {} @ {}", name, aClass);
-			name = name.substring(1);// ~ /WEB-INF/foo ~ WEB-INF/foo
+			log.warn("getResourceAsStream: `name` must be relative, but: {} @ {}", name, aClass);
+			name = name.substring(1);// ~ /WEB-INF/foo ~cut/~> WEB-INF/foo
 		}
-    val classLoader = Thread.currentThread().getContextClassLoader();
-    if (classLoader != null){
-			InputStream is = classLoader.getResourceAsStream(name);
-      if (is != null){ return is; }
-    }
-
-		val cl2 = aClass.getClassLoader();
-		if (classLoader != cl2){
-			InputStream is = cl2.getResourceAsStream(name);
+		val threadClassLoader = Thread.currentThread().getContextClassLoader();
+		if (threadClassLoader != null){
+			val is = threadClassLoader.getResourceAsStream(name);
 			if (is != null){ return is; }
 		}
 
-    // relative?
-		InputStream is = aClass.getResourceAsStream(name);
-    if (is != null){ return is; }
+		val classClassLoader = aClass.getClassLoader();
+		if (threadClassLoader != classClassLoader){
+			val is = classClassLoader.getResourceAsStream(name);
+			if (is != null){ return is; }
+		}
 
-    is = ClickUtils.class.getResourceAsStream(name);// fallback to lib class loader
+		// relative?
+		InputStream is = aClass.getResourceAsStream(name);
 		if (is != null){ return is; }
 
 		if (name.startsWith("WEB-INF/")){// hack old Click to work with Boot ?WEB-INF/classes
 			return getResourceAsStream(name.substring(8), aClass);// no more WEB-INF ⇒ resource in /resources?
-		} else if (!name.startsWith("META-INF/resources/")){// try in pseudo "/WEB-INF/" ~ replace "/WEB-INF/" with real servlet-container location of resources
-			return getResourceAsStream("META-INF/resources/"+ name, aClass);
+		} else if (!name.startsWith(WEB_INF_CLASSPATH)){// try in pseudo "/WEB-INF/" ~ replace "/WEB-INF/" with real servlet-container location of resources
+			return getResourceAsStream(WEB_INF_CLASSPATH+ name, aClass);
 		}
-		return null;// not found anywhere
-  }
+		return ClassLoader.getSystemResourceAsStream(name);// not found anywhere
+	}
+	public static final String WEB_INF_CLASSPATH = "META-INF/resources/";
 
   /**
 	 Get best ClassLoader.
@@ -2587,7 +2588,7 @@ To fix, ensure that ClickServlet is loaded at startup by editing your web.xml an
           + " name has not been set. State cannot be saved until the name is set");
     }
     String resourcePath = context.getResourcePath();
-    Map pageMap = getOrCreatePageState(resourcePath, context);
+    val pageMap = getOrCreatePageState(resourcePath, context);
     Object state = control.getState();
     if (state == null) {
       // Set null state to see if it differs from previous state
@@ -2616,7 +2617,6 @@ To fix, ensure that ClickServlet is loaded at startup by editing your web.xml an
   public static String toPropertyName (String prefix, String propertyName) {
     return prefix + toUpperCase(propertyName.charAt(0)) + propertyName.substring(1);
   }
-
 
   /**
    * Return a field label string from the given field name. For example:
@@ -2658,7 +2658,6 @@ To fix, ensure that ClickServlet is loaded at startup by editing your web.xml an
         }
       }
     }
-
     return buffer.toString();
   }
 
@@ -3102,9 +3101,9 @@ To fix, ensure that ClickServlet is loaded at startup by editing your web.xml an
    * @return the map where page state is stored in
    */
   private static Map getOrCreatePageState(String pagePath, Context context) {
-    Map pageMap = getPageState(pagePath, context);
+    var pageMap = getPageState(pagePath, context);
     if (pageMap == null) {
-      pageMap = new HashMap();
+      pageMap = new HashMap<>();
     }
     return pageMap;
   }
@@ -3205,8 +3204,8 @@ To fix, ensure that ClickServlet is loaded at startup by editing your web.xml an
         : str.length();
   }
 
-
-  public static @Nullable String sysEnv (CharSequence key){
+  @Nullable
+	public static String sysEnv (CharSequence key){
     val name = trim(key);  String v;
     // system properties -Dkey_name=key_value  Gradle? -P
     try {
