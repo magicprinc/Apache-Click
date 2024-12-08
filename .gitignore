@@ -15,6 +15,7 @@ build/
 !**/src/test/**/build/
 
 dist/
+bin/
 
 ### Maven ###
 target/
