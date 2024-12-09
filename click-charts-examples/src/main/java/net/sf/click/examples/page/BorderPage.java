@@ -6,10 +6,11 @@ import org.apache.click.extras.control.Menu;
 import org.apache.click.extras.control.MenuFactory;
 import org.apache.click.util.ClickUtils;
 
+import java.io.Serial;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class BorderPage extends Page {
-  private static final long serialVersionUID = 3721746656550335085L;
+  @Serial private static final long serialVersionUID = 3721746656550335085L;
 
   private final Menu rootMenu = new MenuFactory().getRootMenu();
 
@@ -17,8 +18,7 @@ public class BorderPage extends Page {
     return null;// HomePage, etc
   }
 
-
-  public BorderPage() {
+  public BorderPage () {
     String className = getClass().getName();
 
     String shortName = className.substring(className.lastIndexOf('.') + 1);
@@ -29,13 +29,14 @@ public class BorderPage extends Page {
     addModel("srcPath", srcPath);
 
     addControl(rootMenu);
-  }
+  }//new
 
   /** @see #getTemplate() */
   @Override public String getTemplate (){ return "border-template.htm"; }
 
   /** @see org.apache.click.Page#onInit() */
-  @Override public void onInit() {
+  @Override
+	public void onInit() {
     super.onInit();
 
     var chart = getChart();
