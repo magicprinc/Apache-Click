@@ -52,17 +52,16 @@ dependencies {
 
 	compileOnly libs.javaxServletApi
 
-  api(libs.slf4jApi, libs.slf4jJCL, libs.slf4jLog4j)
+	compileOnly(libs.slf4jApi)
 
   api 'org.mvel:mvel2:latest.release'// 2.4.14
-  api(libs.caffeine)
-  api(libs.guava)
+  api(libs.caffeine, libs.guava)
 
   api libs.commonsLang3, libs.apacheCommonsIo, libs.apacheCommonsFileUpload
 
-  //*** TEST TEST TEST
-
+  //*** TEST TEST TEST ***
   testImplementation libs.bundles.junit
+	testImplementation(libs.bundles.slf4j)
 
   testRuntimeOnly libs.slf4jSimple
 	testImplementation libs.javaxServletApi
@@ -102,7 +101,6 @@ test {
   systemProperty("file.encoding", "UTF-8")
   System.setProperty("file.encoding", "UTF-8")
   systemProperty("user.language", "en")
-  Locale.setDefault(new Locale("en", "US"));
 }
 lombok { version = "latest.release" }
 //sonarLint { ignoreFailures = true }
