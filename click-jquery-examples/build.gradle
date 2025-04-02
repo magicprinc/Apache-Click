@@ -7,7 +7,7 @@ plugins {
   alias(libs.plugins.grettyWebContainer)
 
 	alias(libs.plugins.lombok)
-	alias(libs.plugins.sonarlint)
+	//alias(libs.plugins.sonarlint)
 	alias(libs.plugins.errorprone)
 }
 
@@ -33,7 +33,7 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 dependencies {
-  errorprone "com.google.errorprone:error_prone_core:latest.release"
+  errorprone "com.google.errorprone:error_prone_core:2.36.0"
 
 	compileOnly libs.javaxServletApi
 
@@ -81,17 +81,6 @@ test {
   Locale.setDefault(new Locale("en", "US"));
 }
 lombok { version = "latest.release" }
-sonarLint { ignoreFailures = true }
-tasks.named("sonarlintMain").configure {
-	onlyIf { // gradle build -Psonarlint=true  -or- -Dsonarlint=true
-		(project.hasProperty('sonarlint') && 'true'.equalsIgnoreCase(project.property('sonarlint').toString())) || 'true'.equalsIgnoreCase(System.getProperty('sonarlint'))
-	}
-}
-tasks.named("sonarlintTest").configure {
-	onlyIf {
-		(project.hasProperty('sonarlint') && 'true'.equalsIgnoreCase(project.property('sonarlint').toString())) || 'true'.equalsIgnoreCase(System.getProperty('sonarlint'))
-	}
-}
 
 gretty {// https://gretty-gradle-plugin.github.io/gretty-doc/Switching-between-servlet-containers.html
 	servletContainer = 'tomcat9'

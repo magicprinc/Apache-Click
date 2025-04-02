@@ -10,7 +10,7 @@ plugins {
 	//alias(libs.plugins.ebean)
 
 	alias(libs.plugins.lombok)
-	alias(libs.plugins.sonarlint)
+	//alias(libs.plugins.sonarlint)
 	alias(libs.plugins.errorprone)
 	alias(libs.plugins.gradleGitProperties)
 }
@@ -21,13 +21,13 @@ repositories {
   mavenLocal()
   jcenter() // helps with JMS!
   maven {
-    url "https://repository.jboss.org/maven2" // "https://repository.jboss.org/nexus/content/groups/public"
+    url = "https://repository.jboss.org/maven2" // "https://repository.jboss.org/nexus/content/groups/public"
   }
   maven {
-    url "https://repository.jboss.org/nexus/content/repositories/thirdparty-releases/"
+    url = "https://repository.jboss.org/nexus/content/repositories/thirdparty-releases/"
   }
   mavenCentral()
-	maven { url 'https://jitpack.io' }
+	maven { url = 'https://jitpack.io' }
 }
 
 dependencyManagement {
@@ -54,7 +54,7 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 dependencies {
-  errorprone "com.google.errorprone:error_prone_core:latest.release"
+  errorprone "com.google.errorprone:error_prone_core:2.36.0"
 
   implementation(libs.javax.annotationApi) // @Resource
 	implementation(libs.slf4jApi, libs.slf4jJCL, libs.slf4jLog4j)
@@ -128,20 +128,8 @@ test {
 
   systemProperty("file.encoding", "UTF-8")
   systemProperty("user.language", "en")
-  Locale.setDefault(new Locale("en", "US"));
 }
 lombok { version = "latest.release" }
-sonarLint { ignoreFailures = true }
-tasks.named("sonarlintMain").configure {
-	onlyIf { // gradle build -Psonarlint=true  -or- -Dsonarlint=true
-		(project.hasProperty('sonarlint') && 'true'.equalsIgnoreCase(project.property('sonarlint').toString())) || 'true'.equalsIgnoreCase(System.getProperty('sonarlint'))
-	}
-}
-tasks.named("sonarlintTest").configure {
-	onlyIf {
-		(project.hasProperty('sonarlint') && 'true'.equalsIgnoreCase(project.property('sonarlint').toString())) || 'true'.equalsIgnoreCase(System.getProperty('sonarlint'))
-	}
-}
 
 gretty {// https://gretty-gradle-plugin.github.io/gretty-doc/Switching-between-servlet-containers.html
 	servletContainer = 'tomcat9'
