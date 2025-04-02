@@ -12,6 +12,7 @@ import freemarker.template.TemplateExceptionHandler;
 import freemarker.template.TemplateModel;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -19,9 +20,10 @@ import org.apache.click.service.ConfigService;
 import org.apache.click.service.TemplateService;
 import org.apache.click.util.ClickUtils;
 import org.springframework.beans.factory.BeanFactoryUtils;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.web.context.ContextLoader;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.context.WebApplicationContext;
 
 import javax.servlet.ServletContext;
 import java.io.File;
@@ -42,6 +44,8 @@ import java.util.Map;
  */
 @Slf4j
 public class FreemarkerTemplateServiceSpring extends FreemarkerTemplateService {
+	@Setter private ApplicationContext applicationContext;
+
   /**
    * @see TemplateService#onInit(javax.servlet.ServletContext)
    *
@@ -109,18 +113,21 @@ public class FreemarkerTemplateServiceSpring extends FreemarkerTemplateService {
 			log.warn("onInit: can't wrap ServletContext {}. {}", servletContext, this, e);
     }
 
-    var ctx = WebApplicationContextUtils.getWebApplicationContext(servletContext);
-		if (ctx == null){
-			ctx = ContextLoader.getCurrentWebApplicationContext();
+		if (applicationContext == null){
+			// WebApplicationContextUtils.getWebApplicationContext(servletContext):
+			applicationContext = (ApplicationContext) servletContext.getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);
+
+			if (applicationContext == null)
+					applicationContext = ContextLoader.getCurrentWebApplicationContext();
 		}
-    if (ctx != null){
-      try { //регистрируем ${Spring.freemarkerConfigurationBase.defaultEncoding}, Sql("")
-        Map<String,TemplateModel> tmm = BeanFactoryUtils.beansOfTypeIncludingAncestors(ctx, TemplateModel.class, true, false);
+    if (applicationContext != null){
+      try {// register ${Spring.freemarkerConfigurationBase.defaultEncoding}, Sql("")
+        Map<String,TemplateModel> tmm = BeanFactoryUtils.beansOfTypeIncludingAncestors(applicationContext, TemplateModel.class, true, false);
         for (var tm : tmm.entrySet()){
           configuration.setSharedVariable(tm.getKey().trim(), tm.getValue());
         }
-				configuration.setSharedVariable("spring", ctx);
-        ctx.publishEvent(new FTLSvcConfiguredAppEvent(this, configuration, configService));
+				configuration.setSharedVariable("spring", applicationContext);
+				applicationContext.publishEvent(new FTLSvcConfiguredAppEvent(this, configuration, configService));
       } catch (Exception ignore){}
     }//i !null
 
