@@ -12,7 +12,7 @@ spaces_around_operators = true
 tab_width = 2
 indent_size = 2
 
-ij_continuation_indent_size = 4
+ij_continuation_indent_size = 2
 ij_any_align_multiline_parameters = false
 
 [*.yaml]
